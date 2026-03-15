@@ -1,0 +1,20 @@
+import { ApiError } from "./ApiErrors";
+
+export const dbErrorHandler = (err: any): ApiError => {
+  console.error('Database error:', err);
+  
+
+  if (err.code === "23505") {
+    throw new ApiError(409, "Duplicate value");
+  }
+
+  if (err.code === "23503") {
+    throw new ApiError(400, "Foreign key violation");
+  }
+
+  if (err.code === "23502") {
+    throw new ApiError(400, "Missing required field");
+  }
+
+  throw new ApiError(500, "Database error");
+};
