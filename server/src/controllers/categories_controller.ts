@@ -65,7 +65,8 @@ export const _createUserCategory = async (req: Request, res: Response) => {
 };
 
 export const _updateUserCategory = async (req: Request, res: Response) => {
-  const {user_category_id, ...updatedCategory } = req.body as ReqUpdateUserCategorySchema & { user_category_id: number };
+  const updatedCategory = req.body as ReqUpdateUserCategorySchema;
+  const user_category_id = parseInt(req.params.id as string);
     try {  
         const updatedUserCategory = await updateUserCategory(user_category_id, updatedCategory);
 
@@ -84,7 +85,7 @@ export const _updateUserCategory = async (req: Request, res: Response) => {
 };
 
 export const _deleteUserCategory = async (req: Request, res: Response) => {
-    const  user_category_id  = req.body?.user_category_id as number ;
+    const  user_category_id  = parseInt(req.params.id as string); ;
 
     try {
         await deleteUserCategory(user_category_id);

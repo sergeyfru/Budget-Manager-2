@@ -1,13 +1,18 @@
 import { z } from "zod";
 import { ApiError } from "../errors/ApiErrors";
+import { create } from "node:domain";
 
 export const currencySchema = z.object({
   currency_id: z.number(),
   currency_code: z.string(),
   currency_symbol: z.string().nullable(),
   currency_name: z.string(),
+  created_at: z.date().optional(),
 });
 export type CurrencySchema = z.infer<typeof currencySchema>;
+
+export const currenciesArrDBSchema = z.array(currencySchema);
+export type CurrenciesArrDBSchema = z.infer<typeof currenciesArrDBSchema>;
 
 export const transactionTypeSchema = z.object({
   id: z.number(),
@@ -111,8 +116,25 @@ export type ReqUpdateTransactionSchema = z.infer<
 >;
 
 
-// ### Categories 
+export const transactionTypeDBSchema = z.object({
+  transaction_type_id: z.number(),
+  transaction_type_name: z.string(),
+  transaction_type_direction: z.enum(["in", "out"]),
+  transaction_type_icon: z.string().nullable(),
+  transaction_type_color: z.string(),
+});
 
+export type TransactionTypeDBSchema = z.infer<typeof transactionTypeDBSchema>;
+
+export const transactionTypesArrDBSchema = z.array(transactionTypeDBSchema);
+
+export type TransactionTypesArrDBSchema = z.infer<
+  typeof transactionTypesArrDBSchema
+>;
+
+
+
+// ### Categories
 
 export const defaultCategoryTypeDBSchema = z.object({
   category_type_id: z.number(),
@@ -121,13 +143,17 @@ export const defaultCategoryTypeDBSchema = z.object({
   category_type_color: z.string(),
 });
 
-export type DefaultCategoryTypeDBSchema = z.infer<typeof defaultCategoryTypeDBSchema>;
+export type DefaultCategoryTypeDBSchema = z.infer<
+  typeof defaultCategoryTypeDBSchema
+>;
 
-export const defaultCategoryTypesArrDBSchema = z.array(defaultCategoryTypeDBSchema);
+export const defaultCategoryTypesArrDBSchema = z.array(
+  defaultCategoryTypeDBSchema,
+);
 
-export type DefaultCategoryTypesArrDBSchema = z.infer<typeof defaultCategoryTypesArrDBSchema>;
-
-
+export type DefaultCategoryTypesArrDBSchema = z.infer<
+  typeof defaultCategoryTypesArrDBSchema
+>;
 
 export const userCategoryDBSchema = z.object({
   user_category_id: z.number(),
@@ -142,14 +168,23 @@ export type UserCategoryDBSchema = z.infer<typeof userCategoryDBSchema>;
 
 export const userCategoriesArrDBSchema = z.array(userCategoryDBSchema);
 
-export type UserCategoriesArrDBSchema = z.infer<typeof userCategoriesArrDBSchema>;
+export type UserCategoriesArrDBSchema = z.infer<
+  typeof userCategoriesArrDBSchema
+>;
 
-export const reqCreateUserCategorySchema = userCategoryDBSchema
-  .omit({ user_category_id: true});
-export type ReqCreateUserCategorySchema = z.infer<typeof reqCreateUserCategorySchema>;
+export const reqCreateUserCategorySchema = userCategoryDBSchema.omit({
+  user_category_id: true,
+});
+export type ReqCreateUserCategorySchema = z.infer<
+  typeof reqCreateUserCategorySchema
+>;
 
-export const reqUpdateUserCategorySchema = reqCreateUserCategorySchema.partial().omit({ user_id: true, category_type_id: true , created_at: true});
-export type ReqUpdateUserCategorySchema = z.infer<typeof reqUpdateUserCategorySchema>;
+export const reqUpdateUserCategorySchema = reqCreateUserCategorySchema
+  .partial()
+  .omit({ user_id: true, category_type_id: true, created_at: true });
+export type ReqUpdateUserCategorySchema = z.infer<
+  typeof reqUpdateUserCategorySchema
+>;
 
 // ### Payment Methods
 
@@ -158,43 +193,52 @@ export const defaultPaymentMethodTypeDBSchema = z.object({
   payment_method_type_name: z.string(),
   payment_method_type_icon: z.string().nullable(),
   payment_method_type_color: z.string(),
-})
-export type DefaultPaymentMethodTypeDBSchema = z.infer<typeof defaultPaymentMethodTypeDBSchema>;
+});
+export type DefaultPaymentMethodTypeDBSchema = z.infer<
+  typeof defaultPaymentMethodTypeDBSchema
+>;
 
-export const defaultPaymentMethodTypesArrDBSchema = z.array(defaultPaymentMethodTypeDBSchema);
+export const defaultPaymentMethodTypesArrDBSchema = z.array(
+  defaultPaymentMethodTypeDBSchema,
+);
 
-export type DefaultPaymentMethodTypesArrDBSchema = z.infer<typeof defaultPaymentMethodTypesArrDBSchema>;
-
+export type DefaultPaymentMethodTypesArrDBSchema = z.infer<
+  typeof defaultPaymentMethodTypesArrDBSchema
+>;
 
 export const userPaymentMethodDBSchema = z.object({
   user_payment_method_id: z.number(),
   user_id: z.number(),
   payment_method_type_id: z.number(),
+  user_payment_method_name: z.string(),
   user_payment_method_icon: z.string().nullable(),
   user_payment_method_color: z.string(),
   user_payment_method_details: z.string(),
+  created_at: z.date().optional(),
 });
 
-
-export type UserPaymentMethodDBSchema = z.infer<typeof userPaymentMethodDBSchema>;
+export type UserPaymentMethodDBSchema = z.infer<
+  typeof userPaymentMethodDBSchema
+>;
 
 export const userPaymentMethodsArrDBSchema = z.array(userPaymentMethodDBSchema);
 
-export type UserPaymentMethodsArrDBSchema = z.infer<typeof userPaymentMethodsArrDBSchema>;
+export type UserPaymentMethodsArrDBSchema = z.infer<
+  typeof userPaymentMethodsArrDBSchema
+>;
 
-//   data: any,
-// ): UserPaymentMethodsArrDBSchema => {
-//   try {
-//     const response = userPaymentMethodsArrDBSchema.safeParse(data);
-//     if (!response.success) {
-//       console.error("❌ Invalid user payment methods:", response.error);
-//       throw new ApiError(500, "Invalid DB response: user payment methods");
-//     }
+export const reqCreateUserPaymentMethodSchema = userPaymentMethodDBSchema.omit({
+  user_payment_method_id: true,
+});
 
-//     console.log("✅ Valid User Payment Methods:", response.data);
-//     return response.data;
-//   } catch (err) {
-//     console.error(err)
-//     throw err;
-//   }
-// };
+export type ReqCreateUserPaymentMethodSchema = z.infer<
+  typeof reqCreateUserPaymentMethodSchema
+>;
+
+export const reqUpdateUserPaymentMethodSchema = reqCreateUserPaymentMethodSchema
+  .partial()
+  .omit({ user_id: true, payment_method_type_id: true, created_at: true });
+
+export type ReqUpdateUserPaymentMethodSchema = z.infer<
+  typeof reqUpdateUserPaymentMethodSchema
+>;

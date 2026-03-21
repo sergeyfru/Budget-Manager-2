@@ -6,8 +6,10 @@ import {
   ReqAddTransactionSchema,
   ReqUpdateTransactionSchema,
   TransactionFullSchema,
+  TransactionTypesArrDBSchema,
   TransactionsResponseSchema,
   transactionFullSchema,
+  transactionTypesArrDBSchema,
   transactionsResponseArraySchema,
 } from "../schemas/transaction_schema";
 import { getTransactionsQuery } from "../db/queries";
@@ -143,3 +145,20 @@ export const deleteTransaction = async (transaction_id: number): Promise<void> =
     throw dbErrorHandler(error);
   }
 };
+
+export const getTransactionTypes = async (): Promise<TransactionTypesArrDBSchema> => {
+  try {
+    const responseFromDB = await db("transaction_types").select(
+      "transaction_type_id",
+      "transaction_type_name",
+      "transaction_type_direction",
+      "transaction_type_icon",
+      "transaction_type_color",
+    );
+
+    const transactionTypes = validateDB(transactionTypesArrDBSchema, responseFromDB);
+    return transactionTypes;
+  } catch (error) {
+    throw dbErrorHandler(error);
+  }
+}

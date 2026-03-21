@@ -5,6 +5,7 @@ import {
   getTransactions,
   getTransactionsByDateRange,
   updateTransaction,
+  getTransactionTypes
 } from "../models/transaction_models";
 import {
   ReqAddTransactionSchema,
@@ -128,6 +129,22 @@ export const _deleteTransaction = async (req:Request, res:Response)=>{
       status: "success",
       message: "Transaction deleted succesfully",
     });
+  } catch (error: any) {
+    res.status(error.status || 500).json({
+      error: error.message,
+    });
+  }
+}
+
+export const _getTransactionTypes = async (req: Request, res: Response) => {
+  try {
+    const transactionTypes = await getTransactionTypes();
+    res.status(200).json({
+      transactionTypes,
+      status: "success",
+      message: "Transaction types retrieved successfully",
+    });
+    
   } catch (error: any) {
     res.status(error.status || 500).json({
       error: error.message,

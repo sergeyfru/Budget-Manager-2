@@ -6,6 +6,8 @@ import cors from "cors";
 import auth_routes from "./routes/auth_routes";
 import transaction_routes from "./routes/transaction_routes";
 import categories_routes from "./routes/categories_routes";
+import payment_methods_routes from "./routes/payment_methods_routes";
+import curriencies_routes from "./routes/currencies_routes";
 import { errorHandler } from "./middlewares/middleware";
 import { requestLogger, responseLogger } from "./utils/logger";
 
@@ -46,8 +48,10 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", auth_routes);
 
-app.use("/api/transaction", transaction_routes)
-app.use("/api/catiegries", categories_routes)
+app.use("/api/transactions", transaction_routes)
+app.use("/api/categories", categories_routes)
+app.use("/api/paymentmethods", payment_methods_routes)
+app.use("/api/currencies", curriencies_routes)
 
 
 // Start servernpm i @types/cors
