@@ -24,6 +24,7 @@ export const generateAccessToken = (
   if (!JWT_SECRET) {
     throw new Error("JWT_SECRET is not defined in environment variables");
   }
+  console.log("Generating access token with payload:", payload, "and expiresIn:", expiresIn);
   const access_token = jwt.sign(payload, JWT_SECRET, { expiresIn });
 
   return access_token;
@@ -38,12 +39,12 @@ export const getUserFromToken = async (
       throw new ApiError(401, "Unauthorized");
     }
     const responseFromDB = await db("users").where("user_id", decoded.user_id).first();
-console.log(responseFromDB);
+console.log("Response from DB:", responseFromDB);
 
     const result = user_info_schema.safeParse(responseFromDB);
 
     if (!result.success) {
-      console.log(result.error);
+      console.log("Validation error:", result.error);
       throw new ApiError(404, result.error.message);
     }
     return result.data;

@@ -3,12 +3,15 @@ import { db } from "../config/db";
 import { ApiError } from "../errors/ApiErrors";
 import { dbErrorHandler } from "../errors/db_errors";
 import {
-  parseTransactionsResponse,
   ReqAddTransactionSchema,
-  ReqUdateTransactionSchema,
+  ReqUpdateTransactionSchema,
+  TransactionFullSchema,
   TransactionsResponseSchema,
+  transactionFullSchema,
+  transactionsResponseArraySchema,
 } from "../schemas/transaction_schema";
-import { getTransactionsQuery } from "../db/queries/transactions";
+import { getTransactionsQuery } from "../db/queries";
+import { validateDB } from "../utils/validation";
 
 export const getTransactions = async (
   user_id: number,
@@ -21,7 +24,8 @@ export const getTransactions = async (
       user_id,
     );
 
-    const transactions = parseTransactionsResponse(responseFromDB);
+    const transactions = validateDB(transactionsResponseArraySchema, responseFromDB);
+
     trx.commit();
     return transactions;
   } catch (error) {
@@ -47,7 +51,7 @@ export const getTransactionsByDateRange = async (
       .andWhere("tr.date_of_transaction", ">=", start_date)
       .andWhere("tr.date_of_transaction", "<=", end_date);
 
-    const transactionsByDateRange = parseTransactionsResponse(responseFromDB);
+    const transactionsByDateRange = validateDB(transactionsResponseArraySchema, responseFromDB);
 
     trx.commit();
 
@@ -61,31 +65,32 @@ export const getTransactionsByDateRange = async (
 export const addTransaction = async (
   user_id: number,
   transactionData: ReqAddTransactionSchema,
-): Promise<TransactionsResponseSchema> => {
+): Promise<TransactionFullSchema> => {
   console.log(
     "In models, adding transaction for user_id:",
     user_id,
   );
   const trx = await db.transaction();
   try {
-    await db("transactions").insert({
-      user_id,
-      transaction_amount: transactionData.transaction_amount,
-      date_of_transaction: transactionData.date_of_transaction,
-      transaction_type_id: transactionData.transaction_type_id,
-      user_category_id: transactionData.user_category_id,
-      currency_id: transactionData.currency_id,
-      user_payment_method_id: transactionData.user_payment_method_id,
-      transaction_note: transactionData.transaction_note,
-    });
+    const newTransaction = await trx("transactions")
+      .insert({
+        user_id,
+        transaction_amount: transactionData.transaction_amount,
+        date_of_transaction: transactionData.date_of_transaction,
+        transaction_type_id: transactionData.transaction_type_id,
+        user_category_id: transactionData.user_category_id,
+        currency_id: transactionData.currency_id,
+        user_payment_method_id: transactionData.user_payment_method_id,
+        transaction_note: transactionData.transaction_note,
+      }).select("transaction_id", "user_id").first();
+    const responseFromDB = await getTransactionsQuery(trx).where("tr.transaction_id", newTransaction.transaction_id);
 
-    const responseFromDB = await getTransactionsQuery(trx).where("tr.user_id", user_id,);
+    const newTransactionFull = validateDB(transactionFullSchema, responseFromDB);
 
-    const transactions = parseTransactionsResponse(responseFromDB);
 
     trx.commit();
+    return newTransactionFull;
 
-    return transactions;
   } catch (error) {
     trx.rollback();
     throw dbErrorHandler(error);
@@ -94,8 +99,8 @@ export const addTransaction = async (
 
 export const updateTransaction = async (
   user_id: number,
-  updatedTransactionData: ReqUdateTransactionSchema,
-): Promise<TransactionsResponseSchema> => {
+  updatedTransactionData: ReqUpdateTransactionSchema,
+): Promise<TransactionFullSchema> => {
 console.log(
     "In models, updating transaction for user_id:",
     user_id,
@@ -117,30 +122,24 @@ console.log(
       .where({ "tr.user_id": user_id, "tr.transaction_id": transaction_id })
       .update(fieldsToUpdate);
 
-    const responseFromDB = await getTransactionsQuery(trx).where("tr.user_id", user_id,);
+    const responseFromDB = await getTransactionsQuery(trx).where("tr.transaction_id", transaction_id);
 
-    const transactions = parseTransactionsResponse(responseFromDB);
+    const updatedTransaction = validateDB(transactionFullSchema, responseFromDB);
 
     trx.commit();
-    return transactions;
+    return updatedTransaction;
   } catch (error) {
     trx.rollback();
     throw dbErrorHandler(error);
   }
 };
 
-export const deleteTransaction = async (transaction_id: number): Promise<TransactionsResponseSchema> => {
-  const trx = await db.transaction();
+export const deleteTransaction = async (transaction_id: number): Promise<void> => {
   try {
-   const deletedTransactin =  await trx("transactions").where({ transaction_id }).delete().select("uesr_id","transaction_id");
-   const responseFromDB = await getTransactionsQuery(trx).where("tr.user_id", deletedTransactin.user_id,);
-
-    const transactions = parseTransactionsResponse(responseFromDB);
-    
-    trx.commit();
-    return transactions;
+    await db("transactions").where({ transaction_id }).delete().select("uesr_id","transaction_id");
+  
+    return;
   } catch (error) {
-    trx.rollback();
     throw dbErrorHandler(error);
   }
 };

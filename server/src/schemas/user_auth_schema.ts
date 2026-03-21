@@ -30,6 +30,7 @@ export type ReqLoginSchema = z.infer<typeof req_login_schema>;
 
 
 export const req_register_schema = user_info_schema
+  .omit({ user_id: true })
   .extend({
     password: z
       .string()

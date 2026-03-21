@@ -6,6 +6,9 @@ import { ApiError } from "../errors/ApiErrors";
 import { generateAccessToken, generateRefreshToken, hashedRefreshToken } from "../utils/token";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "../utils/verification";
+import { getDefaultCategoriesQuery, getDefaultPaymentMethodsQuery } from "../db/queries";
+import { defaultCategoryTypesArrDBSchema, defaultPaymentMethodTypesArrDBSchema } from "../schemas/transaction_schema";
+import { validateDB } from "../utils/validation";
 
 export const login = async (
   email: string,
@@ -87,6 +90,8 @@ export const register = async (fullUser: ReqRegisterSchema) => {
       trx.rollback();
       throw new ApiError(409, "Duplicate value");
     }
+    
+
     const [user] = await trx("users")
       .insert(userInfo)
       .returning([
@@ -101,12 +106,42 @@ export const register = async (fullUser: ReqRegisterSchema) => {
         "created_at",
         "updated_at",
       ]);
+      console.log("User created:", user);
+      
     const salt = await bcrypt.genSalt(10);
     const password_hash = await bcrypt.hash(password, salt);
     await trx("users_auth").insert({
       user_id: user.user_id,
       password_hash,
     });
+      console.log("User created, now inserting default categories and payment methods...")
+    const ResponseOfDefaultCategories = await getDefaultCategoriesQuery(trx);
+    const defaultCategories = validateDB(defaultCategoryTypesArrDBSchema, ResponseOfDefaultCategories)
+    console.log(defaultCategories);
+    
+    const defaultUsersCategories = defaultCategories.map((category) => ({
+      user_id: user.user_id,
+      category_type_id: category.category_type_id,
+      user_category_name: category.category_type_name,
+      user_category_icon: category.category_type_icon,
+      user_category_color: category.category_type_color,
+    }));
+    await trx("user_categories").insert(defaultUsersCategories);
+
+    console.log("Default categories inserted for user");
+
+    const ResponseOfDefaultPaymentMethods = await getDefaultPaymentMethodsQuery(trx);
+    const defaultPaymentMethods = validateDB(defaultPaymentMethodTypesArrDBSchema, ResponseOfDefaultPaymentMethods);
+    const defaultPaymentMethodsForUser = defaultPaymentMethods.map((paymentMethod) => ({
+      user_id: user.user_id,
+      payment_method_type_id: paymentMethod.payment_method_type_id,
+      user_payment_method_name: paymentMethod.payment_method_type_name,
+      user_payment_method_icon: paymentMethod.payment_method_type_icon,
+      user_payment_method_color: paymentMethod.payment_method_type_color,
+      user_payment_method_details: null, 
+    }));
+    await trx("user_payment_methods").insert(defaultPaymentMethodsForUser);
+    console.log("Default payment methods inserted for user");
 
     const email_verification_token = generateAccessToken({ user_id: user.user_id }, 60 * 60 * 1000); // 1 hour expiration
     const token_hash = await bcrypt.hash(email_verification_token, salt);
@@ -115,12 +150,15 @@ export const register = async (fullUser: ReqRegisterSchema) => {
       token_hash,
       expires_at: new Date(Date.now() + 60 * 60 * 1000), // 1 hour from now
     });
+    console.log("Email verification token created for user:", user.user_id);
 
     await sendEmail(
       user.email,
       "Verify your email",
       `<p>Please click <a href="${process.env.CLIENT_URL}/verify-email?token=${email_verification_token}">here</a> to verify your email.</p>`
     );
+    console.log("Verification email sent");
+    
 
 
     await trx.commit();
@@ -183,6 +221,8 @@ export const verify_email = async (token: string) : Promise<boolean | ApiError> 
     throw new ApiError(400, "Invalid token");
   }
   const user_id = decoded.user_id;
+  console.log("Decoded user",decoded);
+  
 
   try {
     const tokenRecord = await trx("email_verification_tokens")
@@ -193,16 +233,19 @@ export const verify_email = async (token: string) : Promise<boolean | ApiError> 
       trx.rollback();
       throw new ApiError(404, "Verification token not found");
     }
+    console.log("Token record from DB", tokenRecord);
+
     if (tokenRecord.expires_at < new Date()) {
       trx.rollback();
       throw new ApiError(400, "Verification token expired");
     }
+    console.log("Token is not expired");
     const isTokenValid = await bcrypt.compare(token, tokenRecord.token_hash);
     if (!isTokenValid) {
       trx.rollback();
       throw new ApiError(400, "Invalid verification token");
     }
-
+    console.log("Token is valid");
     await trx("users").where({ user_id }).update({ email_verified: true });
     await trx("email_verification_tokens").where({ user_id }).del();
 

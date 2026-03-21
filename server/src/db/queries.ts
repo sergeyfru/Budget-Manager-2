@@ -63,3 +63,21 @@ export const getTransactionsQuery = (trx: Knex): Knex.QueryBuilder => {
     `),
     );
 };
+
+export const getDefaultCategoriesQuery = (trx: Knex): Knex.QueryBuilder => {
+  return trx("category_types").select(
+    "category_type_id",
+    "category_type_name",
+    "category_type_icon",
+    "category_type_color",
+  );
+};
+
+export const getDefaultPaymentMethodsQuery = (trx: Knex): Knex.QueryBuilder => {
+  return trx("payment_method_types").select(
+    "payment_method_type_id",
+    "payment_method_type_name",
+    "payment_method_type_icon",
+    "payment_method_type_color",
+  );
+};
