@@ -4,6 +4,7 @@ import { z } from "zod";
 // User Info Schema
 
 export const user_info_schema = z.object({
+  user_id:  z.number(),
   email: z.email().toLowerCase(),
   first_name: z.string().min(2),
   last_name: z.string().min(2),
@@ -11,8 +12,8 @@ export const user_info_schema = z.object({
   email_verified: z.boolean().default(false),
   phone_verified: z.boolean().default(false),
   is_active: z.boolean().default(true),
-  created_at: z.number().optional(),
-  updated_at: z.number().optional(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });
 
 export type UserInfoSchema = z.infer<typeof user_info_schema>;
@@ -85,3 +86,22 @@ export const req_reset_password_schema = z
   });
 
 export type ReqResetPasswordSchema = z.infer<typeof req_reset_password_schema>;
+
+
+export const refreshTokenDBSchema = z.object({
+  token_id: z.number().int().positive(),
+
+  user_id: z.number().int().positive(),
+
+  session_id: z.number().int().positive().nullable(),
+
+  hashed_refresh_token: z.string().min(1),
+
+  expires_at: z.coerce.date(), 
+
+  revoked: z.boolean().default(false),
+
+  created_at: z.coerce.date(),
+});
+
+export type RefreshTokenDBSchema = z.infer< typeof refreshTokenDBSchema>

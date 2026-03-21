@@ -1,9 +1,9 @@
 import { db } from "../config/db";
 import bcrypt from "bcryptjs";
-import { ReqRegisterSchema, UserInfoSchema } from "../schemas/user_auth_schema";
+import { RefreshTokenDBSchema, ReqRegisterSchema, UserInfoSchema } from "../schemas/user_auth_schema";
 import { dbErrorHandler } from "../errors/db_errors";
 import { ApiError } from "../errors/ApiErrors";
-import { generateAccessToken, generateRefreshToken } from "../utils/token";
+import { generateAccessToken, generateRefreshToken, hashedRefreshToken } from "../utils/token";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "../utils/verification";
 
@@ -22,7 +22,7 @@ export const login = async (
       .innerJoin({ ua: "users_auth" }, "u.user_id", "ua.user_id")
       .where({ "u.email": email })
       .first();
-    console.log(user);
+    // console.log(user);
 
     if (!user) {
       throw new ApiError(404, "User not found");
@@ -43,8 +43,8 @@ export const login = async (
     // const hashed_refresh_token = await bcrypt.hash(refresh_token, 10);
     // const expires_at = new Date(
     //   Date.now() +
-    //     (process.env.JWT_EXPIRES_LONG
-    //       ? parseInt(process.env.JWT_EXPIRES_LONG) * 1000
+    //     (process.env.JWT_EXPIRES_REFRESH
+    //       ? parseInt(process.env.JWT_EXPIRES_REFRESH) * 1000
     //       : 1000 * 60 * 60 * 24 * 7),
     // );
 
@@ -124,7 +124,7 @@ export const register = async (fullUser: ReqRegisterSchema) => {
 
 
     await trx.commit();
-    return user;
+    return user as UserInfoSchema;
   } catch (error) {
     await trx.rollback();
     dbErrorHandler(error);
@@ -156,20 +156,20 @@ export const changePassword = async (user_id: string, old_password: string, new_
   }
 };
 
-export const logout = async (session_id: string, refresh_token: string) : Promise<boolean | ApiError> => {
+export const logout = async (refresh_token: string, session_id: string | null = null ) : Promise<boolean> => {
 const trx = await db.transaction();
 try {
-  const session = await trx("sessions").where({ session_id }).first().del();
-  if (!session) {
-    trx.rollback();
-    throw new ApiError(404, "Session not found");
+  if(refresh_token){
+  const hashed_refresh_token = hashedRefreshToken(refresh_token)
+  await trx("refresh_tokens").where({ hashed_refresh_token }).delete();
+  
   }
-
-
+  
+  await trx.commit()
   return true;
 } catch (error) {
 trx.rollback();
-return dbErrorHandler(error);  
+throw dbErrorHandler(error);  
 }
 
 };
@@ -218,6 +218,30 @@ export const verify_email = async (token: string) : Promise<boolean | ApiError> 
 
 
 
-export const refresh = async () => {};
+export const refresh = async (hashed_refresh_token:string ) => {
+  const trx =  await db.transaction()
+try {
+  const dbResponse : RefreshTokenDBSchema = await trx('refresh_tokens').where({hashed_refresh_token}).first()
+  if(!dbResponse){
+    throw new ApiError(401, 'Invalid refresh token')
+  }
+
+  const newRefreshToken = generateRefreshToken()
+  const hashedNewRefreshToken = hashedRefreshToken(newRefreshToken)
+  await trx('refresh_tokens').insert({'hased_refresh_token': hashedNewRefreshToken})
+  await trx('refresh_tokens').where({'token_id':dbResponse.token_id}).delete()
+
+  const newAccessToken = generateAccessToken({user_id:dbResponse.user_id})
+
+  return{newRefreshToken, newAccessToken}
+  
+  } catch (error) {
+  await trx.rollback();
+  throw dbErrorHandler(error);
+}
+
+
+};
+
 export const forgotPassword = async () => {};
 export const resetPassword = async () => {};

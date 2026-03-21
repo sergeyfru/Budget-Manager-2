@@ -1,4 +1,3 @@
-import Api from "twilio/lib/rest/Api";
 import { z } from "zod";
 import { ApiError } from "../errors/ApiErrors";
 
@@ -97,3 +96,11 @@ export const reqAddTransactionSchema = z.object({
 });
 
 export type ReqAddTransactionSchema = z.infer<typeof reqAddTransactionSchema>;
+
+export const reqUpdateTransactionSchema = z.object({
+  transaction_id: z.number()
+})
+.merge(reqAddTransactionSchema.partial())
+
+export type ReqUdateTransactionSchema = z.infer<typeof reqUpdateTransactionSchema>;
+

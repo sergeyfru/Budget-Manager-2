@@ -1,6 +1,7 @@
 import { ZodType } from "zod";
 import { Request, Response, NextFunction } from "express";
 import { ApiError } from "../errors/ApiErrors";
+import { getUserFromToken } from "../utils/token";
 
 export const validate =
   (schema: ZodType) => (req: Request, res: Response, next: NextFunction) => {
@@ -22,21 +23,46 @@ export const validate =
     next();
   };
 
-
-export const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunction) => {
-
+export const errorHandler = (
+  err: unknown,
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   if (err instanceof ApiError) {
     return res.status(err.status).json({
-      error: err.message
+      error: err.message,
     });
   }
 
   console.error(err);
 
   res.status(500).json({
-    error: "Internal server error"
+    error: "Internal server error",
   });
-
 };
 
+export const authMiddleware =
+  () => async (req: Request, res: Response, next: NextFunction) => {
+    console.log("auth Middleware");
+    
+      const authHeader =
+        req.headers["authorization"] || (req.cookies.access_token as string);
+      if (!authHeader) {
+        return res.status(401).json({
+          error: "No token provided, authorization denied",
+        });
+      }
+      
+      const access_token = authHeader.split(" ")[1];
+      if (!access_token) {
+        return res.status(401).json({ message: "Token format invalid" });
+      }
 
+      const user = await getUserFromToken(access_token);
+
+      req.user = user;
+
+      next();
+  
+  };

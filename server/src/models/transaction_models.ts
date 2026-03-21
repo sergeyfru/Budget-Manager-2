@@ -5,78 +5,21 @@ import { dbErrorHandler } from "../errors/db_errors";
 import {
   parseTransactionsResponse,
   ReqAddTransactionSchema,
+  ReqUdateTransactionSchema,
   TransactionsResponseSchema,
 } from "../schemas/transaction_schema";
+import { getTransactionsQuery } from "../db/queries/transactions";
 
-export const getUsersTransactions = async (
+export const getTransactions = async (
   user_id: number,
-): Promise<object | ApiError> => {
-  console.log("Getting transactions for user_id:", typeof user_id);
+): Promise<TransactionsResponseSchema> => {
+  console.log("In models, getting transactions for user_id:", user_id);
   const trx = await db.transaction();
   try {
-    const responseFromDB = await trx({ tr: "transactions" })
-      // .innerJoin({u:"users"}, "tr.user_id",'=', "u.user_id")
-      .innerJoin({ c: "currencies" }, "tr.currency_id", "c.currency_id")
-      .innerJoin(
-        { tt: "transaction_types" },
-        "tr.transaction_type_id",
-        "tt.transaction_type_id",
-      )
-      .innerJoin(
-        { uc: "user_categories" },
-        "tr.user_category_id",
-        "uc.user_category_id",
-      )
-      .innerJoin(
-        { upm: "user_payment_methods" },
-        "tr.user_payment_method_id",
-        "upm.user_payment_method_id",
-      )
-      .where("tr.user_id", user_id)
-      .select(
-        "tr.transaction_id",
-        "tr.transaction_amount",
-        "tr.date_of_transaction",
-        "tr.transaction_note",
-        "tr.created_at",
-        trx.raw(`
-        json_build_object(
-          'currency_id', c.currency_id,
-          'currency_code', c.currency_code,
-          'currency_symbol', c.currency_symbol,
-          'currency_name', c.currency_name
-        ) as currency
-      `),
-
-        trx.raw(`
-      json_build_object(
-        'id', tt.transaction_type_id,
-        'name', tt.transaction_type_name,
-        'direction', tt.transaction_direction,
-        'icon', tt.transaction_type_icon,
-        'color', tt.transaction_type_color
-      ) as transaction_type
-    `),
-
-        trx.raw(`
-      json_build_object(
-        'id', uc.user_category_id,
-        'type_id', uc.category_type_id,
-        'name', uc.user_category_name,
-        'icon', uc.user_category_icon,
-        'color', uc.user_category_color
-      ) as user_category
-    `),
-
-        trx.raw(`
-      json_build_object(
-        'id', upm.user_payment_method_id,
-        'type_id', upm.payment_method_type_id,
-        'label', upm.user_payment_method_label,
-        'details', upm.user_payment_method_details
-      ) as user_payment_method
-    `),
-      );
+    const responseFromDB = await getTransactionsQuery(trx).where(
+      "tr.user_id",
+      user_id,
+    );
 
     const transactions = parseTransactionsResponse(responseFromDB);
     trx.commit();
@@ -88,83 +31,24 @@ export const getUsersTransactions = async (
   }
 };
 
-export const getUsersTransactionsByDateRange = async (
+export const getTransactionsByDateRange = async (
   user_id: number,
   start_date: Date,
   end_date: Date,
-): Promise<TransactionsResponseSchema | { message: string } | ApiError> => {
+): Promise<TransactionsResponseSchema> => {
+  console.log(
+    "In models, getting transactions in a date range for user_id:",
+    user_id,
+  );
   const trx = await db.transaction();
-
   try {
-    const responseFromDB = await trx({ tr: "transactions" })
-      //   .innerJoin({u:"users"}, "tr.user_id",'=', "u.user_id")
-      .innerJoin({ c: "currencies" }, "tr.currency_id", "c.currency_id")
-      .innerJoin(
-        { tt: "transaction_types" },
-        "tr.transaction_type_id",
-        "tt.transaction_type_id",
-      )
-      .innerJoin(
-        { uc: "user_categories" },
-        "tr.user_category_id",
-        "uc.user_category_id",
-      )
-      .innerJoin(
-        { upm: "user_payment_methods" },
-        "tr.user_payment_method_id",
-        "upm.user_payment_method_id",
-      )
+    const responseFromDB = await getTransactionsQuery(trx)
       .where("tr.user_id", user_id)
       .andWhere("tr.date_of_transaction", ">=", start_date)
-      .andWhere("tr.date_of_transaction", "<=", end_date)
-      .select(
-        "tr.transaction_id",
-        "tr.transaction_amount",
-        "tr.date_of_transaction",
-        "tr.transaction_note",
-        "tr.created_at",
-        trx.raw(`
-        json_build_object(
-          'currency_id', c.currency_id,
-          'currency_code', c.currency_code,
-          'currency_symbol', c.currency_symbol,
-          'currency_name', c.currency_name
-        ) as currency
-      `),
+      .andWhere("tr.date_of_transaction", "<=", end_date);
 
-        trx.raw(`
-      json_build_object(
-        'id', tt.transaction_type_id,
-        'name', tt.transaction_type_name,
-        'direction', tt.transaction_direction,
-        'icon', tt.transaction_type_icon,
-        'color', tt.transaction_type_color
-      ) as transaction_type
-    `),
-
-        trx.raw(`
-      json_build_object(
-        'id', uc.user_category_id,
-        'type_id', uc.category_type_id,
-        'name', uc.user_category_name,
-        'icon', uc.user_category_icon,
-        'color', uc.user_category_color
-      ) as user_category
-    `),
-
-        trx.raw(`
-      json_build_object(
-        'id', upm.user_payment_method_id,
-        'type_id', upm.payment_method_type_id,
-        'label', upm.user_payment_method_label,
-        'details', upm.user_payment_method_details
-      ) as user_payment_method
-    `),
-      );
     const transactionsByDateRange = parseTransactionsResponse(responseFromDB);
-    if (transactionsByDateRange.length === 0) {
-      return { message: "No transactions found for the specified date range" };
-    }
+
     trx.commit();
 
     return transactionsByDateRange;
@@ -177,7 +61,11 @@ export const getUsersTransactionsByDateRange = async (
 export const addTransaction = async (
   user_id: number,
   transactionData: ReqAddTransactionSchema,
-): Promise<object | ApiError> => {
+): Promise<TransactionsResponseSchema> => {
+  console.log(
+    "In models, adding transaction for user_id:",
+    user_id,
+  );
   const trx = await db.transaction();
   try {
     await db("transactions").insert({
@@ -191,72 +79,65 @@ export const addTransaction = async (
       transaction_note: transactionData.transaction_note,
     });
 
-    const responseFromDB = await trx({ tr: "transactions" })
-      .innerJoin({ c: "currencies" }, "tr.currency_id", "c.currency_id")
-      .innerJoin(
-        { tt: "transaction_types" },
-        "tr.transaction_type_id",
-        "tt.transaction_type_id",
-      )
-      .innerJoin(
-        { uc: "user_categories" },
-        "tr.user_category_id",
-        "uc.user_category_id",
-      )
-      .innerJoin(
-        { upm: "user_payment_methods" },
-        "tr.user_payment_method_id",
-        "upm.user_payment_method_id",
-      )
-      .where("tr.user_id", user_id)
-      .select(
-        "tr.transaction_id",
-        "tr.transaction_amount",
-        "tr.date_of_transaction",
-        "tr.transaction_note",
-        "tr.created_at",
-        trx.raw(`
-        json_build_object(
-          'currency_id', c.currency_id,
-          'currency_code', c.currency_code,
-          'currency_symbol', c.currency_symbol,
-          'currency_name', c.currency_name
-        ) as currency
-      `),
+    const responseFromDB = await getTransactionsQuery(trx).where("tr.user_id", user_id,);
 
-        trx.raw(`
-      json_build_object(
-        'id', tt.transaction_type_id,
-        'name', tt.transaction_type_name,
-        'direction', tt.transaction_direction,
-        'icon', tt.transaction_type_icon,
-        'color', tt.transaction_type_color
-      ) as transaction_type
-    `),
-
-        trx.raw(`
-      json_build_object(
-        'id', uc.user_category_id,
-        'type_id', uc.category_type_id,
-        'name', uc.user_category_name,
-        'icon', uc.user_category_icon,
-        'color', uc.user_category_color
-      ) as user_category
-    `),
-
-        trx.raw(`
-      json_build_object(
-        'id', upm.user_payment_method_id,
-        'type_id', upm.payment_method_type_id,
-        'label', upm.user_payment_method_label,
-        'details', upm.user_payment_method_details
-      ) as user_payment_method
-    `),
-      );
-      const transactions = parseTransactionsResponse(responseFromDB);
+    const transactions = parseTransactionsResponse(responseFromDB);
 
     trx.commit();
 
+    return transactions;
+  } catch (error) {
+    trx.rollback();
+    throw dbErrorHandler(error);
+  }
+};
+
+export const updateTransaction = async (
+  user_id: number,
+  updatedTransactionData: ReqUdateTransactionSchema,
+): Promise<TransactionsResponseSchema> => {
+console.log(
+    "In models, updating transaction for user_id:",
+    user_id,
+  );
+
+  const trx = await db.transaction();
+  try {
+    const { transaction_id, ...fields } = updatedTransactionData;
+
+    const fieldsToUpdate = Object.fromEntries(
+      Object.entries(fields).filter(([_, v]) => v !== undefined),
+    );
+
+    if (Object.keys(fieldsToUpdate).length === 0) {
+      throw new ApiError(400, "No fields to update");
+    }
+
+    await trx({ tr: "transactions" })
+      .where({ "tr.user_id": user_id, "tr.transaction_id": transaction_id })
+      .update(fieldsToUpdate);
+
+    const responseFromDB = await getTransactionsQuery(trx).where("tr.user_id", user_id,);
+
+    const transactions = parseTransactionsResponse(responseFromDB);
+
+    trx.commit();
+    return transactions;
+  } catch (error) {
+    trx.rollback();
+    throw dbErrorHandler(error);
+  }
+};
+
+export const deleteTransaction = async (transaction_id: number): Promise<TransactionsResponseSchema> => {
+  const trx = await db.transaction();
+  try {
+   const deletedTransactin =  await trx("transactions").where({ transaction_id }).delete().select("uesr_id","transaction_id");
+   const responseFromDB = await getTransactionsQuery(trx).where("tr.user_id", deletedTransactin.user_id,);
+
+    const transactions = parseTransactionsResponse(responseFromDB);
+    
+    trx.commit();
     return transactions;
   } catch (error) {
     trx.rollback();

@@ -10,7 +10,9 @@ import {
   _forgotPassword,
   _resetPassword,
 } from "../controllers/auth_controller";
-import { validate } from "../middlewares/middleware";
+
+import { authMiddleware, validate } from "../middlewares/middleware";
+
 import {
   req_change_password_schema,
   req_forgot_password_schema,
@@ -26,6 +28,7 @@ router.post("/register", validate(req_register_schema), _register);
 router.post("/logout", _logout);
 router.put(
   "/change-password",
+  authMiddleware(),
   validate(req_change_password_schema),
   _changePassword,
 );

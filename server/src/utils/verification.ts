@@ -1,9 +1,9 @@
 import nodemailer from "nodemailer";
-import dotenv from "dotenv";
+// import dotenv from "dotenv";
 import { ApiError } from "../errors/ApiErrors";
 // import client from "twilio"
 
-dotenv.config();
+// dotenv.config();
 
 const transporter = nodemailer.createTransport({
   service: "Gmail",

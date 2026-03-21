@@ -1,16 +1,25 @@
-import { Request, Response } from "express";
+import {Request, Response } from "express";
 import { ReqRegisterSchema, ReqLoginSchema } from "../schemas/user_auth_schema";
-import { changePassword, login, register, verify_email } from "../models/auth_model";
+import {
+  changePassword,
+  login,
+  logout,
+  refresh,
+  register,
+  verify_email,
+} from "../models/auth_model";
 import { ApiError } from "../errors/ApiErrors";
-import dotenv from "dotenv";
-dotenv.config();
+// import dotenv from "dotenv";
+import { getUserFromToken, hashedRefreshToken } from "../utils/token";
+import { success } from "zod";
+// dotenv.config();
 // const UAParser = require("ua-parser-js");
 
 export const _login = async (req: Request, res: Response) => {
   const ip_address = req.ip || "Unknown IP";
   const device_name = req.get("User-Agent") || "Unknown Device";
   // const ua = new UAParser(req.get("User-Agent"));
-  console.log("IP Address:", ip_address);
+  // console.log("IP Address:", ip_address);
 
   const { email, password } = req.body as ReqLoginSchema;
 
@@ -20,31 +29,37 @@ export const _login = async (req: Request, res: Response) => {
       res.status(result.status).json({ error: result.message });
       return;
     }
-    const maxAge_short = process.env.JWT_EXPIRES_SHORT
-      ? parseInt(process.env.JWT_EXPIRES_SHORT)
+    const maxAge_access = process.env.JWT_EXPIRES_ACCESS
+      ? parseInt(process.env.JWT_EXPIRES_ACCESS)
       : 60000 * 15; // default to 15 minutes
-    const maxAge_long = process.env.JWT_EXPIRES_LONG
-      ? parseInt(process.env.JWT_EXPIRES_LONG)
+    const maxAge_refresh = process.env.JWT_EXPIRES_REFRESH
+      ? parseInt(process.env.JWT_EXPIRES_REFRESH)
       : 3600000 * 24 * 7; // default to 7 days
 
-    console.log("Max Age Short:", maxAge_short);
-    console.log("Max Age Long:", maxAge_long);
-
     const { user, access_token, refresh_token } = result;
-    res.cookie("access_token", access_token, {
-      httpOnly: true,
-      secure: false, // for development, set to true in production
-      sameSite: "strict",
-      maxAge: maxAge_short
-    });
+
     res.cookie("refresh_token", refresh_token, {
       httpOnly: true,
       secure: false, // for development, set to true in production
       sameSite: "strict",
-        maxAge: maxAge_long
+      maxAge: maxAge_refresh,
     });
 
-    res.send(user);
+    // res.cookie("access_token", access_token, {
+    //   httpOnly: true,
+    //   secure: false, // for development, set to true in production
+    //   sameSite: "strict",
+    //   maxAge: maxAge_access,
+    // });
+
+    res
+      .status(201)
+      .json({
+        user,
+        access_token,
+        status: "success",
+        message: "Login successful",
+      });
   } catch (error: any) {
     res.status(error.status || 500).json({
       error: error.message,
@@ -57,7 +72,7 @@ export const _register = async (req: Request, res: Response) => {
   console.log("_register data:", data);
   try {
     const user = await register(data);
-    res.send(user);
+    res.status(201).json({ user, message: "Created" });
   } catch (error: any) {
     res.status(error.status || 500).json({
       error: error.message,
@@ -79,17 +94,25 @@ export const _changePassword = async (req: Request, res: Response) => {
       .json({ error: changePasswordResult.message });
     return;
   }
-  res.send("Password changed successfully");
+  res.status(200).json({
+    status: "success",
+    message: "Password changed successfully",
+  });
 };
 
 export const _logout = async (req: Request, res: Response) => {
   console.log("In _logout controller");
+  const refresh_token = req.cookies.refresh_token || "";
+  await logout(refresh_token);
 
   res.clearCookie("access_token");
   res.clearCookie("refresh_token");
 
-  res.send("You have been logged out successfully");
+  res
+    .status(200)
+    .json({ success: true, message: "You have been logged out successfully" });
 };
+
 export const _veriyfy_email = async (req: Request, res: Response) => {
   const token = req.query.token as string;
   console.log("Verification token:", token);
@@ -98,25 +121,50 @@ export const _veriyfy_email = async (req: Request, res: Response) => {
   if (result instanceof ApiError) {
     res.status(result.status).json({ error: result.message });
     return;
-  } 
+  }
 
-  res.send({ msg: "Email verified successfully" });
+  res
+    .status(200)
+    .json({ status: "success", message: "Email verified successfully" });
 };
 
 export const _verify_phone_number = async (req: Request, res: Response) => {
-  res.send("Verify Phone Number");
+  res
+    .status(200)
+    .json({ status: "success", message: "Phone number verified successfully" });
 };
 
-export const _refresh = (req: Request, res: Response) => {
-  const token = req.cookies.access_token;
-  console.log("Token from cookie:", token);
-  res.send("Refresh");
+export const _refresh = async (req: Request, res: Response) => {
+  const maxAge_access = process.env.JWT_EXPIRES_ACCESS
+    ? parseInt(process.env.JWT_EXPIRES_ACCESS)
+    : 60000 * 15; // default to 15 minutes
+  const maxAge_refresh = process.env.JWT_EXPIRES_REFRESH
+    ? parseInt(process.env.JWT_EXPIRES_REFRESH)
+    : 3600000 * 24 * 7; // default to 7 days
+  const refreshToken = req.cookies.refresh_token;
+  const hashed_refresh_token = hashedRefreshToken(refreshToken);
+  const newTokens = await refresh(hashed_refresh_token);
+
+  res.cookie("refresh_token", newTokens.newRefreshToken, {
+    httpOnly: true,
+    secure: false, // for development, set to true in production
+    sameSite: "strict",
+    maxAge: maxAge_refresh,
+  });
+
+  res
+    .status(200)
+    .json({
+      access_token: newTokens.newAccessToken,
+      status: "success",
+      message: "Tokens were refreshed successfully",
+    });
 };
 
 export const _forgotPassword = (req: Request, res: Response) => {
-  res.send("Forgot Password");
+  res.status(200).json({ message: "Forgot Password" });
 };
 
 export const _resetPassword = (req: Request, res: Response) => {
-  res.send("Reset Password");
+  res.status(200).json({ message: "Reset Password" });
 };
