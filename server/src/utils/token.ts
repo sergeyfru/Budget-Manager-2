@@ -10,16 +10,19 @@ import { user_info_schema, UserInfoSchema } from "../schemas/user_auth_schema";
 
 // dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET!;
-const JWT_EXPIRES_ACCESS = process.env.JWT_EXPIRES_ACCESS
+
+export const maxAgeAccess = process.env.JWT_EXPIRES_ACCESS
   ? parseInt(process.env.JWT_EXPIRES_ACCESS)
   : 60 * 15 * 1000; // 15 minutes
-const JWT_EXPIRES_REFRESH = process.env.JWT_EXPIRES_REFRESH
+export const maxAgeRefresh = process.env.JWT_EXPIRES_REFRESH
   ? parseInt(process.env.JWT_EXPIRES_REFRESH)
   : 60 * 60 * 24 * 7 * 1000; // 7 days
 
+
+
 export const generateAccessToken = (
   payload: object,
-  expiresIn: number = JWT_EXPIRES_ACCESS,
+  expiresIn: number = maxAgeAccess,
 ): string => {
   if (!JWT_SECRET) {
     throw new Error("JWT_SECRET is not defined in environment variables");
@@ -34,7 +37,7 @@ export const getUserFromToken = async (
   access_token: string,
 ): Promise<UserInfoSchema> => {
   try {
-    const decoded = jwt.verify(access_token, process.env.JWT_SECRET!) ;
+    const decoded = jwt.verify(access_token, JWT_SECRET!) ;
     if (typeof decoded == "string" || !decoded.user_id) {
       throw new ApiError(401, "Unauthorized");
     }

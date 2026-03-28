@@ -43,7 +43,7 @@
     "moduleDetection": "force",
     "skipLibCheck": true,
   }, 
-  "include": ["src"],
+  "include": ["src", "src/schemas/transaction_schema.ts", "src/schemas/user_auth_schema.ts"],
   "ts-node": {
     "files": true
   }

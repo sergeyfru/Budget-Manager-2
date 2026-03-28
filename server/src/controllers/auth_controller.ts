@@ -9,17 +9,15 @@ import {
   verify_email,
 } from "../models/auth_model";
 import { ApiError } from "../errors/ApiErrors";
-// import dotenv from "dotenv";
-import { getUserFromToken, hashedRefreshToken } from "../utils/token";
-import { success } from "zod";
-// dotenv.config();
+import {  hashedRefreshToken, maxAgeRefresh } from "../utils/token";
 // const UAParser = require("ua-parser-js");
+
 
 export const _login = async (req: Request, res: Response) => {
   const ip_address = req.ip || "Unknown IP";
   const device_name = req.get("User-Agent") || "Unknown Device";
-  // const ua = new UAParser(req.get("User-Agent"));
-  // console.log("IP Address:", ip_address);
+  console.log("IP Address:", ip_address);
+  console.log("Device Name:", device_name);
 
   const { email, password } = req.body as ReqLoginSchema;
 
@@ -29,12 +27,6 @@ export const _login = async (req: Request, res: Response) => {
       res.status(result.status).json({ error: result.message });
       return;
     }
-    const maxAge_access = process.env.JWT_EXPIRES_ACCESS
-      ? parseInt(process.env.JWT_EXPIRES_ACCESS)
-      : 60000 * 15; // default to 15 minutes
-    const maxAge_refresh = process.env.JWT_EXPIRES_REFRESH
-      ? parseInt(process.env.JWT_EXPIRES_REFRESH)
-      : 3600000 * 24 * 7; // default to 7 days
 
     const { user, access_token, refresh_token } = result;
 
@@ -42,14 +34,14 @@ export const _login = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: false, // for development, set to true in production
       sameSite: "strict",
-      maxAge: maxAge_refresh,
+      maxAge: maxAgeRefresh,
     });
 
     // res.cookie("access_token", access_token, {
     //   httpOnly: true,
     //   secure: false, // for development, set to true in production
     //   sameSite: "strict",
-    //   maxAge: maxAge_access,
+    //   maxAge: maxAgeAccess,
     // });
 
     res
@@ -67,6 +59,7 @@ export const _login = async (req: Request, res: Response) => {
   }
 };
 
+
 export const _register = async (req: Request, res: Response) => {
   const data = req.body as ReqRegisterSchema;
   console.log("_register data:", data);
@@ -79,6 +72,7 @@ export const _register = async (req: Request, res: Response) => {
     });
   }
 };
+
 
 export const _changePassword = async (req: Request, res: Response) => {
   const user_id = (req as any).user_id;
@@ -100,6 +94,7 @@ export const _changePassword = async (req: Request, res: Response) => {
   });
 };
 
+
 export const _logout = async (req: Request, res: Response) => {
   console.log("In _logout controller");
   const refresh_token = req.cookies.refresh_token || "";
@@ -112,6 +107,7 @@ export const _logout = async (req: Request, res: Response) => {
     .status(200)
     .json({ success: true, message: "You have been logged out successfully" });
 };
+
 
 export const _veriyfy_email = async (req: Request, res: Response) => {
   const token = req.query.token as string;
@@ -128,19 +124,16 @@ export const _veriyfy_email = async (req: Request, res: Response) => {
     .json({ status: "success", message: "Email verified successfully" });
 };
 
+
 export const _verify_phone_number = async (req: Request, res: Response) => {
   res
     .status(200)
     .json({ status: "success", message: "Phone number verified successfully" });
 };
 
+
 export const _refresh = async (req: Request, res: Response) => {
-  const maxAge_access = process.env.JWT_EXPIRES_ACCESS
-    ? parseInt(process.env.JWT_EXPIRES_ACCESS)
-    : 60000 * 15; // default to 15 minutes
-  const maxAge_refresh = process.env.JWT_EXPIRES_REFRESH
-    ? parseInt(process.env.JWT_EXPIRES_REFRESH)
-    : 3600000 * 24 * 7; // default to 7 days
+
   const refreshToken = req.cookies.refresh_token;
   const hashed_refresh_token = hashedRefreshToken(refreshToken);
   const newTokens = await refresh(hashed_refresh_token);
@@ -149,7 +142,7 @@ export const _refresh = async (req: Request, res: Response) => {
     httpOnly: true,
     secure: false, // for development, set to true in production
     sameSite: "strict",
-    maxAge: maxAge_refresh,
+    maxAge: maxAgeRefresh,
   });
 
   res
@@ -161,9 +154,11 @@ export const _refresh = async (req: Request, res: Response) => {
     });
 };
 
+
 export const _forgotPassword = (req: Request, res: Response) => {
   res.status(200).json({ message: "Forgot Password" });
 };
+
 
 export const _resetPassword = (req: Request, res: Response) => {
   res.status(200).json({ message: "Reset Password" });
