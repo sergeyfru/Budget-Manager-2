@@ -25,9 +25,10 @@ export const login = async (
       .innerJoin({ ua: "users_auth" }, "u.user_id", "ua.user_id")
       .where({ "u.email": email })
       .first();
-    // console.log(user);
+    console.log(user);
 
     if (!user) {
+      console.log("User not found with email:", email);
       throw new ApiError(404, "User not found");
     } else {
       const isPasswordValid = await bcrypt.compare(
@@ -35,11 +36,13 @@ export const login = async (
         user.password_hash,
       );
       if (!isPasswordValid) {
+        console.log("Invalid password for email:", email);
         throw new ApiError(401, "Invalid password");
       }
     }
 
     const refresh_token = generateRefreshToken();
+
  //       #  for version 2, we will store refresh tokens in the database and associate them with sessions
 
 
@@ -63,6 +66,7 @@ export const login = async (
     //   hashed_refresh_token,
     //   expires_at,
     // });
+  
     const access_token = generateAccessToken({ user_id: user.user_id  });
 
     delete user.password_hash;
@@ -77,6 +81,7 @@ export const login = async (
     return dbErrorHandler(error);
   }
 };
+
 
 export const register = async (fullUser: ReqRegisterSchema) => {
   const { password, confirm_password, ...userInfo } = fullUser;
@@ -168,6 +173,8 @@ export const register = async (fullUser: ReqRegisterSchema) => {
     dbErrorHandler(error);
   }
 };
+
+
 export const changePassword = async (user_id: string, old_password: string, new_password: string): Promise<boolean | ApiError> => {
   const trx = await db.transaction();
   try {
@@ -193,6 +200,7 @@ export const changePassword = async (user_id: string, old_password: string, new_
     throw dbErrorHandler(error);
   }
 };
+
 
 export const logout = async (refresh_token: string, session_id: string | null = null ) : Promise<boolean> => {
 const trx = await db.transaction();
@@ -258,9 +266,6 @@ export const verify_email = async (token: string) : Promise<boolean | ApiError> 
 };
 
 
-
-
-
 export const refresh = async (hashed_refresh_token:string ) => {
   const trx =  await db.transaction()
 try {
@@ -287,4 +292,5 @@ try {
 };
 
 export const forgotPassword = async () => {};
+
 export const resetPassword = async () => {};

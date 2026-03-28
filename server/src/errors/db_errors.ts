@@ -1,8 +1,11 @@
 import { ApiError } from "./ApiErrors";
 
 export const dbErrorHandler = (err: any): ApiError => {
-  console.error('Database error:', err);
-  
+
+  if(err instanceof ApiError) {
+    console.log('Error is already an ApiError, rethrowing:', err);
+    throw err;
+  }
 
   if (err.code === "23505") {
     throw new ApiError(409, "Duplicate value");
