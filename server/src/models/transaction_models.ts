@@ -74,18 +74,23 @@ export const addTransaction = async (
   );
   const trx = await db.transaction();
   try {
-    const newTransaction = await trx("transactions")
+    console.log("Transaction data to insert:", transactionData);
+    const [newTransaction] = await trx("transactions")
       .insert({
         user_id,
-        transaction_amount: transactionData.transaction_amount,
-        date_of_transaction: transactionData.date_of_transaction,
         transaction_type_id: transactionData.transaction_type_id,
-        user_category_id: transactionData.user_category_id,
-        currency_id: transactionData.currency_id,
         user_payment_method_id: transactionData.user_payment_method_id,
+        user_category_id: transactionData.user_category_id,
+        transaction_amount: transactionData.transaction_amount,
+        currency_id: transactionData.currency_id,
+        date_of_transaction: transactionData.date_of_transaction,
         transaction_note: transactionData.transaction_note,
-      }).select("transaction_id", "user_id").first();
-    const responseFromDB = await getTransactionsQuery(trx).where("tr.transaction_id", newTransaction.transaction_id);
+      }).returning(["transaction_id", "user_id"]);
+
+    console.log("New transaction inserted with ID:", newTransaction);
+
+    const responseFromDB = await getTransactionsQuery(trx).where("tr.transaction_id", newTransaction.transaction_id).first();
+    console.log("Response from DB after inserting transaction:", responseFromDB);
 
     const newTransactionFull = validateDB(transactionFullSchema, responseFromDB);
 
@@ -94,6 +99,7 @@ export const addTransaction = async (
     return newTransactionFull;
 
   } catch (error) {
+    console.error("Error adding transaction:", error);
     trx.rollback();
     throw dbErrorHandler(error);
   }
@@ -124,13 +130,14 @@ console.log(
       .where({ "tr.user_id": user_id, "tr.transaction_id": transaction_id })
       .update(fieldsToUpdate);
 
-    const responseFromDB = await getTransactionsQuery(trx).where("tr.transaction_id", transaction_id);
+    const responseFromDB = await getTransactionsQuery(trx).where("tr.transaction_id", transaction_id).first();
 
     const updatedTransaction = validateDB(transactionFullSchema, responseFromDB);
 
     trx.commit();
     return updatedTransaction;
   } catch (error) {
+    console.error("Error updating transaction:", error);
     trx.rollback();
     throw dbErrorHandler(error);
   }
@@ -138,7 +145,7 @@ console.log(
 
 export const deleteTransaction = async (transaction_id: number): Promise<void> => {
   try {
-    await db("transactions").where({ transaction_id }).delete().select("uesr_id","transaction_id");
+    await db("transactions").where({ transaction_id }).delete().select("user_id","transaction_id");
   
     return;
   } catch (error) {
@@ -159,6 +166,7 @@ export const getTransactionTypes = async (): Promise<TransactionTypesArrDBSchema
     const transactionTypes = validateDB(transactionTypesArrDBSchema, responseFromDB);
     return transactionTypes;
   } catch (error) {
+    console.error("Error fetching transaction types:", error);
     throw dbErrorHandler(error);
   }
 }

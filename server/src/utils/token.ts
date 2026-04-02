@@ -1,5 +1,5 @@
-import { log } from "console";
-import jwt, { JsonWebTokenError } from "jsonwebtoken";
+
+import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import crypto, { Hash } from "crypto";
 // import dotenv from "dotenv";
@@ -13,10 +13,10 @@ const JWT_SECRET = process.env.JWT_SECRET!;
 
 export const maxAgeAccess = process.env.JWT_EXPIRES_ACCESS
   ? parseInt(process.env.JWT_EXPIRES_ACCESS)
-  : 60 * 15 * 1000; // 15 minutes
+  : 60 * 15; // 15 minutes
 export const maxAgeRefresh = process.env.JWT_EXPIRES_REFRESH
   ? parseInt(process.env.JWT_EXPIRES_REFRESH)
-  : 60 * 60 * 24 * 7 * 1000; // 7 days
+  : 60 * 60 * 24 * 7; // 7 days
 
 
 
@@ -38,9 +38,11 @@ export const getUserFromToken = async (
 ): Promise<UserInfoSchema> => {
   try {
     const decoded = jwt.verify(access_token, JWT_SECRET!) ;
-    if (typeof decoded == "string" || !decoded.user_id) {
+    if (typeof decoded == "string" || !decoded.user_id || !decoded.exp) {
       throw new ApiError(401, "Unauthorized");
     }
+    // console.log("Decoded token:", decoded);
+    console.log("Token expires in (seconds):", decoded.exp - Math.floor(Date.now() / 1000));
     const responseFromDB = await db("users").where("user_id", decoded.user_id).first();
 console.log("Response from DB:", responseFromDB);
 
@@ -54,6 +56,10 @@ console.log("Response from DB:", responseFromDB);
   } catch (error) {
      if (error instanceof JsonWebTokenError) {
       throw new ApiError(401,'Token is not valid');
+    }else if (error instanceof TokenExpiredError) {
+      throw new ApiError(401,'Token has expired');
+    }else if (error instanceof ApiError) {
+      throw error;
     }
     throw new ApiError(500,'Server error during authentication' );
   
@@ -76,10 +82,10 @@ export const hashedRefreshToken = (refresh_token: string): string => {
 export const verifyToken = (token: string) => {
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    log("Verified token:", decoded);
+    console.log("Verified token:", decoded);
     return decoded;
   } catch (error) {
-    log("Token verification failed:", error);
+    console.log("Token verification failed:", error);
     return null;
   }
 };

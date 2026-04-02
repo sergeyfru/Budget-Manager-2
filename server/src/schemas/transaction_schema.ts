@@ -40,6 +40,7 @@ export const userPaymentMethodSchema = z.object({
   color: z.string(),
   details: z.string().nullable(),
 });
+
 export type UserPaymentMethodSchema = z.infer<typeof userPaymentMethodSchema>;
 
 export const transactionFullSchema = z.object({

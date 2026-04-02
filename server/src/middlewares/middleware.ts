@@ -52,8 +52,7 @@ export const authMiddleware =
         error: "No token provided, authorization denied",
       });
     }
-
-    console.log(authHeader);
+    console.log("authHeader", authHeader);
 
     const access_token = authHeader.split(" ")[1];
     if (!access_token) {

@@ -60,7 +60,7 @@ export const login = async (
     const refresh_token = generateRefreshToken();
 
     const hashed_refresh_token = hashedRefreshToken(refresh_token);
-    const expires_at = new Date(Date.now() + maxAgeRefresh);
+    const expires_at = new Date(Date.now() + (maxAgeRefresh * 1000)); 
 
     //       #  for version 2, we will associate refresh tokens with sessions
 
@@ -128,6 +128,8 @@ export const register = async (fullUser: ReqRegisterSchema) => {
       "User created, now inserting default categories and payment methods...",
     );
     const ResponseOfDefaultCategories = await getDefaultCategoriesQuery(trx);
+    console.log("Default categories response:", ResponseOfDefaultCategories);
+    
     const defaultCategories = validateDB(
       defaultCategoryTypesArrDBSchema,
       ResponseOfDefaultCategories,
@@ -186,6 +188,7 @@ export const register = async (fullUser: ReqRegisterSchema) => {
     await trx.commit();
     return user as UserInfoSchema;
   } catch (error) {
+    console.error("Error during registration:", error);
     await trx.rollback();
     dbErrorHandler(error);
   }
@@ -303,7 +306,7 @@ export const refresh = async (hashed_refresh_token: string) => {
     await trx("refresh_tokens").insert({
       hashed_refresh_token: hashedNewRefreshToken,
       user_id: dbResponse.user_id,
-      expires_at: new Date(Date.now() + maxAgeRefresh),
+      expires_at: new Date(Date.now() + (maxAgeRefresh * 1000)),
       session_id: null,
     });
     await trx("refresh_tokens")

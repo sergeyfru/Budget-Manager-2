@@ -34,14 +34,14 @@ export const _login = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: false, // for development, set to true in production
       sameSite: "strict",
-      maxAge: maxAgeRefresh,
+      maxAge: maxAgeRefresh * 1000, // convert to milliseconds
     });
 
     // res.cookie("access_token", access_token, {
     //   httpOnly: true,
     //   secure: false, // for development, set to true in production
     //   sameSite: "strict",
-    //   maxAge: maxAgeAccess,
+    //   maxAge: maxAgeAccess * 1000, // convert to milliseconds
     // });
 
     res
@@ -142,7 +142,7 @@ export const _refresh = async (req: Request, res: Response) => {
     httpOnly: true,
     secure: false, // for development, set to true in production
     sameSite: "strict",
-    maxAge: maxAgeRefresh,
+    maxAge: maxAgeRefresh * 1000, // convert to milliseconds
   });
 
   res
