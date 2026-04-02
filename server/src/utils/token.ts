@@ -1,4 +1,3 @@
-
 import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import crypto, { Hash } from "crypto";
@@ -18,8 +17,6 @@ export const maxAgeRefresh = process.env.JWT_EXPIRES_REFRESH
   ? parseInt(process.env.JWT_EXPIRES_REFRESH)
   : 60 * 60 * 24 * 7; // 7 days
 
-
-
 export const generateAccessToken = (
   payload: object,
   expiresIn: number = maxAgeAccess,
@@ -27,7 +24,12 @@ export const generateAccessToken = (
   if (!JWT_SECRET) {
     throw new Error("JWT_SECRET is not defined in environment variables");
   }
-  console.log("Generating access token with payload:", payload, "and expiresIn:", expiresIn);
+  console.log(
+    "Generating access token with payload:",
+    payload,
+    "and expiresIn:",
+    expiresIn,
+  );
   const access_token = jwt.sign(payload, JWT_SECRET, { expiresIn });
 
   return access_token;
@@ -37,14 +39,19 @@ export const getUserFromToken = async (
   access_token: string,
 ): Promise<UserInfoSchema> => {
   try {
-    const decoded = jwt.verify(access_token, JWT_SECRET!) ;
+    const decoded = jwt.verify(access_token, JWT_SECRET!);
     if (typeof decoded == "string" || !decoded.user_id || !decoded.exp) {
       throw new ApiError(401, "Unauthorized");
     }
     // console.log("Decoded token:", decoded);
-    console.log("Token expires in (seconds):", decoded.exp - Math.floor(Date.now() / 1000));
-    const responseFromDB = await db("users").where("user_id", decoded.user_id).first();
-console.log("Response from DB:", responseFromDB);
+    console.log(
+      "Token expires in (seconds):",
+      decoded.exp - Math.floor(Date.now() / 1000),
+    );
+    const responseFromDB = await db("users")
+      .where("user_id", decoded.user_id)
+      .first();
+    console.log("Response from DB:", responseFromDB);
 
     const result = user_info_schema.safeParse(responseFromDB);
 
@@ -54,15 +61,13 @@ console.log("Response from DB:", responseFromDB);
     }
     return result.data;
   } catch (error) {
-     if (error instanceof JsonWebTokenError) {
-      throw new ApiError(401,'Token is not valid');
-    }else if (error instanceof TokenExpiredError) {
-      throw new ApiError(401,'Token has expired');
-    }else if (error instanceof ApiError) {
+    console.log("Error in getUserFromToken:", error);
+    if (error instanceof JsonWebTokenError) {
+      throw new ApiError(401, error.message);
+    } else if (error instanceof ApiError) {
       throw error;
     }
-    throw new ApiError(500,'Server error during authentication' );
-  
+    throw new ApiError(500, "Server error during authentication");
   }
 };
 
@@ -90,15 +95,15 @@ export const verifyToken = (token: string) => {
   }
 };
 
-export const getCheckedUser = async  (access_token: string) => {
-    // const access_token = req.body.access_token as string || req.cookies.access_token as string;
-    console.log(access_token);
-    
-    if (!access_token) {
-      throw new ApiError(401,"Unauthorized");
-    }
+export const getCheckedUser = async (access_token: string) => {
+  // const access_token = req.body.access_token as string || req.cookies.access_token as string;
+  console.log(access_token);
 
-    const user = await getUserFromToken(access_token)
+  if (!access_token) {
+    throw new ApiError(401, "Unauthorized");
+  }
 
-    return user
-  };
+  const user = await getUserFromToken(access_token);
+
+  return user;
+};
