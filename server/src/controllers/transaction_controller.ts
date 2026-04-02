@@ -5,28 +5,26 @@ import {
   getTransactions,
   getTransactionsByDateRange,
   updateTransaction,
-  getTransactionTypes
+  getTransactionTypes,
 } from "../models/transaction_models";
-import {
-  ReqAddTransactionSchema,
-} from "../schemas/transaction_schema";
+import { ReqAddTransactionSchema } from "../schemas/transaction_schema";
 import { UserInfoSchema } from "../schemas/user_auth_schema";
 
 export const _getTransactions = async (req: Request, res: Response) => {
   const user_id = req.user?.user_id as number;
+  console.log("Trying to get all transactions for user_id:", user_id);
 
   try {
-
     const transactions = await getTransactions(user_id);
     if (transactions.length === 0) {
-      return res.send(200).json({
+      return res.status(200).json({
         transactions: [],
         status: "success",
         message: "No transactions found",
       });
-    } 
+    }
 
-    return res.status(201).json({
+    res.status(200).json({
       transactions,
       status: "success",
       message: "Here are all transactions",
@@ -43,10 +41,8 @@ export const _getTransactionsByDateRange = async (
   res: Response,
 ) => {
   const user_id = req.user?.user_id as number;
-  
 
   try {
-    
     const { start_date, end_date } = req.body;
     const transactionsByDateRange = await getTransactionsByDateRange(
       user_id,
@@ -62,7 +58,7 @@ export const _getTransactionsByDateRange = async (
       });
     }
 
-    return res.status(201).json({
+    return res.status(200).json({
       transactionsByDateRange,
       status: "success",
       message: "Here are all transactions",
@@ -76,7 +72,7 @@ export const _getTransactionsByDateRange = async (
 
 export const _addTransaction = async (req: Request, res: Response) => {
   const user_id = req.user?.user_id as number;
-  
+
   try {
     const transactionData = req.body as ReqAddTransactionSchema;
 
@@ -96,11 +92,10 @@ export const _addTransaction = async (req: Request, res: Response) => {
 
 export const _updateTransaction = async (req: Request, res: Response) => {
   const user_id = req.user?.user_id as number;
-  
+
   const updatedTransactionData = req.body;
 
   try {
-    
     const updatedTransaction = await updateTransaction(
       user_id,
       updatedTransactionData,
@@ -118,11 +113,10 @@ export const _updateTransaction = async (req: Request, res: Response) => {
   }
 };
 
-export const _deleteTransaction = async (req:Request, res:Response)=>{
+export const _deleteTransaction = async (req: Request, res: Response) => {
   const transaction_id = req.body.transaction_id;
 
   try {
-
     await deleteTransaction(transaction_id);
 
     res.status(201).json({
@@ -134,7 +128,7 @@ export const _deleteTransaction = async (req:Request, res:Response)=>{
       error: error.message,
     });
   }
-}
+};
 
 export const _getTransactionTypes = async (req: Request, res: Response) => {
   try {
@@ -144,10 +138,9 @@ export const _getTransactionTypes = async (req: Request, res: Response) => {
       status: "success",
       message: "Transaction types retrieved successfully",
     });
-    
   } catch (error: any) {
     res.status(error.status || 500).json({
       error: error.message,
     });
   }
-}
+};

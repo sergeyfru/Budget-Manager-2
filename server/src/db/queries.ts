@@ -37,7 +37,7 @@ export const getTransactionsQuery = (trx: Knex): Knex.QueryBuilder => {
       json_build_object(
         'id', tt.transaction_type_id,
         'name', tt.transaction_type_name,
-        'direction', tt.transaction_direction,
+        'direction', tt.transaction_type_direction,
         'icon', tt.transaction_type_icon,
         'color', tt.transaction_type_color
       ) as transaction_type
@@ -57,7 +57,9 @@ export const getTransactionsQuery = (trx: Knex): Knex.QueryBuilder => {
       json_build_object(
         'id', upm.user_payment_method_id,
         'type_id', upm.payment_method_type_id,
-        'label', upm.user_payment_method_label,
+        'name', upm.user_payment_method_name,
+        'icon', upm.user_payment_method_icon,
+        'color', upm.user_payment_method_color,
         'details', upm.user_payment_method_details
       ) as user_payment_method
     `),

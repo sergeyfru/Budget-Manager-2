@@ -26,8 +26,7 @@ const router = exporess.Router();
 router.post("/login", validate(req_login_schema), _login);
 router.post("/register", validate(req_register_schema), _register);
 router.post("/logout", _logout);
-router.put(
-  "/change-password",
+router.put("/change-password",
   authMiddleware(),
   validate(req_change_password_schema),
   _changePassword,
@@ -38,13 +37,11 @@ router.put('/verify_phone_number', _verify_phone_number);
 
 router.post("/refresh", _refresh);
 
-router.post(
-  "/forgot-password",
+router.post("/forgot-password",
   validate(req_forgot_password_schema),
   _forgotPassword,
 );
-router.post(
-  "/reset-password",
+router.post("/reset-password",
   validate(req_reset_password_schema),
   _resetPassword,
 );

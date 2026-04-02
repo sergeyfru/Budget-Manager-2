@@ -35,7 +35,9 @@ export type UserCategorySchema = z.infer<typeof userCategorySchema>;
 export const userPaymentMethodSchema = z.object({
   id: z.number(),
   type_id: z.number(),
-  label: z.string(),
+  name: z.string(),
+  icon: z.string().nullable(),
+  color: z.string(),
   details: z.string().nullable(),
 });
 export type UserPaymentMethodSchema = z.infer<typeof userPaymentMethodSchema>;

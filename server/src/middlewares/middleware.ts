@@ -9,13 +9,12 @@ export const validate =
 
     if (!result.success) {
       console.log(result.error);
-      return res.status(400).json(
-        result.error.issues.map((issue) => {
-          return {
-            [issue.path.join(".")]: issue.message,
-          };
-        }),
-      );
+      return res.status(400).json({
+        errors: result.error.issues.map((issue) => ({
+          field: issue.path.join("."),
+          message: issue.message,
+        })),
+      });
     }
 
     req.body = result.data;
@@ -45,24 +44,26 @@ export const errorHandler = (
 export const authMiddleware =
   () => async (req: Request, res: Response, next: NextFunction) => {
     console.log("auth Middleware");
-    
-      const authHeader =
-        req.headers["authorization"] || (req.cookies.access_token as string);
-      if (!authHeader) {
-        return res.status(401).json({
-          error: "No token provided, authorization denied",
-        });
-      }
-      
-      const access_token = authHeader.split(" ")[1];
-      if (!access_token) {
-        return res.status(401).json({ message: "Token format invalid" });
-      }
 
-      const user = await getUserFromToken(access_token);
+    const authHeader =
+      req.headers["authorization"] || (req.cookies.access_token as string);
+    if (!authHeader) {
+      return res.status(401).json({
+        error: "No token provided, authorization denied",
+      });
+    }
 
-      req.user = user;
+    console.log(authHeader);
 
-      next();
-  
+    const access_token = authHeader.split(" ")[1];
+    if (!access_token) {
+      return res.status(401).json({ message: "Token format invalid" });
+    }
+
+    const user = await getUserFromToken(access_token);
+    console.log("user in Middleware", user);
+
+    req.user = user;
+
+    next();
   };
