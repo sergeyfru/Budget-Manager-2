@@ -239,7 +239,7 @@ export const logout = async (
     await trx.commit();
     return true;
   } catch (error) {
-    trx.rollback();
+    await trx.rollback();
     throw dbErrorHandler(error);
   }
 };
@@ -312,7 +312,9 @@ export const refresh = async (hashed_refresh_token: string) => {
     await trx("refresh_tokens")
       .where({ token_id: dbResponse.token_id })
       .delete();
+console.log("New refresh token generated and old one deleted for user_id:", dbResponse.user_id);
 
+    await trx.commit();
     const newAccessToken = generateAccessToken({ user_id: dbResponse.user_id });
 
     return { newRefreshToken, newAccessToken };

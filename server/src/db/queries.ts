@@ -63,7 +63,7 @@ export const getTransactionsQuery = (trx: Knex): Knex.QueryBuilder => {
         'details', upm.user_payment_method_details
       ) as user_payment_method
     `),
-    );
+    ).orderBy("tr.date_of_transaction", "desc");
 };
 
 export const getDefaultCategoriesQuery = (trx: Knex): Knex.QueryBuilder => {
