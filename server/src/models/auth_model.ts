@@ -138,8 +138,8 @@ export const register = async (fullUser: ReqRegisterSchema) => {
 
     const defaultUsersCategories = defaultCategories.map((category) => ({
       user_id: user.user_id,
-      category_type_id: category.category_type_id,
       user_category_name: category.category_type_name,
+      user_category_direction: category.category_type_direction,
       user_category_icon: category.category_type_icon,
       user_category_color: category.category_type_color,
     }));

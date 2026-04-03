@@ -46,7 +46,7 @@ export const getTransactionsQuery = (trx: Knex): Knex.QueryBuilder => {
       trx.raw(`
       json_build_object(
         'id', uc.user_category_id,
-        'type_id', uc.category_type_id,
+        'direction', uc.user_category_direction,
         'name', uc.user_category_name,
         'icon', uc.user_category_icon,
         'color', uc.user_category_color
@@ -70,6 +70,7 @@ export const getDefaultCategoriesQuery = (trx: Knex): Knex.QueryBuilder => {
   return trx("category_types").select(
     "category_type_id",
     "category_type_name",
+    "category_type_direction",
     "category_type_icon",
     "category_type_color",
   );

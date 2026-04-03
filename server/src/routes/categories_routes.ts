@@ -7,14 +7,14 @@ import {
     _updateUserCategory
 } from "../controllers/categories_controller"
 import { authMiddleware, validate } from "../middlewares/middleware";
-import { reqCreateUserCategorySchema } from "../schemas/transaction_schema";
+import { reqCreateUserCategorySchema, reqUpdateUserCategorySchema } from "../schemas/transaction_schema";
 
 const router = express.Router()
 
-router.get('/categories/default', _getDefaultCategories)
-router.get('/categories',authMiddleware(),_getUserCategories)
-router.post('/categories',authMiddleware(),validate(reqCreateUserCategorySchema), _createUserCategory)
-router.patch('/categories/:id',authMiddleware(), validate(reqCreateUserCategorySchema), _updateUserCategory)
-router.delete('/categories/:id',authMiddleware(),_deleteUserCategory)
+router.get('/default', _getDefaultCategories)
+router.get('/',authMiddleware(),_getUserCategories)
+router.post('/',authMiddleware(),validate(reqCreateUserCategorySchema), _createUserCategory)
+router.patch('/:id',authMiddleware(), validate(reqUpdateUserCategorySchema), _updateUserCategory)
+router.delete('/:id',authMiddleware(),_deleteUserCategory)
 
 export default router

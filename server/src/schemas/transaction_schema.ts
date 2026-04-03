@@ -25,7 +25,7 @@ export type TransactionTypeSchema = z.infer<typeof transactionTypeSchema>;
 
 export const userCategorySchema = z.object({
   id: z.number(),
-  type_id: z.number(),
+  direction: z.enum(["in", "out"]),
   name: z.string(),
   icon: z.string().nullable(),
   color: z.string(),
@@ -142,6 +142,7 @@ export type TransactionTypesArrDBSchema = z.infer<
 export const defaultCategoryTypeDBSchema = z.object({
   category_type_id: z.number(),
   category_type_name: z.string(),
+  category_type_direction: z.enum(["in", "out"]),
   category_type_icon: z.string().nullable(),
   category_type_color: z.string(),
 });
@@ -161,8 +162,8 @@ export type DefaultCategoryTypesArrDBSchema = z.infer<
 export const userCategoryDBSchema = z.object({
   user_category_id: z.number(),
   user_id: z.number(),
-  category_type_id: z.number(),
   user_category_name: z.string(),
+  user_category_direction: z.enum(["in", "out"]), 
   user_category_icon: z.string().nullable(),
   user_category_color: z.string(),
   created_at: z.date().optional(),
@@ -184,7 +185,7 @@ export type ReqCreateUserCategorySchema = z.infer<
 
 export const reqUpdateUserCategorySchema = reqCreateUserCategorySchema
   .partial()
-  .omit({ user_id: true, category_type_id: true, created_at: true });
+  .omit({ user_id: true, created_at: true });
 export type ReqUpdateUserCategorySchema = z.infer<
   typeof reqUpdateUserCategorySchema
 >;

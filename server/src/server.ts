@@ -61,7 +61,7 @@ app.listen(process.env.PORT || 3001, () => {
 
 // All other GET requests not handled before will return our React app
 app.use((req, res) => {
-    res.sendFile(path.resolve(__dirname, "../../client", "404.html"));
+    res.sendFile(path.resolve(__dirname, "../../client/public", "404.html"));
 });
 
 app.use(errorHandler);
