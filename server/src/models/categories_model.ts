@@ -6,7 +6,7 @@ import { validateDB, validateRequest } from "../utils/validation";
 
 export const getDefaultCategories = async (): Promise<DefaultCategoryTypesArrDBSchema> =>{
     try {
-        const responseFromDB = await db("category_types").select("category_type_id", "category_type_name","category_type_icon","category_type_color")
+        const responseFromDB = await db("category_types").select("category_type_id", "category_type_name", "category_type_direction","category_type_icon","category_type_color")
        const defaultCategoryTypes = validateDB(defaultCategoryTypesArrDBSchema, responseFromDB)
         return defaultCategoryTypes
     } catch (error) {
@@ -17,7 +17,8 @@ export const getDefaultCategories = async (): Promise<DefaultCategoryTypesArrDBS
 
 export const getUserCategories = async (user_id:number): Promise<UserCategoriesArrDBSchema> =>{
     try {
-        const responseFromDB = await db("user_categories").where({user_id}).select("user_category_id", "user_id","category_type_id","user_category_name","user_category_icon","user_category_color")
+        const responseFromDB = await db("user_categories").where({user_id})
+        .select("user_category_id", "user_id","user_category_direction","user_category_name","user_category_icon","user_category_color")
 
         const userCategories = validateDB(userCategoriesArrDBSchema, responseFromDB)
         return userCategories
@@ -31,7 +32,7 @@ export const createUserCategory = async (newUserCategory:ReqCreateUserCategorySc
     try {
         const responseFromDB = await db("user_categories")
         .insert(newUserCategory)
-        .returning(["user_category_id", "user_id","category_type_id","user_category_name","user_category_icon","user_category_color", "created_at"]).first()
+        .returning(["user_category_id", "user_id","user_category_direction","user_category_name","user_category_icon","user_category_color", "created_at"]).first()
         const newUserCategoryParsed = validateDB(userCategoryDBSchema, responseFromDB);
 
         return newUserCategoryParsed;
@@ -57,7 +58,7 @@ export const updateUserCategory = async (user_category_id:number, updatedUserCat
         const responseFromDB = await db("user_categories")
         .where({ user_category_id })
         .update(fieldsToUpdate)
-        .returning(["user_category_id", "user_id","category_type_id","user_category_name","user_category_icon","user_category_color", "created_at"]).first()
+        .returning(["user_category_id", "user_id","user_category_direction","user_category_name","user_category_icon","user_category_color", "created_at"]).first()
         const updatedUserCategoryParsed = validateDB(userCategoryDBSchema, responseFromDB);
 
         return updatedUserCategoryParsed;
