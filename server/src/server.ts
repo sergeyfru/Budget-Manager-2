@@ -41,7 +41,6 @@ app.use(express.urlencoded({ extended: true }));
 
 // Route
 app.get("/", (req, res) => {
-    console.table(req.cookies);
   res.send("<h1 style='text-align: center;'>Server is Running</h1>");
 });
 
