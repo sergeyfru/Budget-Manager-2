@@ -63,7 +63,7 @@ export const addTransaction = async (
   try {
     console.log("Transaction data to insert:", transactionData);
     const [newTransaction] = await trx("transactions")
-      .insert({
+      .insert({  // insert transactionData as an object with the correct keys
         user_id,
         transaction_type_id: transactionData.transaction_type_id,
         user_payment_method_id: transactionData.user_payment_method_id,

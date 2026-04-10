@@ -29,7 +29,8 @@ export const getTransactionsQuery = (trx: Knex): Knex.QueryBuilder => {
           'currency_id', c.currency_id,
           'currency_code', c.currency_code,
           'currency_symbol', c.currency_symbol,
-          'currency_name', c.currency_name
+          'currency_name', c.currency_name,
+          'created_at', c.created_at
         ) as currency
       `),
 

@@ -82,7 +82,7 @@ export const _logout = async (req: Request, res: Response<ResSimple>) => {
   res.status(200).json({ status: "success", message: "You have been logged out successfully" });
 };
 
-export const _veriyfy_email = async (req: Request, res: Response<ResSimple>) => {
+export const _verify_email = async (req: Request, res: Response<ResSimple>) => {
   const token = req.query.token as string;
   console.log("Verification token:", token);
   await verify_email(token);
