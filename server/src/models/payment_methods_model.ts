@@ -1,22 +1,19 @@
 import { db } from "../config/db";
 import { ApiError } from "../errors/ApiErrors";
 import { dbErrorHandler } from "../errors/db_errors";
+
 import {
-  DefaultPaymentMethodTypesArrDBSchema,
-  defaultPaymentMethodTypesArrDBSchema,
-  reqCreateUserPaymentMethodSchema,
-  ReqCreateUserPaymentMethodSchema,
-  reqUpdateUserPaymentMethodSchema,
-  ReqUpdateUserPaymentMethodSchema,
-  userPaymentMethodDBSchema,
-  UserPaymentMethodDBSchema,
-  userPaymentMethodsArrDBSchema,
-  UserPaymentMethodsArrDBSchema,
-} from "../schemas/transaction_schema";
+  DefaultPaymentMethodTypesArrDB, defaultPaymentMethodTypesArrDBSchema,
+  ReqCreateUserPaymentMethod, ReqUpdateUserPaymentMethod,
+  reqUpdateUserPaymentMethodSchema, UserPaymentMethodDB,
+  userPaymentMethodDBSchema, UserPaymentMethodsArrDB,
+  userPaymentMethodsArrDBSchema
+} from "@shared/core";
+
 import { validateDB, validateRequest } from "../utils/validation";
 
 export const getDefaultPaymentMethods =
-  async (): Promise<DefaultPaymentMethodTypesArrDBSchema> => {
+  async (): Promise<DefaultPaymentMethodTypesArrDB> => {
     try {
       const responseFromDB = await db("payment_method_types").select(
         "payment_method_type_id",
@@ -39,7 +36,7 @@ export const getDefaultPaymentMethods =
 
 export const getUserPaymentMethods = async (
   user_id: number,
-): Promise<UserPaymentMethodsArrDBSchema> => {
+): Promise<UserPaymentMethodsArrDB> => {
   try {
     const responseFromDB = await db("user_payment_methods")
       .where({ user_id })
@@ -65,8 +62,8 @@ export const getUserPaymentMethods = async (
 };
 
 export const createUserPaymentMethod = async (
-  newUserPaymentMethod: ReqCreateUserPaymentMethodSchema,
-): Promise<UserPaymentMethodDBSchema> => {
+  newUserPaymentMethod: ReqCreateUserPaymentMethod,
+): Promise<UserPaymentMethodDB> => {
   try {
     const responseFromDB = await db("user_payment_methods")
       .insert(newUserPaymentMethod)
@@ -95,8 +92,8 @@ export const createUserPaymentMethod = async (
 
 export const updateUserPaymentMethod = async (
   user_payment_method_id: number,
-  updatedUserPaymentMethod: ReqUpdateUserPaymentMethodSchema,
-): Promise<UserPaymentMethodDBSchema> => {
+  updatedUserPaymentMethod: ReqUpdateUserPaymentMethod,
+): Promise<UserPaymentMethodDB> => {
   const validatedData = validateRequest(
     reqUpdateUserPaymentMethodSchema,
     updatedUserPaymentMethod,

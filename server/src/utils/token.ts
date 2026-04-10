@@ -5,7 +5,7 @@ import crypto, { Hash } from "crypto";
 import { ApiError } from "../errors/ApiErrors";
 import { db } from "../config/db";
 import { Request } from "express";
-import { user_info_schema, UserInfoSchema } from "../schemas/user_auth_schema";
+import { UserDB, userDBSchema } from "@shared/core";
 
 // dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET!;
@@ -37,7 +37,7 @@ export const generateAccessToken = (
 
 export const getUserFromToken = async (
   access_token: string,
-): Promise<UserInfoSchema> => {
+): Promise<UserDB> => {
   try {
     const decoded = jwt.verify(access_token, JWT_SECRET!);
     if (typeof decoded == "string" || !decoded.user_id || !decoded.exp) {
@@ -53,7 +53,7 @@ export const getUserFromToken = async (
       .first();
     console.log("Response from DB:", responseFromDB);
 
-    const result = user_info_schema.safeParse(responseFromDB);
+    const result = userDBSchema.safeParse(responseFromDB);
 
     if (!result.success) {
       console.log("Validation error:", result.error);

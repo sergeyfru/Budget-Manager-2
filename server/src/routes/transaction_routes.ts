@@ -9,9 +9,8 @@ import {
 } from "../controllers/transaction_controller";
 import { authMiddleware, validate } from "../middlewares/middleware";
 import {
-  reqAddTransactionSchema,
-  reqUpdateTransactionSchema,
-} from "../schemas/transaction_schema";
+  createTransactionFormSchema, reqUpdateTransactionSchema
+} from "@shared/core";
 
 const router = express.Router();
 
@@ -25,7 +24,7 @@ router.post("/getTransactionsByDateRange",
 );
 router.post("/addTransaction",
   authMiddleware(),
-  validate(reqAddTransactionSchema),
+  validate(createTransactionFormSchema),
   _addTransaction,
 );
 router.put("/updatetransaction",

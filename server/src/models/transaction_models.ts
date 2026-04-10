@@ -2,31 +2,24 @@ import { parse } from "node:path";
 import { db } from "../config/db";
 import { ApiError } from "../errors/ApiErrors";
 import { dbErrorHandler } from "../errors/db_errors";
-import {
-  ReqAddTransactionSchema,
-  ReqUpdateTransactionSchema,
-  TransactionFullSchema,
-  TransactionTypesArrDBSchema,
-  TransactionsResponseSchema,
-  transactionFullSchema,
-  transactionTypesArrDBSchema,
-  transactionsResponseArraySchema,
-} from "../schemas/transaction_schema";
+
 import { getTransactionsQuery } from "../db/queries";
 import { validateDB } from "../utils/validation";
 
-export const getTransactions = async (
-  user_id: number,
-): Promise<TransactionsResponseSchema> => {
+import {
+  ReqCreateTransaction, ReqUpdateTransaction,
+  TransactionDetailed, transactionDetailedSchema,
+  TransactionsDetailedArr, transactionsDetailedArrSchema,
+  TransactionTypesArrDB, transactionTypesArrDBSchema
+} from "@shared/core";
+
+export const getTransactions = async (user_id: number): Promise<TransactionsDetailedArr> => {
   console.log("In models, getting transactions for user_id:", user_id);
   const trx = await db.transaction();
   try {
-    const responseFromDB = await getTransactionsQuery(trx).where(
-      "tr.user_id",
-      user_id,
-    );
+    const responseFromDB = await getTransactionsQuery(trx).where("tr.user_id", user_id);
 
-    const transactions = validateDB(transactionsResponseArraySchema, responseFromDB);
+    const transactions = validateDB(transactionsDetailedArrSchema, responseFromDB);
 
     trx.commit();
     return transactions;
@@ -41,11 +34,8 @@ export const getTransactionsByDateRange = async (
   user_id: number,
   start_date: Date,
   end_date: Date,
-): Promise<TransactionsResponseSchema> => {
-  console.log(
-    "In models, getting transactions in a date range for user_id:",
-    user_id,
-  );
+): Promise<TransactionsDetailedArr> => {
+  console.log("In models, getting transactions in a date range for user_id:", user_id);
   const trx = await db.transaction();
   try {
     const responseFromDB = await getTransactionsQuery(trx)
@@ -53,7 +43,7 @@ export const getTransactionsByDateRange = async (
       .andWhere("tr.date_of_transaction", ">=", start_date)
       .andWhere("tr.date_of_transaction", "<=", end_date);
 
-    const transactionsByDateRange = validateDB(transactionsResponseArraySchema, responseFromDB);
+    const transactionsByDateRange = validateDB(transactionsDetailedArrSchema, responseFromDB);
 
     trx.commit();
 
@@ -66,12 +56,9 @@ export const getTransactionsByDateRange = async (
 
 export const addTransaction = async (
   user_id: number,
-  transactionData: ReqAddTransactionSchema,
-): Promise<TransactionFullSchema> => {
-  console.log(
-    "In models, adding transaction for user_id:",
-    user_id,
-  );
+  transactionData: ReqCreateTransaction,
+): Promise<TransactionDetailed> => {
+  console.log("In models, adding transaction for user_id:", user_id);
   const trx = await db.transaction();
   try {
     console.log("Transaction data to insert:", transactionData);
@@ -85,19 +72,20 @@ export const addTransaction = async (
         currency_id: transactionData.currency_id,
         date_of_transaction: transactionData.date_of_transaction,
         transaction_note: transactionData.transaction_note,
-      }).returning(["transaction_id", "user_id"]);
+      })
+      .returning(["transaction_id", "user_id"]);
 
     console.log("New transaction inserted with ID:", newTransaction);
 
-    const responseFromDB = await getTransactionsQuery(trx).where("tr.transaction_id", newTransaction.transaction_id).first();
+    const responseFromDB = await getTransactionsQuery(trx)
+      .where("tr.transaction_id", newTransaction.transaction_id)
+      .first();
     console.log("Response from DB after inserting transaction:", responseFromDB);
 
-    const newTransactionFull = validateDB(transactionFullSchema, responseFromDB);
-
+    const newTransactionFull = validateDB(transactionDetailedSchema, responseFromDB);
 
     trx.commit();
     return newTransactionFull;
-
   } catch (error) {
     console.error("Error adding transaction:", error);
     trx.rollback();
@@ -107,20 +95,15 @@ export const addTransaction = async (
 
 export const updateTransaction = async (
   user_id: number,
-  updatedTransactionData: ReqUpdateTransactionSchema,
-): Promise<TransactionFullSchema> => {
-console.log(
-    "In models, updating transaction for user_id:",
-    user_id,
-  );
+  updatedTransactionData: ReqUpdateTransaction,
+): Promise<TransactionDetailed> => {
+  console.log("In models, updating transaction for user_id:", user_id);
 
   const trx = await db.transaction();
   try {
     const { transaction_id, ...fields } = updatedTransactionData;
 
-    const fieldsToUpdate = Object.fromEntries(
-      Object.entries(fields).filter(([_, v]) => v !== undefined),
-    );
+    const fieldsToUpdate = Object.fromEntries(Object.entries(fields).filter(([_, v]) => v !== undefined));
 
     if (Object.keys(fieldsToUpdate).length === 0) {
       throw new ApiError(400, "No fields to update");
@@ -132,7 +115,7 @@ console.log(
 
     const responseFromDB = await getTransactionsQuery(trx).where("tr.transaction_id", transaction_id).first();
 
-    const updatedTransaction = validateDB(transactionFullSchema, responseFromDB);
+    const updatedTransaction = validateDB(transactionDetailedSchema, responseFromDB);
 
     trx.commit();
     return updatedTransaction;
@@ -145,15 +128,15 @@ console.log(
 
 export const deleteTransaction = async (transaction_id: number): Promise<void> => {
   try {
-    await db("transactions").where({ transaction_id }).delete().select("user_id","transaction_id");
-  
+    await db("transactions").where({ transaction_id }).delete().select("user_id", "transaction_id");
+
     return;
   } catch (error) {
     throw dbErrorHandler(error);
   }
 };
 
-export const getTransactionTypes = async (): Promise<TransactionTypesArrDBSchema> => {
+export const getTransactionTypes = async (): Promise<TransactionTypesArrDB> => {
   try {
     const responseFromDB = await db("transaction_types").select(
       "transaction_type_id",
@@ -169,4 +152,4 @@ export const getTransactionTypes = async (): Promise<TransactionTypesArrDBSchema
     console.error("Error fetching transaction types:", error);
     throw dbErrorHandler(error);
   }
-}
+};

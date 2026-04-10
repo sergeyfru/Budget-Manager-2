@@ -7,7 +7,7 @@ import {
     _updateUserCategory
 } from "../controllers/categories_controller"
 import { authMiddleware, validate } from "../middlewares/middleware";
-import { reqCreateUserCategorySchema, reqUpdateUserCategorySchema } from "../schemas/transaction_schema";
+import { reqCreateUserCategorySchema, reqUpdateUserCategorySchema } from "@shared/core";
 
 const router = express.Router()
 

@@ -1,28 +1,22 @@
 import { db } from "../config/db";
 import bcrypt from "bcryptjs";
-import {
-  RefreshTokenDBSchema,
-  ReqRegisterSchema,
-  UserInfoSchema,
-} from "../schemas/user_auth_schema";
 import { dbErrorHandler } from "../errors/db_errors";
 import { ApiError } from "../errors/ApiErrors";
-import {
-  generateAccessToken,
-  generateRefreshToken,
-  hashedRefreshToken,
-  maxAgeRefresh,
-} from "../utils/token";
+import { 
+  generateAccessToken, generateRefreshToken,
+   hashedRefreshToken, maxAgeRefresh
+   } from "../utils/token";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "../utils/verification";
+import { 
+  getDefaultCategoriesQuery, getDefaultPaymentMethodsQuery
+ } from "../db/queries";
 import {
-  getDefaultCategoriesQuery,
-  getDefaultPaymentMethodsQuery,
-} from "../db/queries";
-import {
-  defaultCategoryTypesArrDBSchema,
+  LoginService, RefreshTokenService,
   defaultPaymentMethodTypesArrDBSchema,
-} from "../schemas/transaction_schema";
+  defaultCategoriesArrDBSchema,
+  RefreshTokenDB,ReqRegister, UserView
+} from "@shared/core";
 import { validateDB } from "../utils/validation";
 
 export const login = async (
@@ -30,10 +24,7 @@ export const login = async (
   password: string,
   ip_address: string,
   device_name: string,
-): Promise<
-  | { user: UserInfoSchema; access_token: string; refresh_token: string }
-  | ApiError
-> => {
+): Promise<LoginService> => {
   const trx = await db.transaction();
 
   try {
@@ -47,10 +38,7 @@ export const login = async (
       console.log("User not found with email:", email);
       throw new ApiError(404, "User not found");
     } else {
-      const isPasswordValid = await bcrypt.compare(
-        password,
-        user.password_hash,
-      );
+      const isPasswordValid = await bcrypt.compare(password, user.password_hash);
       if (!isPasswordValid) {
         console.log("Invalid password for email:", email);
         throw new ApiError(401, "Invalid password");
@@ -60,13 +48,7 @@ export const login = async (
     const refresh_token = generateRefreshToken();
 
     const hashed_refresh_token = hashedRefreshToken(refresh_token);
-    const expires_at = new Date(Date.now() + (maxAgeRefresh * 1000)); 
-
-    //       #  for version 2, we will associate refresh tokens with sessions
-
-    // const [session] = await trx("sessions")
-    //   .insert({ user_id: user.user_id, ip_address, device_name, expires_at })
-    //   .returning(["session_id", "ip_address", "device_name"]);
+    const expires_at = new Date(Date.now() + maxAgeRefresh * 1000);
 
     await trx("refresh_tokens").insert({
       user_id: user.user_id,
@@ -85,18 +67,16 @@ export const login = async (
     return { user, access_token, refresh_token };
   } catch (error) {
     trx.rollback();
-    return dbErrorHandler(error);
+    throw dbErrorHandler(error);
   }
 };
 
-export const register = async (fullUser: ReqRegisterSchema) => {
-  const { password, confirm_password, ...userInfo } = fullUser;
+export const register = async (newUser: ReqRegister): Promise<UserView> => {
+  const { password, confirm_password, ...userInfo } = newUser;
 
   const trx = await db.transaction();
   try {
-    const existingUser = await trx("users")
-      .where({ email: userInfo.email })
-      .first();
+    const existingUser = await trx("users").where({ email: userInfo.email }).first();
     if (existingUser) {
       trx.rollback();
       throw new ApiError(409, "Duplicate value");
@@ -124,16 +104,11 @@ export const register = async (fullUser: ReqRegisterSchema) => {
       user_id: user.user_id,
       password_hash,
     });
-    console.log(
-      "User created, now inserting default categories and payment methods...",
-    );
+    console.log("User created, now inserting default categories and payment methods...");
     const ResponseOfDefaultCategories = await getDefaultCategoriesQuery(trx);
     console.log("Default categories response:", ResponseOfDefaultCategories);
-    
-    const defaultCategories = validateDB(
-      defaultCategoryTypesArrDBSchema,
-      ResponseOfDefaultCategories,
-    );
+
+    const defaultCategories = validateDB(defaultCategoriesArrDBSchema, ResponseOfDefaultCategories);
     console.log(defaultCategories);
 
     const defaultUsersCategories = defaultCategories.map((category) => ({
@@ -147,29 +122,20 @@ export const register = async (fullUser: ReqRegisterSchema) => {
 
     console.log("Default categories inserted for user");
 
-    const ResponseOfDefaultPaymentMethods =
-      await getDefaultPaymentMethodsQuery(trx);
-    const defaultPaymentMethods = validateDB(
-      defaultPaymentMethodTypesArrDBSchema,
-      ResponseOfDefaultPaymentMethods,
-    );
-    const defaultPaymentMethodsForUser = defaultPaymentMethods.map(
-      (paymentMethod) => ({
-        user_id: user.user_id,
-        payment_method_type_id: paymentMethod.payment_method_type_id,
-        user_payment_method_name: paymentMethod.payment_method_type_name,
-        user_payment_method_icon: paymentMethod.payment_method_type_icon,
-        user_payment_method_color: paymentMethod.payment_method_type_color,
-        user_payment_method_details: null,
-      }),
-    );
+    const ResponseOfDefaultPaymentMethods = await getDefaultPaymentMethodsQuery(trx);
+    const defaultPaymentMethods = validateDB(defaultPaymentMethodTypesArrDBSchema, ResponseOfDefaultPaymentMethods);
+    const defaultPaymentMethodsForUser = defaultPaymentMethods.map((paymentMethod) => ({
+      user_id: user.user_id,
+      payment_method_type_id: paymentMethod.payment_method_type_id,
+      user_payment_method_name: paymentMethod.payment_method_type_name,
+      user_payment_method_icon: paymentMethod.payment_method_type_icon,
+      user_payment_method_color: paymentMethod.payment_method_type_color,
+      user_payment_method_details: null,
+    }));
     await trx("user_payment_methods").insert(defaultPaymentMethodsForUser);
     console.log("Default payment methods inserted for user");
 
-    const email_verification_token = generateAccessToken(
-      { user_id: user.user_id },
-      60 * 60 * 1000,
-    ); // 1 hour expiration
+    const email_verification_token = generateAccessToken({ user_id: user.user_id }, 60 * 60 * 1000); // 1 hour expiration
     const token_hash = await bcrypt.hash(email_verification_token, salt);
     await trx("email_verification_tokens").insert({
       user_id: user.user_id,
@@ -186,37 +152,31 @@ export const register = async (fullUser: ReqRegisterSchema) => {
     console.log("Verification email sent");
 
     await trx.commit();
-    return user as UserInfoSchema;
+    return user;
   } catch (error) {
     console.error("Error during registration:", error);
     await trx.rollback();
-    dbErrorHandler(error);
+    throw dbErrorHandler(error);
   }
 };
 
-export const changePassword = async (
-  user_id: string,
-  old_password: string,
-  new_password: string,
-): Promise<boolean | ApiError> => {
+export const changePassword = async (user_id: number, old_password: string, new_password: string): Promise<boolean> => {
   const trx = await db.transaction();
+  console.log("Changing password for user_id:", user_id);
   try {
     const userAuth = await trx("users_auth").where({ user_id }).first();
     if (!userAuth) {
+      console.log("User auth record not found for user_id:", user_id);
       throw new ApiError(404, "User not found");
     }
-    const isOldPasswordValid = await bcrypt.compare(
-      old_password,
-      userAuth.password_hash,
-    );
+    const isOldPasswordValid = await bcrypt.compare(old_password, userAuth.password_hash);
     if (!isOldPasswordValid) {
+      console.log("Invalid old password for user_id:", user_id);
       throw new ApiError(401, "Invalid old password");
     }
     const salt = await bcrypt.genSalt(10);
     const new_password_hash = await bcrypt.hash(new_password, salt);
-    await trx("users_auth")
-      .where({ user_id })
-      .update({ password_hash: new_password_hash });
+    await trx("users_auth").where({ user_id }).update({ password_hash: new_password_hash });
     await trx.commit();
     return true;
   } catch (error) {
@@ -225,10 +185,7 @@ export const changePassword = async (
   }
 };
 
-export const logout = async (
-  refresh_token: string,
-  session_id: string | null = null,
-): Promise<boolean> => {
+export const logout = async (refresh_token: string, session_id: string | null = null): Promise<boolean> => {
   const trx = await db.transaction();
   try {
     if (refresh_token) {
@@ -244,9 +201,7 @@ export const logout = async (
   }
 };
 
-export const verify_email = async (
-  token: string,
-): Promise<boolean | ApiError> => {
+export const verify_email = async (token: string): Promise<boolean> => {
   const trx = await db.transaction();
   const decoded = jwt.decode(token);
   if (!decoded || typeof decoded === "string") {
@@ -257,9 +212,7 @@ export const verify_email = async (
   console.log("Decoded user", decoded);
 
   try {
-    const tokenRecord = await trx("email_verification_tokens")
-      .where({ user_id })
-      .first();
+    const tokenRecord = await trx("email_verification_tokens").where({ user_id }).first();
 
     if (!tokenRecord) {
       trx.rollback();
@@ -289,10 +242,10 @@ export const verify_email = async (
   }
 };
 
-export const refresh = async (hashed_refresh_token: string) => {
+export const refresh = async (hashed_refresh_token: string): Promise<RefreshTokenService> => {
   const trx = await db.transaction();
   try {
-    const dbResponse: RefreshTokenDBSchema = await trx("refresh_tokens")
+    const dbResponse: RefreshTokenDB = await trx("refresh_tokens")
       .where({ hashed_refresh_token })
       .where("expires_at", ">", new Date())
       .first();
@@ -306,18 +259,16 @@ export const refresh = async (hashed_refresh_token: string) => {
     await trx("refresh_tokens").insert({
       hashed_refresh_token: hashedNewRefreshToken,
       user_id: dbResponse.user_id,
-      expires_at: new Date(Date.now() + (maxAgeRefresh * 1000)),
+      expires_at: new Date(Date.now() + maxAgeRefresh * 1000),
       session_id: null,
     });
-    await trx("refresh_tokens")
-      .where({ token_id: dbResponse.token_id })
-      .delete();
-console.log("New refresh token generated and old one deleted for user_id:", dbResponse.user_id);
+    await trx("refresh_tokens").where({ token_id: dbResponse.token_id }).delete();
+    console.log("New refresh token generated and old one deleted for user_id:", dbResponse.user_id);
 
     await trx.commit();
     const newAccessToken = generateAccessToken({ user_id: dbResponse.user_id });
 
-    return { newRefreshToken, newAccessToken };
+    return { access_token: newAccessToken, refresh_token: newRefreshToken };
   } catch (error) {
     await trx.rollback();
     throw dbErrorHandler(error);

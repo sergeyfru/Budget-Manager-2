@@ -1,11 +1,11 @@
 import { Request } from "express";
 
-import {UserInfoSchema} from "../../schemas/user_auth_schema";
+import { UserDB } from "@shared/core";
 
 declare global {
   namespace Express {
     export interface Request { 
-      user: UserInfoSchema; 
+      user: UserDB; 
     }
   }
 }

@@ -1,6 +1,6 @@
 import {db } from "../config/db";
 import { dbErrorHandler } from "../errors/db_errors";
-import { currenciesArrDBSchema } from "../schemas/transaction_schema";
+import { currenciesArrDBSchema } from "@shared/core";
 import { validateDB } from "../utils/validation";
 
 export const getAllCurrencies = async () => {

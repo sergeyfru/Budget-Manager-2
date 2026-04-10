@@ -73,6 +73,7 @@ export const getDefaultCategoriesQuery = (trx: Knex): Knex.QueryBuilder => {
     "category_type_direction",
     "category_type_icon",
     "category_type_color",
+    "created_at",
   );
 };
 
@@ -82,5 +83,7 @@ export const getDefaultPaymentMethodsQuery = (trx: Knex): Knex.QueryBuilder => {
     "payment_method_type_name",
     "payment_method_type_icon",
     "payment_method_type_color",
+    "created_at",
+
   );
 };

@@ -2,8 +2,13 @@
   // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
     // File Layout
-    "rootDir": "./src",
+    "rootDir": "src",
     "outDir": "./dist",
+    // "baseUrl": "..",
+
+    // "paths": {
+    //   "@shared/*": ["shared/*"]
+    // },
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
@@ -43,7 +48,7 @@
     "moduleDetection": "force",
     "skipLibCheck": true,
   }, 
-  "include": ["src", "src/schemas/transaction_schema.ts", "src/schemas/user_auth_schema.ts"],
+  "include": ["src"],
   "ts-node": {
     "files": true
   }

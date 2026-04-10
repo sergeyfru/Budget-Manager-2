@@ -7,8 +7,7 @@ import {
   updateTransaction,
   getTransactionTypes,
 } from "../models/transaction_models";
-import { ReqAddTransactionSchema } from "../schemas/transaction_schema";
-import { UserInfoSchema } from "../schemas/user_auth_schema";
+import { ReqCreateTransaction, ReqUpdateTransaction } from "@shared/core";
 
 export const _getTransactions = async (req: Request, res: Response) => {
   const user_id = req.user?.user_id as number;
@@ -74,7 +73,7 @@ export const _addTransaction = async (req: Request, res: Response) => {
   const user_id = req.user?.user_id as number;
 
   try {
-    const transactionData = req.body as ReqAddTransactionSchema;
+    const transactionData = req.body as ReqCreateTransaction;
 
     const newTransaction = await addTransaction(user_id, transactionData);
 
@@ -93,7 +92,7 @@ export const _addTransaction = async (req: Request, res: Response) => {
 export const _updateTransaction = async (req: Request, res: Response) => {
   const user_id = req.user?.user_id as number;
 
-  const updatedTransactionData = req.body;
+  const updatedTransactionData = req.body as ReqUpdateTransaction;
 
   try {
     const updatedTransaction = await updateTransaction(
@@ -114,7 +113,7 @@ export const _updateTransaction = async (req: Request, res: Response) => {
 };
 
 export const _deleteTransaction = async (req: Request, res: Response) => {
-  const transaction_id = req.body.transaction_id;
+  const transaction_id = parseInt(req.params.id as string) || req.body.transaction_id as number;
 
   try {
     await deleteTransaction(transaction_id);
