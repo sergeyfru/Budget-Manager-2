@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createApiResponseSchema} from "../api_utils";
+import { createApiResponseSchema} from "../api_utils.js";
 
 //
 // ======================================================

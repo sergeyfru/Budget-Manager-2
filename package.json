@@ -8,11 +8,14 @@
     "dev:server": "npm run dev -w server",
     "dev:client": "npm run dev -w client",
 
-    "build": "npm run build -w server && npm run build -w client",
+    "build": "npm run build -w shared && npm run build -w server && npm run build -w client",
+    "build:server": "npm run build -w shared && npm run build -w server",
+
+    "start": "npm run start -w server",
 
     "clean": "rm -rf node_modules */node_modules */package-lock.json */dist"
   },
   "dependencies": {
-    "zod": "^4.3.6"
+   
   }
 }

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { currencyDBSchema, userCategorySchema, userPaymentMethodSchema } from "@shared/core";
-import { createApiResponseSchema } from "../api_utils";
+import { createApiResponseSchema } from "../api_utils.js";
 
 
 //

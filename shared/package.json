@@ -3,8 +3,16 @@
 {
   "name": "@shared/core",
   "version": "1.0.0",
-  "main": "index.ts",
-  "types": "index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  
+    "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist node_modules package-lock.json"
+  },
   "dependencies": {
     "zod": "^4.3.6"
   }
