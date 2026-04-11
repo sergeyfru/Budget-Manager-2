@@ -109,11 +109,11 @@ export type TransactionsDetailedArr = z.infer<
 
 // FORM / REQUEST
 export const createTransactionFormSchema = z.object({
-  transaction_type_id: z.number(),
-  user_payment_method_id: z.number(),
-  user_category_id: z.number(),
-  transaction_amount: z.number(),
-  currency_id: z.number(),
+  transaction_type_id: z.coerce.number(),
+  user_payment_method_id: z.coerce.number(),
+  user_category_id: z.coerce.number(),
+  transaction_amount: z.coerce.number(),
+  currency_id: z.coerce.number(),
   date_of_transaction: z.coerce.date(),
   transaction_note: z.string().optional(),
 });
@@ -139,9 +139,7 @@ export type UpdateTransactionForm = z.infer<
 >;
 
 // REQUEST
-export const reqUpdateTransactionSchema = updateTransactionFormSchema.extend({
-  transaction_id: z.number(),
-});
+export const reqUpdateTransactionSchema = updateTransactionFormSchema;
 
 export type ReqUpdateTransaction = z.infer<
   typeof reqUpdateTransactionSchema
@@ -154,14 +152,9 @@ export type ReqUpdateTransaction = z.infer<
 // ======================================================
 //
 
-export const reqDeleteTransactionSchema = z.object({
-  transaction_id: z.number(),
-});
+//    REQUEST : transaction_id comes in the URL as a params
 
-export type ReqDeleteTransaction = z.infer<
-  typeof reqDeleteTransactionSchema
->;
-
+//    RESPONSE : response as a ResSimple
 
 //
 // ======================================================

@@ -95,15 +95,15 @@ export const addTransaction = async (
 
 export const updateTransaction = async (
   user_id: number,
+  transaction_id: number,
   updatedTransactionData: ReqUpdateTransaction,
 ): Promise<TransactionDetailed> => {
   console.log("In models, updating transaction for user_id:", user_id);
 
   const trx = await db.transaction();
   try {
-    const { transaction_id, ...fields } = updatedTransactionData;
 
-    const fieldsToUpdate = Object.fromEntries(Object.entries(fields).filter(([_, v]) => v !== undefined));
+    const fieldsToUpdate = Object.fromEntries(Object.entries(updatedTransactionData).filter(([_, v]) => v !== undefined));
 
     if (Object.keys(fieldsToUpdate).length === 0) {
       throw new ApiError(400, "No fields to update");

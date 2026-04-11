@@ -97,7 +97,7 @@ export type UserPaymentMethod = z.infer<typeof userPaymentMethodSchema>;
 
 // FORM
 export const createUserPaymentMethodFormSchema = z.object({
-  payment_method_type_id: z.number(),
+  payment_method_type_id: z.coerce.number(),
   user_payment_method_name: z.string().min(1),
   user_payment_method_icon: z.string().nullable().optional(),
   user_payment_method_color: z.string(),
@@ -150,14 +150,9 @@ export type ReqUpdateUserPaymentMethod = z.infer<
 // ======================================================
 //
 
-export const reqDeleteUserPaymentMethodSchema = z.object({
-  user_payment_method_id: z.number(),
-});
+//    REQUEST : user_payment_method_id comes in the URL as a params
 
-export type ReqDeleteUserPaymentMethod = z.infer<
-  typeof reqDeleteUserPaymentMethodSchema
->;
-
+//    RESPONSE : response as a ResSimple
 
 //
 // ======================================================

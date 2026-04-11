@@ -38,6 +38,7 @@ export const _login = async (req: Request, res: Response<ResLogin>) => {
       status: "success",
       message: "Login successful",
     });
+    
   } catch (error: any) {
     res.status(error.status || 500).json({
       status: "error",
@@ -46,12 +47,12 @@ export const _login = async (req: Request, res: Response<ResLogin>) => {
   }
 };
 
-export const _register = async (req: Request, res: Response<ResRegister>) => {
+export const _register = async (req: Request, res: Response<ResSimple>) => {
   const data = req.body as ReqRegister;
   console.log("_register data:", data);
   try {
-    const user = await register(data);
-    res.status(201).json({ data: user, status: "success", message: "Created" });
+    await register(data);
+    res.status(201).json({ status: "success", message: "Created" });
   } catch (error: any) {
     res.status(error.status || 500).json({
       status: "error",

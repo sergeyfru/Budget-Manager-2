@@ -12,10 +12,10 @@ import {
 import { authMiddleware, validate } from "../middlewares/middleware";
 import { reqCreateUserPaymentMethodSchema, reqUpdateUserPaymentMethodSchema } from "@shared/core";
 
-router.get("/paymentmethods/default", _getDefaultPaymentMethods);
-router.get("/paymentmethods", authMiddleware(), _getUserPaymentMethods);
-router.post("/paymentmethods", authMiddleware(), validate(reqCreateUserPaymentMethodSchema), _createUserPaymentMethod);
-router.patch("/paymentmethods/:id", authMiddleware(), validate(reqUpdateUserPaymentMethodSchema), _updateUserPaymentMethod);
-router.delete("/paymentmethods/:id", authMiddleware(), _deleteUserPaymentMethod);
+router.get("/default", _getDefaultPaymentMethods);
+router.get("/", authMiddleware(), _getUserPaymentMethods);
+router.post("/", authMiddleware(), validate(reqCreateUserPaymentMethodSchema), _createUserPaymentMethod);
+router.patch("/:id", authMiddleware(), validate(reqUpdateUserPaymentMethodSchema), _updateUserPaymentMethod);
+router.delete("/:id", authMiddleware(), _deleteUserPaymentMethod);
 
 export default router;

@@ -114,9 +114,7 @@ export type UpdateUserCategoryForm = z.infer<
 >;
 
 // REQUEST
-export const reqUpdateUserCategorySchema = updateUserCategoryFormSchema.extend({
-  user_category_id: z.number(),
-});
+export const reqUpdateUserCategorySchema = updateUserCategoryFormSchema
 
 export type ReqUpdateUserCategory = z.infer<
   typeof reqUpdateUserCategorySchema
@@ -129,13 +127,9 @@ export type ReqUpdateUserCategory = z.infer<
 // ======================================================
 //
 
-export const reqDeleteUserCategorySchema = z.object({
-  user_category_id: z.number(),
-});
+//    REQUEST : user_category_id comes in the URL as a params
 
-export type ReqDeleteUserCategory = z.infer<
-  typeof reqDeleteUserCategorySchema
->;
+//    RESPONSE : response as a ResSimple 
 
 
 //

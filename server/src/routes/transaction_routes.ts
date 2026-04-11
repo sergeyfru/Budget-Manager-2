@@ -14,26 +14,26 @@ import {
 
 const router = express.Router();
 
-router.get("/getTransactions", 
+router.get("/", 
     authMiddleware(), 
     _getTransactions);
 
-router.post("/getTransactionsByDateRange",
+router.post("/byDateRange",
   authMiddleware(),
   _getTransactionsByDateRange,
 );
-router.post("/addTransaction",
+router.post("/",
   authMiddleware(),
   validate(createTransactionFormSchema),
   _addTransaction,
 );
-router.put("/updatetransaction",
+router.patch("/:id",
   authMiddleware(),
   validate(reqUpdateTransactionSchema),
   _updateTransaction,
 );
-router.delete("/deleteTransaction", 
-    authMiddleware(), 
+router.delete("/:id",
+    authMiddleware(),
     _deleteTransaction);
 
 router.get("/transactiontypes", _getTransactionTypes);

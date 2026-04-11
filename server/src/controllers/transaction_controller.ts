@@ -94,13 +94,15 @@ export const _addTransaction = async (req: Request, res: Response<ResTransaction
 
 export const _updateTransaction = async (req: Request, res: Response<ResTransactionDetailed>) => {
   const user_id = req.user?.user_id as number;
+  const transaction_id = parseInt(req.params.id as string);
 
   const updatedTransactionData = req.body as ReqUpdateTransaction;
 
   try {
     const updatedTransaction = await updateTransaction(
       user_id,
-      updatedTransactionData,
+      transaction_id,
+      updatedTransactionData
     );
 
     res.status(201).json({
@@ -117,7 +119,7 @@ export const _updateTransaction = async (req: Request, res: Response<ResTransact
 };
 
 export const _deleteTransaction = async (req: Request, res: Response<ResSimple>) => {
-  const transaction_id = parseInt(req.params.id as string) || req.body.transaction_id as number;
+  const transaction_id = parseInt(req.params.id as string)
 
   try {
     await deleteTransaction(transaction_id);
