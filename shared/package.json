@@ -5,11 +5,13 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": ["dist"],
   
     "exports": {
     ".": "./dist/index.js"
   },
   "scripts": {
+     "dev": "tsc --watch",
     "build": "tsc",
     "clean": "rm -rf dist node_modules package-lock.json"
   },

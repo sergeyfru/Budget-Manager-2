@@ -1,10 +1,10 @@
 {
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",
 
     "module": "esnext",
-    "target": "ES2020",
 
     "declaration": true,
 
@@ -12,7 +12,6 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
 
-    "strict": true,
     "skipLibCheck": true
   },
   "include": ["src"]

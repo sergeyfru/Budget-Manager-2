@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    /* ========================
+       🔹 GENERAL
+    ======================== */
+    "target": "ES2020",
+    "strict": true,
+
+    /* ========================
+       🔹 MODULE INTEROP
+    ======================== */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    /* ========================
+       🔹 TYPE SAFETY
+    ======================== */
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* ========================
+       🔹 DX / DEV EXPERIENCE
+    ======================== */
+    "isolatedModules": true,
+
+    /* ========================
+       🔹 IMPORTANT (MONOREPO)
+    ======================== */
+    "resolveJsonModule": true
+  }
+}
