@@ -51,14 +51,15 @@ export const getUserFromToken = async (
     const responseFromDB = await db("users")
       .where("user_id", decoded.user_id)
       .first();
-    console.log("Response from DB:", responseFromDB);
 
     const result = userDBSchema.safeParse(responseFromDB);
-
     if (!result.success) {
       console.log("Validation error:", result.error);
       throw new ApiError(404, result.error.message);
     }
+    
+    console.log("Get user with ID:", result.data.user_id);
+
     return result.data;
   } catch (error) {
     console.log("Error in getUserFromToken:", error);

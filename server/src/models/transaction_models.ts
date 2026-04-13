@@ -61,7 +61,6 @@ export const addTransaction = async (
   console.log("In models, adding transaction for user_id:", user_id);
   const trx = await db.transaction();
   try {
-    console.log("Transaction data to insert:", transactionData);
     const [newTransaction] = await trx("transactions")
       .insert({  // insert transactionData as an object with the correct keys
         user_id,
@@ -75,12 +74,12 @@ export const addTransaction = async (
       })
       .returning(["transaction_id", "user_id"]);
 
-    console.log("New transaction inserted with ID:", newTransaction);
+    console.log("New transaction inserted with ID:", newTransaction.transaction_id);
 
     const responseFromDB = await getTransactionsQuery(trx)
       .where("tr.transaction_id", newTransaction.transaction_id)
       .first();
-    console.log("Response from DB after inserting transaction:", responseFromDB);
+    // console.log("Response from DB after inserting transaction:", responseFromDB);
 
     const newTransactionFull = validateDB(transactionDetailedSchema, responseFromDB);
 

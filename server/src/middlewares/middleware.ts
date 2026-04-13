@@ -60,7 +60,7 @@ export const authMiddleware =
     }
 
     const user = await getUserFromToken(access_token);
-    console.log("user in Middleware", user);
+    console.log("user in Middleware", user.email);
 
     req.user = user;
 

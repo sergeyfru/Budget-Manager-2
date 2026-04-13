@@ -29,7 +29,7 @@ export const _login = async (req: Request, res: Response<ResLogin>) => {
     res.cookie("refresh_token", refresh_token, {
       httpOnly: true,
       secure: false, // for development, set to true in production
-      sameSite: "strict",
+      sameSite: "none", // allow cross-site cookies for refresh token
       maxAge: maxAgeRefresh * 1000, // convert to milliseconds
     });
 
@@ -103,7 +103,7 @@ export const _refresh = async (req: Request, res: Response<ResRefresh>) => {
   res.cookie("refresh_token", newTokens.refresh_token, {
     httpOnly: true,
     secure: false, // for development, set to true in production
-    sameSite: "strict",
+    sameSite: "none", // allow cross-site cookies for refresh token
     maxAge: maxAgeRefresh * 1000, // convert to milliseconds
   });
 

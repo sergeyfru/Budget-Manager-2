@@ -32,7 +32,7 @@ export const login = async (
       .innerJoin({ ua: "users_auth" }, "u.user_id", "ua.user_id")
       .where({ "u.email": email })
       .first();
-    console.log(user);
+    console.log(user.email);
 
     if (!user) {
       console.log("User not found with email:", email);
@@ -106,10 +106,9 @@ export const register = async (newUser: ReqRegister): Promise<UserView> => {
     });
     console.log("User created, now inserting default categories and payment methods...");
     const ResponseOfDefaultCategories = await getDefaultCategoriesQuery(trx);
-    console.log("Default categories response:", ResponseOfDefaultCategories);
-
+    
     const defaultCategories = validateDB(defaultCategoriesArrDBSchema, ResponseOfDefaultCategories);
-    console.log(defaultCategories);
+    console.log("Number of default categories:", defaultCategories.length);
 
     const defaultUsersCategories = defaultCategories.map((category) => ({
       user_id: user.user_id,
@@ -124,6 +123,7 @@ export const register = async (newUser: ReqRegister): Promise<UserView> => {
 
     const ResponseOfDefaultPaymentMethods = await getDefaultPaymentMethodsQuery(trx);
     const defaultPaymentMethods = validateDB(defaultPaymentMethodTypesArrDBSchema, ResponseOfDefaultPaymentMethods);
+    console.log("Number of default payment methods:", defaultPaymentMethods.length);
     const defaultPaymentMethodsForUser = defaultPaymentMethods.map((paymentMethod) => ({
       user_id: user.user_id,
       payment_method_type_id: paymentMethod.payment_method_type_id,

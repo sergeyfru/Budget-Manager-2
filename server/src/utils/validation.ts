@@ -10,7 +10,7 @@ export const validateDB = <T>(
       console.error("❌ DB Validation error:", result.error);
       throw new ApiError(500, "Invalid DB response");
     }
-    console.log("✅ Valid DB response:", result.data);
+    console.log("✅  DB response is valid");
     return result.data;
  
 };
