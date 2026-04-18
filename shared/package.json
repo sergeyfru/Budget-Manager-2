@@ -13,7 +13,8 @@
   "scripts": {
      "dev": "tsc --watch",
     "build": "tsc",
-    "clean": "rm -rf dist node_modules package-lock.json"
+    "clean": "rm -rf dist node_modules package-lock.json",
+    "rebuild": "rm -rf dist && npm run build"
   },
   "dependencies": {
     "zod": "^4.3.6"

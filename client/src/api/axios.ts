@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useAuthStore } from "../store/authStore";
+import { apiAuth, authApi } from "./authApi";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api",
@@ -36,6 +37,7 @@ api.interceptors.response.use(
   (res) => res,
   async (error) => {
     const originalRequest = error.config;
+    console.log("API response error: ", error);
 
     if (error.response?.status !== 401 || originalRequest._retry) {
       return Promise.reject(error);
@@ -60,13 +62,13 @@ api.interceptors.response.use(
 
     try {
       console.log("Attempting to refresh token...");
-
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api"}/auth/refresh`,
-        {},
-        { withCredentials: true },
-      );
-
+      const refresh_token = localStorage.getItem("refresh_token")||"";
+      const res = await authApi.refresh(refresh_token);
+      console.log("Token refresh response: ", res);
+      if(res.status === "error"){
+        throw new Error(res.message || "Token refresh failed");
+      }
+      localStorage.setItem("refresh_token", res.data.refresh_token);
       const newToken = res.data.access_token;
       useAuthStore.getState().setToken(newToken);
 
@@ -74,8 +76,10 @@ api.interceptors.response.use(
 
       originalRequest.headers.Authorization = `Bearer ${newToken}`;
       console.log("Returning to original request after setting new token");
+      useAuthStore.getState().setToken(newToken);
       return api(originalRequest);
     } catch (err) {
+      console.log("Token refresh failed: ", err);
       console.error("Token refresh failed: ", err);
       processQueue(err, null);
 

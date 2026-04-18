@@ -7,13 +7,15 @@ import { createApiResponseSchema } from "../api_utils.js";
 // ======================================================
 //
 
+const categoryAllowedDirections = z.enum(["in", "out", "both"]);
+
 // DB
 export const defaultCategoryDBSchema = z.object({
-  category_type_id: z.number(),
-  category_type_name: z.string(),
-  category_type_direction: z.enum(["in", "out"]),
-  category_type_icon: z.string().nullable(),
-  category_type_color: z.string(),
+  category_id: z.number(),
+  category_name: z.string(),
+  category_allowed_direction: categoryAllowedDirections,
+  category_icon: z.string().nullable(),
+  category_color: z.string(),
 });
 
 export type DefaultCategoryDB = z.infer<typeof defaultCategoryDBSchema>;
@@ -43,8 +45,8 @@ export const userCategoryDBSchema = z.object({
   user_category_id: z.number(),
   user_id: z.number(),
   user_category_name: z.string(),
-  user_category_direction: z.enum(["in", "out"]),
-  user_category_icon: z.string().nullable(),
+  user_category_allowed_direction: categoryAllowedDirections,
+  user_category_icon: z.string(),
   user_category_color: z.string(),
   created_at: z.date(),
 });
@@ -64,9 +66,9 @@ export type UserCategoriesArrDB = z.infer<typeof userCategoriesArrDBSchema>;
 
 export const userCategorySchema = z.object({
   id: z.number(),
-  direction: z.enum(["in", "out"]),
+  allowed_direction: categoryAllowedDirections,
   name: z.string(),
-  icon: z.string().nullable(),
+  icon: z.string(),
   color: z.string(),
 });
 
@@ -82,8 +84,8 @@ export type UserCategory = z.infer<typeof userCategorySchema>;
 // FORM
 export const createUserCategoryFormSchema = z.object({
   user_category_name: z.string().min(1),
-  user_category_direction: z.enum(["in", "out"]),
-  user_category_icon: z.string().nullable().optional(),
+  user_category_allowed_direction: categoryAllowedDirections,
+  user_category_icon: z.string(),
   user_category_color: z.string(),
 });
 
@@ -107,15 +109,18 @@ export type ReqCreateUserCategory = z.infer<
 // ======================================================
 //
 
-export const updateUserCategoryFormSchema = createUserCategoryFormSchema.partial();
+export const updateUserCategoryFormSchema = createUserCategoryFormSchema.extend({
+  user_category_id: z.number()
+});
 
 export type UpdateUserCategoryForm = z.infer<
   typeof updateUserCategoryFormSchema
 >;
 
 // REQUEST
-export const reqUpdateUserCategorySchema = updateUserCategoryFormSchema
-
+export const reqUpdateUserCategorySchema = createUserCategoryFormSchema.partial().extend({
+  user_category_id: z.number()
+});
 export type ReqUpdateUserCategory = z.infer<
   typeof reqUpdateUserCategorySchema
 >;

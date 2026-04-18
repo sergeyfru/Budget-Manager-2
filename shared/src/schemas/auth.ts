@@ -106,7 +106,8 @@ export type LoginService = z.infer<typeof loginServiceSchema>;
 
 // RESPONSE (🔥 без refresh_token)
 export const resLoginSchema = createApiResponseSchema(
-  loginServiceSchema.omit({ refresh_token: true })
+  // loginServiceSchema.omit({ refresh_token: true })
+  loginServiceSchema
 );
 export type ResLogin = z.infer<typeof resLoginSchema>;
 
@@ -143,8 +144,9 @@ export type RefreshTokenService = z.infer<typeof refreshTokenServiceSchema>;
 export const resRefreshSchema = createApiResponseSchema(
   z.object({
     access_token: z.jwt(),
+    refresh_token: z.string(),   //  returning refresh token just for testing purposes.
   })
-);
+  );
 export type ResRefresh = z.infer<typeof resRefreshSchema>;
 
 

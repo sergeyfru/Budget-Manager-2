@@ -53,7 +53,7 @@ export const useCategoriesStore = create<CategoriesState>()(
         }
         console.log("Default categories:", response.data);
 
-        set({ defaultCategories: response.data.sort((a, b) => a.category_type_id - b.category_type_id), defaultCategoriesStatus: "success" });
+        set({ defaultCategories: response.data.sort((a, b) => a.category_id - b.category_id), defaultCategoriesStatus: "success" });
       },
 
       getUserCategories: async () => {
@@ -125,7 +125,7 @@ export const useCategoriesStore = create<CategoriesState>()(
       setDefaultCategories: (data: DefaultCategoriesArrDB) => set({ defaultCategories: data }),
 
       getCategoriesByDirection: (direction: "in" | "out") =>
-        get().categories.filter((c) => c.user_category_direction === direction),
+        get().categories.filter((c) => c.user_category_allowed_direction === direction || c.user_category_allowed_direction === "both"),
 
       clear: () => set({ categories: [] as UserCategoriesArrDB, defaultCategories: [] as DefaultCategoriesArrDB }),
     }),

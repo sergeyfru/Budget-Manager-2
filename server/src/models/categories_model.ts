@@ -14,11 +14,11 @@ export const getDefaultCategories =
   async (): Promise<DefaultCategoriesArrDB> => {
     try {
       const responseFromDB = await db("category_types").select(
-        "category_type_id",
-        "category_type_name",
-        "category_type_direction",
-        "category_type_icon",
-        "category_type_color",
+        "category_id",
+        "category_name",
+        "category_allowed_direction",
+        "category_icon",
+        "category_color",
         "created_at",
       );
       const defaultCategoryTypes = validateDB(
@@ -41,7 +41,7 @@ export const getUserCategories = async (
       .select(
         "user_category_id",
         "user_id",
-        "user_category_direction",
+        "user_category_allowed_direction",
         "user_category_name",
         "user_category_icon",
         "user_category_color",
@@ -69,7 +69,7 @@ export const createUserCategory = async (
       .returning([
         "user_category_id",
         "user_id",
-        "user_category_direction",
+        "user_category_allowed_direction",
         "user_category_name",
         "user_category_icon",
         "user_category_color",
@@ -111,7 +111,7 @@ export const updateUserCategory = async (
       .returning([
         "user_category_id",
         "user_id",
-        "user_category_direction",
+        "user_category_allowed_direction",
         "user_category_name",
         "user_category_icon",
         "user_category_color",

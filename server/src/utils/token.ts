@@ -43,7 +43,7 @@ export const getUserFromToken = async (
     if (typeof decoded == "string" || !decoded.user_id || !decoded.exp) {
       throw new ApiError(401, "Unauthorized");
     }
-    // console.log("Decoded token:", decoded);
+    
     console.log(
       "Token expires in (seconds):",
       decoded.exp - Math.floor(Date.now() / 1000),

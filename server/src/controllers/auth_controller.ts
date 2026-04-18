@@ -29,16 +29,14 @@ export const _login = async (req: Request, res: Response<ResLogin>) => {
     res.cookie("refresh_token", refresh_token, {
       httpOnly: true,
       secure: false, // for development, set to true in production
-      sameSite: "none", // allow cross-site cookies for refresh token
       maxAge: maxAgeRefresh * 1000, // convert to milliseconds
     });
 
     res.status(201).json({
-      data: { user, access_token },
+      data: { user, access_token, refresh_token },
       status: "success",
       message: "Login successful",
     });
-    
   } catch (error: any) {
     res.status(error.status || 500).json({
       status: "error",
@@ -52,7 +50,7 @@ export const _register = async (req: Request, res: Response<ResSimple>) => {
   console.log("_register data:", data);
   try {
     await register(data);
-    res.status(201).json({ status: "success", message: "Created" });
+    res.status(201).json({ status: "success", message: "User registered successfully" });
   } catch (error: any) {
     res.status(error.status || 500).json({
       status: "error",
@@ -96,19 +94,25 @@ export const _verify_phone_number = async (req: Request, res: Response<ResSimple
 };
 
 export const _refresh = async (req: Request, res: Response<ResRefresh>) => {
-  const refreshToken = req.cookies.refresh_token;
+  const refreshTokenCookie = req.cookies.refresh_token;
+  console.log("Refresh token from cookie:", refreshTokenCookie);
+
+  const refreshTokenHeader = req.headers["x-refresh-token"];
+  console.log("Refresh token from header:", refreshTokenHeader);
+
+  const refreshToken =  refreshTokenCookie || refreshTokenHeader;
+
   const hashed_refresh_token = hashedRefreshToken(refreshToken);
   const newTokens = await refresh(hashed_refresh_token);
 
   res.cookie("refresh_token", newTokens.refresh_token, {
     httpOnly: true,
     secure: false, // for development, set to true in production
-    sameSite: "none", // allow cross-site cookies for refresh token
     maxAge: maxAgeRefresh * 1000, // convert to milliseconds
   });
 
   res.status(200).json({
-    data: { access_token: newTokens.access_token },
+    data: { access_token: newTokens.access_token, refresh_token: newTokens.refresh_token },
     status: "success",
     message: "Tokens were refreshed successfully",
   });

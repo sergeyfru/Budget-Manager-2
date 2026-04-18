@@ -112,10 +112,10 @@ export const register = async (newUser: ReqRegister): Promise<UserView> => {
 
     const defaultUsersCategories = defaultCategories.map((category) => ({
       user_id: user.user_id,
-      user_category_name: category.category_type_name,
-      user_category_direction: category.category_type_direction,
-      user_category_icon: category.category_type_icon,
-      user_category_color: category.category_type_color,
+      user_category_name: category.category_name,
+      user_category_allowed_direction: category.category_allowed_direction,
+      user_category_icon: category.category_icon,
+      user_category_color: category.category_color,
     }));
     await trx("user_categories").insert(defaultUsersCategories);
 
@@ -203,36 +203,46 @@ export const logout = async (refresh_token: string, session_id: string | null = 
 
 export const verify_email = async (token: string): Promise<boolean> => {
   const trx = await db.transaction();
-  const decoded = jwt.decode(token);
-  if (!decoded || typeof decoded === "string") {
-    trx.rollback();
-    throw new ApiError(400, "Invalid token");
-  }
-  const user_id = decoded.user_id;
-  console.log("Decoded user", decoded);
-
+  
   try {
-    const tokenRecord = await trx("email_verification_tokens").where({ user_id }).first();
+    const decoded = jwt.decode(token);
+    if (!decoded || typeof decoded === "string") {
+      throw new ApiError(400, "Invalid token");
+    }
+    const user_id = decoded.user_id;
+    console.log("Decoded user", decoded);
+
+    const user = await trx("users").where({ user_id }).first();
+
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+
+    if (user.email_verified) {
+      await trx.commit();
+      return true;
+    }
+
+    const tokenRecord = await trx("email_verification_tokens").where({ user_id, used: false }).first();
 
     if (!tokenRecord) {
-      trx.rollback();
       throw new ApiError(404, "Verification token not found");
     }
     console.log("Token record from DB", tokenRecord);
 
     if (tokenRecord.expires_at < new Date()) {
-      trx.rollback();
       throw new ApiError(400, "Verification token expired");
     }
+
     console.log("Token is not expired");
+
     const isTokenValid = await bcrypt.compare(token, tokenRecord.token_hash);
     if (!isTokenValid) {
-      trx.rollback();
       throw new ApiError(400, "Invalid verification token");
     }
     console.log("Token is valid");
-    await trx("users").where({ user_id }).update({ email_verified: true });
-    await trx("email_verification_tokens").where({ user_id }).del();
+    await trx("users").where({ user_id }).update({ email_verified: true, is_active: true });
+    await trx("email_verification_tokens").where({ user_id }).update({ used: true });
 
     await trx.commit();
     return true;
