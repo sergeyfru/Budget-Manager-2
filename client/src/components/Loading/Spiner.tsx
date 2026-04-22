@@ -1,18 +1,20 @@
-type SpinnerProps = {
-  size?: number;          // px
-  color?: string;         // tailwind color class
+
+interface SpinnerProps {
+  size?: number;
   className?: string;
 };
 
-export function Spinner({
+export const  Spinner = ({
   size = 20,
-  color = "border-blue-500",
   className = "",
-}: SpinnerProps) {
+}: SpinnerProps) => {
   return (
     <div
-      className={`inline-block rounded-full border-2 border-white/30 border-t-white animate-spin ${color} ${className}`}
-
+      className={`
+        inline-block rounded-full border-2 animate-spin
+        border-muted border-t-foreground
+        ${className}
+      `}
       style={{ width: size, height: size }}
     />
   );

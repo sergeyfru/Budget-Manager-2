@@ -4,7 +4,7 @@ import { authApi } from "../api/authApi";
 import { toast } from "sonner";
 import type {AxiosError } from "axios";
 import { persist } from "zustand/middleware";
-import type { ReqLogin, Status, UserDB } from "@shared/core";
+import type { ReqLogin, ReqRegister, Status, UserDB } from "@shared/core";
 
 type AuthState = {
   user: UserDB | null;
@@ -18,6 +18,7 @@ type AuthState = {
   
   login: (data: ReqLogin) => Promise<void>;
 
+  register: (data: ReqRegister) => Promise<void>;
 
   logout: () => Promise<void>;
   // fetchMe: () => Promise<void>;
@@ -57,6 +58,7 @@ export const useAuthStore = create<AuthState>()(
       
       toast.success("Login successful");
       localStorage.setItem("access_token", response.data.access_token);
+      localStorage.setItem("refresh_token", response.data.refresh_token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
       set({ user: response.data.user, access_token: response.data.access_token, isAuth: true , authStatus: "success"});
     } catch (err: AxiosError | any) {
@@ -64,6 +66,25 @@ export const useAuthStore = create<AuthState>()(
       toast.error(err.response?.data?.message || err.message || "An unexpected error occurred during login");
       throw err;
     } 
+  },
+
+
+  register: async (data: ReqRegister) => {
+    set({ authStatus: "loading", authError: null });
+    try {
+      const response = await authApi.register(data);
+      if (response.status === "error") {
+        set({ authStatus: "error", authError: response.message });
+        toast.error(response.message);
+        throw response;
+      }
+      toast.success("Account created successfully");
+      set({ authStatus: "success" });
+    } catch (err: AxiosError | any) {
+      set({ authStatus: "error", authError: err.response?.data?.message || err.message || "An unexpected error occurred during registration" });
+      toast.error(err.response?.data?.message || err.message || "An unexpected error occurred during registration");
+      throw err;
+    }
   },
 
   logout: async () => {

@@ -5,12 +5,11 @@ type LoaderProps = {
   children: React.ReactNode;
 
   // modes
-  overlay?: boolean;      // перекрыть контент
-  center?: boolean;       // центрировать
+  overlay?: boolean;      
+  center?: boolean;       
 
   // spinner props
   size?: number;
-  color?: string;
 
   className?: string;
 };
@@ -21,35 +20,32 @@ export function Loader({
   overlay = false,
   center = false,
   size,
-  color,
   className = "",
 }: LoaderProps) {
   if (!loading) return <>{children}</>;
 
-  const spinner = <Spinner size={size} color={color} />;
+  const spinner = <Spinner size={size} />;
 
-  // 🔹 overlay режим (блок/страница)
+  // 🔹 overlay 
   if (overlay) {
     return (
       <div className={`relative ${className}`}>
         {children}
 
-        <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+        <div 
+          className="absolute inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-sm">
           {spinner}
         </div>
       </div>
     );
   }
 
-  // 🔹 центрированный loader вместо контента
+  // 🔹 center 
   if (center) {
     return (
-      <div className="flex items-center justify-center w-full h-full">
+      <div className="flex items-center justify-center w-full h-full min-h-[80px]">
         {spinner}
       </div>
     );
   }
-
-  // 🔹 inline (например внутри кнопки)
-  return spinner;
 }
