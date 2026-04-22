@@ -6,8 +6,8 @@ interface CategoryIconProps {
   size?: number;
 }
 
-export const CustomIcon = ({ name = 'ImageOff', color = 'currentColor', size = 24 }: CategoryIconProps) => {
-  const Icon = (LucideIcons as any)[name] || LucideIcons.DollarSign;
+export const CustomIcon = ({ name = 'ImageOff', color = 'currentColor', size = 24}: CategoryIconProps) => {
+  const Icon = (LucideIcons as any)[name] || LucideIcons.ImageOff;
   
   return <Icon size={size} color={color} />;
 }
