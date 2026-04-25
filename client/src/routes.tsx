@@ -6,7 +6,6 @@ import { DashBoardPage } from "./pages/DashBoardPage/DashBoardPage";
 import { AnalyticsPage } from "./pages/AnalyticsPage/AnalyticsPage";
 import { CategoriesPage } from "./pages/CategoriesPage/CategoriesPage";
 import { ErrorPage } from "./pages/ErrorPage/ErrorPage";
-import { TestPage } from "./pages/TestPage/TestPage";
 import { SettingsPage } from "./pages/SettingsPage/SettingsPage";
 
 export const router = createBrowserRouter([
@@ -21,7 +20,6 @@ export const router = createBrowserRouter([
       { path: "analytics", element: <AnalyticsPage /> },
       { path: "settings", element: <SettingsPage /> },
       { path: "error", element: <ErrorPage /> },
-      { path: "test", element: <TestPage /> },
     ],
   },
 ]);
