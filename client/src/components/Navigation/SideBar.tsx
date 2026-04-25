@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router';
-import { Home, BarChart3, Grid3x3, Settings, TrendingUp, Plus, LogOut } from 'lucide-react';
+import { Home, BarChart3, Grid3x3, Settings, TrendingUp, Plus } from 'lucide-react';
 
 interface SidebarProps {
   onAddClick: () => void;
@@ -13,7 +13,6 @@ export function Sidebar({ onAddClick }: SidebarProps) {
     { path: '/categories', icon: Grid3x3, label: 'Categories' },
     { path: '/analytics', icon: BarChart3, label: 'Analytics' },
     { path: '/settings', icon: Settings, label: 'Settings' },
-    // { path: '/login', icon: LogOut, label: 'Logout' },
   ];
 
   return (

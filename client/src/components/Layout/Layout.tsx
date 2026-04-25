@@ -1,4 +1,4 @@
-import { Navigate, Outlet, useLocation } from 'react-router';
+import { Navigate, Outlet } from 'react-router';
 import { BottomNav } from '../Navigation/BottomNav.tsx';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '../../store/authStore.ts';
@@ -6,7 +6,6 @@ import { Sidebar } from '../Navigation/SideBar.tsx';
 import { AddTransactionModal } from '../AddTransaction/AddTransactionModal.tsx';
 
 export const Layout = () => {
-  const location = useLocation();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const isAutorized = useAuthStore((state) => state.isAuth);
 

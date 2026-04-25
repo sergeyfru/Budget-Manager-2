@@ -2,7 +2,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createUserCategoryFormSchema, type CreateUserCategoryForm } from "@shared/core";
 import { useForm } from "react-hook-form";
 import { useCategoriesStore } from "../../store/categoriesStore";
-import { set } from "zod";
 import type { AxiosError } from "axios";
 import { toast } from "sonner";
 import { CustomIcon } from "../CustomIcons/CustomIcons";
@@ -67,7 +66,7 @@ export const CreateCategoryModal = (props: CreateCategoryModalProps) => {
 
     try {
       await categoryStore.createUserCategory(data);
-      setAddModalOpen(!addModalOpen);
+      setAddModalOpen(false);
     } catch (err: any) {
       const data = (err as AxiosError)?.response?.data || err;
       if (data?.errors) {
@@ -176,6 +175,7 @@ export const CreateCategoryModal = (props: CreateCategoryModalProps) => {
               Cancel
             </button>
             <button
+              disabled={isSubmitting}
               type="submit"
               className="flex-1 py-4 bg-primary text-primary-foreground rounded-xl hover:shadow-lg transition-all"
             >

@@ -1,6 +1,4 @@
 
-import { X, Calendar as CalendarIcon, DollarSign } from 'lucide-react';
-// import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 
 interface AddTransactionModalProps {
   open: boolean;
@@ -8,9 +6,16 @@ interface AddTransactionModalProps {
 }
 
 export function AddTransactionModal({ open, onOpenChange }: AddTransactionModalProps) {
+
+  // const {register, handleSubmit, setValue} = useForm<CreateUserCategoryForm>({
+
+  // })
     
     const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Form clicked as submitted with data: ",{
+
+    });
     // Handle form submission logic here (e.g., send data to the server)
     onOpenChange(false); // Close the modal after submission
   };
@@ -18,6 +23,7 @@ export function AddTransactionModal({ open, onOpenChange }: AddTransactionModalP
   const handleCancel = () => {
     onOpenChange(false);
   };
+
 if (!open) return null;
 
   return (
@@ -28,14 +34,16 @@ if (!open) return null;
     <div className="p-6 pb-4 border-b border-gray-200">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Add Transaction</h2>
-        <button className="rounded-full p-2 hover:bg-gray-100 transition-colors">
+        <button onClick={handleCancel} className="rounded-full p-2 hover:bg-gray-100 transition-colors">
           ✕
         </button>
       </div>
     </div>
 
     {/* Form */}
-    <form className="p-6 space-y-6">
+    <form
+      onSubmit={handleSubmit}
+      className="p-6 space-y-6">
 
       {/* Type Toggle */}
       <div className="flex gap-2">
@@ -133,6 +141,7 @@ if (!open) return null;
         </button>
         <button
           type="submit"
+
           className="flex-1 h-12 bg-blue-600 text-white rounded-xl hover:bg-blue-700"
         >
           Add Transaction

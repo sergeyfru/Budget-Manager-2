@@ -7,6 +7,7 @@ import { AnalyticsPage } from "./pages/AnalyticsPage/AnalyticsPage";
 import { CategoriesPage } from "./pages/CategoriesPage/CategoriesPage";
 import { ErrorPage } from "./pages/ErrorPage/ErrorPage";
 import { TestPage } from "./pages/TestPage/TestPage";
+import { SettingsPage } from "./pages/SettingsPage/SettingsPage";
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
@@ -18,7 +19,7 @@ export const router = createBrowserRouter([
       { index: true, element: <DashBoardPage /> },
       { path: "categories", element: <CategoriesPage /> },
       { path: "analytics", element: <AnalyticsPage /> },
-      { path: "settings", element: <div>Settings Page</div> },
+      { path: "settings", element: <SettingsPage /> },
       { path: "error", element: <ErrorPage /> },
       { path: "test", element: <TestPage /> },
     ],

@@ -52,10 +52,7 @@ export const DashBoardPage = () => {
     });
   const monthlyIncome = monthlyIncomeTransactions.reduce((acc, transaction) => acc + transaction.transaction_amount, 0);
 
-  const recentTransactions = transactionStore.transactions
-    .slice()
-    .sort((a, b) => new Date(b.date_of_transaction).getTime() - new Date(a.date_of_transaction).getTime())
-    .slice(0, 5);
+
 
   const spendingsGrupedByCategory = monthlyExpenseTransactions.reduce(
     (acc, t) => {
@@ -108,7 +105,6 @@ export const DashBoardPage = () => {
             <div className="xl:col-span-2">
               <Loader loading={transactionStore.transactionsStatus === "loading"} overlay={true} size={48}>
                 <RecentTransactionsCard
-                  recentTransactions={recentTransactions}
                   symbol={symbol}
                   transactions={transactions}
                 />

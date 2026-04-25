@@ -1,22 +1,20 @@
 import type { TransactionsDetailedArr } from "@shared/core";
-import { EditDelete } from "../EditDelete/EditDelete";
-import { CustomIcon } from "../CustomIcons/CustomIcons";
-import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
 import { TransactionItem } from "../TransactionItem/TransactionItem";
 import { RecentTransactionsTableCard } from "./RecentTransactionsTableCard";
 import { useState } from "react";
-import { set } from "zod";
 
 interface RecentTransactionsCardProps {
   transactions: TransactionsDetailedArr;
   symbol: string | null;
-  recentTransactions: TransactionsDetailedArr;
 }
 
 
-export const RecentTransactionsCard= ({ transactions, symbol, recentTransactions }: RecentTransactionsCardProps) => {
+export const RecentTransactionsCard= ({ transactions, symbol }: RecentTransactionsCardProps) => {
     const [howManyToShow, setHowManyToShow] = useState(5);
-    const transactionsToShow = transactions.slice(0, howManyToShow);
+    const transactionsToShow = transactions
+        .sort((a, b) => new Date(b.date_of_transaction).getTime() - new Date(a.date_of_transaction).getTime())
+        .slice(0, howManyToShow);
+    
 
     const toggleShowMore = () => {
         console.log("Show more clicked, now showing", howManyToShow + 5, "transactions");
@@ -55,7 +53,7 @@ export const RecentTransactionsCard= ({ transactions, symbol, recentTransactions
               <div className="hidden md:block">
                 {/* <TransactionTable transactions={recentTransactions} /> */}
                 <div className="overflow-x-auto">
-                  <RecentTransactionsTableCard transactions={transactionsToShow} showMore={transactions.length > howManyToShow} howManyToShow={howManyToShow} toggleShowMore={() => toggleShowMore()} symbol={symbol} />
+                  <RecentTransactionsTableCard transactions={transactionsToShow} showMore={transactions.length > howManyToShow} toggleShowMore={() => toggleShowMore()} symbol={symbol} />
                 </div>
               </div>
             </div>

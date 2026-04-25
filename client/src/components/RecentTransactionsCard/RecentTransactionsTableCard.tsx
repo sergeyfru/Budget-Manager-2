@@ -6,7 +6,6 @@ interface RecentTransactionsTableCardProps {
   transactions: TransactionsDetailedArr;
   symbol: string | null;
   showMore: boolean;
-  howManyToShow: number;
   toggleShowMore: () => void;
 }
 
@@ -14,7 +13,6 @@ export const RecentTransactionsTableCard = ({
   transactions,
   symbol,
   showMore,
-  howManyToShow,
   toggleShowMore,
 }: RecentTransactionsTableCardProps) => {
   return (

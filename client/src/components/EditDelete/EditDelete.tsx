@@ -1,4 +1,4 @@
-import { Edit2, Pen, Trash2 } from "lucide-react";
+import { Edit2, Trash2 } from "lucide-react";
 
 interface EditDeleteProps {
   onEdit: () => void;

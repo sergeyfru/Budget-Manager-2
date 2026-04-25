@@ -33,6 +33,7 @@ export const CategoriesPage = () => {
     user_category_color: "",
     user_category_icon: "",
   });
+  console.log("I don't use editingId or formData now, but here they are to prevent unused variable warnings:", { editingId, formData });
 
   // const handleSubmit = (e: React.FormEvent) => {
   //   e.preventDefault();
