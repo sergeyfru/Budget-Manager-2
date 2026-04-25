@@ -1,38 +1,36 @@
-
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
+import { Greeting } from "../../components/Greeting/Greeting";
 
 export const AnalyticsPage = () => {
- 
+ const isFeatureEnabled = import.meta.env.VITE_ENABLE_ANALYTICS === "true";
 
-  const symbol =  '$';
+  const symbol = "$";
+
+  if (!isFeatureEnabled) {
+    return (
+      <div className="min-h-screen pb-20 lg:pb-8">
+        {/* Header */}
+        <Greeting title="Analytics" subtitle="Financial insights and trends" />
+        <div className="px-4 sm:px-6 lg:px-8 xl:px-12 py-6 lg:py-8">
+          <p className="font-bold">Work in Progress</p>
+          <p>This page is still under development. We are working hard to bring you insightful analytics soon!</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pb-20 lg:pb-8">
       {/* Header */}
-      <div className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="px-4 sm:px-6 lg:px-8 xl:px-12 py-6 lg:py-8">
-          <h1 className="mb-2">Analytics</h1>
-          <p className="text-muted-foreground">Financial insights and trends</p>
-        </div>
-      </div>
-
+      <Greeting title="Analytics" subtitle="Financial insights and trends" />
       <div className="px-4 sm:px-6 lg:px-8 xl:px-12 py-6 lg:py-8">
         {/* Time Range Filter */}
         <div className="flex gap-2 p-1 bg-muted rounded-xl mb-6 lg:mb-8 max-w-md">
-          <button
-            className={`flex-1 py-3 rounded-lg transition-all font-medium bg-card shadow-sm`}
-          >
-            3 Months
-          </button>
-          <button
-            
-            className={`flex-1 py-3 rounded-lg transition-all font-medium text-muted-foreground`}
-          >
+          <button className={`flex-1 py-3 rounded-lg transition-all font-medium bg-card shadow-sm`}>3 Months</button>
+          <button className={`flex-1 py-3 rounded-lg transition-all font-medium text-muted-foreground`}>
             6 Months
           </button>
-          <button
-            className={`flex-1 py-3 rounded-lg transition-all font-medium text-muted-foreground`}
-          >
+          <button className={`flex-1 py-3 rounded-lg transition-all font-medium text-muted-foreground`}>
             12 Months
           </button>
         </div>
@@ -41,21 +39,15 @@ export const AnalyticsPage = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6 mb-6 lg:mb-8">
           <div className="bg-card rounded-xl p-5 lg:p-6 border border-border shadow-sm">
             <p className="text-sm text-muted-foreground mb-2">Total Income</p>
-            <p className="text-2xl lg:text-3xl text-green-600 dark:text-green-400 font-medium">
-              {symbol}
-            </p>
+            <p className="text-2xl lg:text-3xl text-green-600 dark:text-green-400 font-medium">{symbol}</p>
           </div>
           <div className="bg-card rounded-xl p-5 lg:p-6 border border-border shadow-sm">
             <p className="text-sm text-muted-foreground mb-2">Total Expenses</p>
-            <p className="text-2xl lg:text-3xl text-red-600 dark:text-red-400 font-medium">
-              {symbol}
-            </p>
+            <p className="text-2xl lg:text-3xl text-red-600 dark:text-red-400 font-medium">{symbol}</p>
           </div>
           <div className="bg-card rounded-xl p-5 lg:p-6 border border-border shadow-sm">
             <p className="text-sm text-muted-foreground mb-2">Net Balance</p>
-            <p className={`text-2xl lg:text-3xl font-medium text-green-600 dark:text-green-400`}>
-              {symbol}
-            </p>
+            <p className={`text-2xl lg:text-3xl font-medium text-green-600 dark:text-green-400`}>{symbol}</p>
           </div>
         </div>
 
@@ -65,43 +57,32 @@ export const AnalyticsPage = () => {
           <div className="bg-card rounded-2xl p-5 lg:p-8 border border-border shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <h3>Income vs Expenses</h3>
-                <div className="text-sm text-muted-foreground">
-                 monthlyData[activeBarIndex].fullMonth
-                </div>
-              
+              <div className="text-sm text-muted-foreground">monthlyData[activeBarIndex].fullMonth</div>
             </div>
             <ResponsiveContainer width="100%" height={340}>
-              <BarChart 
-              >
+              <BarChart>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                <XAxis 
-                  dataKey="month" 
-                  stroke="var(--color-muted-foreground)"
-                  fontSize={12}
-                />
-                <YAxis 
-                  stroke="var(--color-muted-foreground)"
-                  fontSize={12}
-                />
-                <Tooltip 
-                  cursor={{ fill: 'var(--color-muted)', opacity: 0.3 }}
+                <XAxis dataKey="month" stroke="var(--color-muted-foreground)" fontSize={12} />
+                <YAxis stroke="var(--color-muted-foreground)" fontSize={12} />
+                <Tooltip
+                  cursor={{ fill: "var(--color-muted)", opacity: 0.3 }}
                   contentStyle={{
-                    backgroundColor: 'var(--color-card)',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: '12px',
-                    padding: '12px',
+                    backgroundColor: "var(--color-card)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: "12px",
+                    padding: "12px",
                   }}
                   // formatter={(value: number) => `${symbol}${value.toFixed(0)}`}
                 />
-                <Bar 
-                  dataKey="income" 
-                  fill="#10b981" 
+                <Bar
+                  dataKey="income"
+                  fill="#10b981"
                   radius={[8, 8, 0, 0]}
                   // onMouseEnter={(_, index) => setActiveBarIndex(index)}
                 />
-                <Bar 
-                  dataKey="expenses" 
-                  fill="#ef4444" 
+                <Bar
+                  dataKey="expenses"
+                  fill="#ef4444"
                   radius={[8, 8, 0, 0]}
                   // onMouseEnter={(_, index) => setActiveBarIndex(index)}
                 />
@@ -115,31 +96,24 @@ export const AnalyticsPage = () => {
             <ResponsiveContainer width="100%" height={340}>
               <LineChart>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                <XAxis 
-                  dataKey="month" 
-                  stroke="var(--color-muted-foreground)"
-                  fontSize={12}
-                />
-                <YAxis 
-                  stroke="var(--color-muted-foreground)"
-                  fontSize={12}
-                />
-                <Tooltip 
+                <XAxis dataKey="month" stroke="var(--color-muted-foreground)" fontSize={12} />
+                <YAxis stroke="var(--color-muted-foreground)" fontSize={12} />
+                <Tooltip
                   contentStyle={{
-                    backgroundColor: 'var(--color-card)',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: '12px',
-                    padding: '12px',
+                    backgroundColor: "var(--color-card)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: "12px",
+                    padding: "12px",
                   }}
                   // formatter={(value: number) => `${symbol}${value.toFixed(0)}`}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="net" 
-                  stroke="#3b82f6" 
+                <Line
+                  type="monotone"
+                  dataKey="net"
+                  stroke="#3b82f6"
                   strokeWidth={3}
-                  dot={{ fill: '#3b82f6', r: 5 }}
-                  activeDot={{ r: 7, strokeWidth: 2, stroke: 'var(--color-card)' }}
+                  dot={{ fill: "#3b82f6", r: 5 }}
+                  activeDot={{ r: 7, strokeWidth: 2, stroke: "var(--color-card)" }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -202,4 +176,4 @@ export const AnalyticsPage = () => {
       </div>
     </div>
   );
-}
+};
