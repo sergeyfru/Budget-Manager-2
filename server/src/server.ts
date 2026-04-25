@@ -15,6 +15,7 @@ import { requestLogger, responseLogger } from "./utils/logger";
 
 const app = express();
 
+const root = path.resolve(__dirname, "../../");
 
 app.use(requestLogger);
 
@@ -40,12 +41,7 @@ app.use(
 
 app.use(express.urlencoded({ extended: true }));
 
-
-// Route
-app.get("/", (req, res) => {
-  res.send("<h1 style='text-align: center;'>Server is Running</h1>");
-});
-
+app.use(express.static(path.join(root, "client/dist")));
 
 app.use("/api/auth", auth_routes);
 
@@ -60,9 +56,8 @@ app.listen(process.env.PORT || 3001, () => {
     console.log(`Run on ${process.env.PORT || 3001}`);
 });
 
-// All other GET requests not handled before will return our React app
-app.use((req, res) => {
-    res.sendFile(path.resolve(__dirname, "../../client/public", "404.html"));
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(root, "client/dist", "index.html"));
 });
 
 app.use(errorHandler);
