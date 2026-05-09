@@ -43,26 +43,21 @@ export function AddTransactionModal({ open, onOpenChange }: AddTransactionModalP
     resolver: zodResolver(createTransactionFormSchema),
     defaultValues: {
       currency_id: defaultCurrency?.currency_id || 3,
-      date_of_transaction: new Date()
+      date_of_transaction: new Date(),
     },
   });
 
   const watchValues = useWatch({ control });
-
 
   const selectedCurrency = watch("currency_id");
 
   const onFormSubmit = async (data: ReqCreateTransaction) => {
     console.log("Form submitted with values:", data);
     try {
-      addTransaction(data)
-      
-      closeModal();
+      addTransaction(data);
 
-    } catch (error) {
-      
-    }
-    
+      closeModal();
+    } catch (error) {}
   };
 
   const onFormChange = () => {
@@ -168,7 +163,12 @@ export function AddTransactionModal({ open, onOpenChange }: AddTransactionModalP
               {/* Currency */}
               <select
                 {...register("currency_id", { valueAsNumber: true })}
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-10 px-2 rounded-md bg-gray-100 text-sm"
+                className={`
+                  absolute right-2 top-1/2 -translate-y-1/2
+                  h-10 px-2 pr-8 rounded-md bg-accent
+                  text-foreground border border-border text-sm
+                  focus:outline-none focus:ring-2 focus:ring-ring/50
+                `}
               >
                 {currenciesStatus === "loading" ? (
                   <option>Loading...</option>
@@ -204,7 +204,7 @@ export function AddTransactionModal({ open, onOpenChange }: AddTransactionModalP
           <div className="space-y-2">
             <label className="text-sm font-medium">Category *</label>
             <select
-              {...(register("user_category_id", { valueAsNumber: true }))}
+              {...register("user_category_id", { valueAsNumber: true })}
               defaultValue=""
               className={`w-full h-12 px-3 border rounded-xl
                 ${
@@ -224,9 +224,7 @@ export function AddTransactionModal({ open, onOpenChange }: AddTransactionModalP
                 <option disabled>Failed to load categories</option>
               ) : (
                 categories.map((category) => (
-                  <option 
-                    key={category.user_category_id} 
-                    value={category.user_category_id}>
+                  <option key={category.user_category_id} value={category.user_category_id}>
                     {category.user_category_name}
                   </option>
                 ))
@@ -311,10 +309,17 @@ export function AddTransactionModal({ open, onOpenChange }: AddTransactionModalP
 
           {/* Actions */}
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={closeModal} className="flex-1 h-12 border rounded-xl hover:bg-gray-100">
+            <button
+              type="button"
+              onClick={closeModal}
+              className="flex-1 h-12 rounded-xl border border-border bg-card text-foreground hover:bg-muted transition-colors"
+            >
               Cancel
             </button>
-            <button type="submit" className="flex-1 h-12 bg-blue-600 text-white rounded-xl hover:bg-blue-700">
+            <button
+              type="submit"
+              className="flex-1 h-12 rounded-xl bg-primary text-primary-foreground hover:opacity-70 transition-opacity"
+            >
               Add Transaction
             </button>
           </div>

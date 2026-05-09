@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useCategoriesStore } from "../../store/categoriesStore";
 import { CustomIcon } from "../../components/CustomIcons/CustomIcons";
-import type {  UserCategoryDB } from "@shared/core";
+import type { UserCategoryDB } from "@shared/core";
 import { CreateEditCategoryModal } from "../../components/CreateEditCategoryModal/CreateEditCategoryModal";
 import { EditDelete } from "../../components/EditDelete/EditDelete";
 import { Loader } from "../../components/Loading/Loader";
 import { Plus } from "lucide-react";
+import { Greeting } from "../../components/Greeting/Greeting";
 
 export const CategoriesPage = () => {
   const categoriesStore = useCategoriesStore();
@@ -26,18 +27,15 @@ export const CategoriesPage = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [formData, setFormData] = useState<UserCategoryDB>();
 
-
-  const handleEdit = (category:UserCategoryDB) => {
-
-      setFormData(category)
-      setShowAddModal(true);
-    
+  const handleEdit = (category: UserCategoryDB) => {
+    setFormData(category);
+    setShowAddModal(true);
   };
 
-  const closeModal = ()=>{
-    setFormData(undefined)
-    setShowAddModal(false)
-  }
+  const closeModal = () => {
+    setFormData(undefined);
+    setShowAddModal(false);
+  };
 
   const handleDelete = (user_category_id: number) => {
     useCategoriesStore.getState().deleteUserCategory(user_category_id);
@@ -46,7 +44,7 @@ export const CategoriesPage = () => {
   return (
     <div className="min-h-screen pb-20 lg:pb-8">
       {/* Header */}
-      <div className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
+      {/* <div className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="px-4 sm:px-6 lg:px-8 xl:px-12 py-6 lg:py-8">
           <div className="flex items-center justify-between">
             <div>
@@ -63,11 +61,28 @@ export const CategoriesPage = () => {
             </button>
           </div>
         </div>
-      </div>
+      </div> */}
+      <Greeting
+        title="Categories"
+        subtitle="Manage your transaction categories"
+        children={
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 transition-all"
+          >
+            <Plus className="w-5 h-5" />
+          </button>
+        }
+      />
 
       <div className="px-4 sm:px-6 lg:px-8 xl:px-12 py-6 lg:py-8">
         {/* Categories Grid */}
-        <h3 className="mb-4 text-muted-foreground">Categories</h3>
+        <div className="flex items-center justify-between p-5 lg:p-6 pt-0 lg:pt-0 border-b border-border">
+          <h3 className="mb-4 text-muted-foreground">Categories</h3>
+          <button onClick={() => categoriesStore.getUserCategories()}>
+            <CustomIcon name={"RefreshCw"} />
+          </button>
+        </div>
         {/* Expense Categories */}
         <div>
           <Loader loading={categoriesStore.categoriesStatus === "loading"} center size={48}>
@@ -107,12 +122,9 @@ export const CategoriesPage = () => {
       </div>
 
       {/* Add/Edit Modal */}
-      {showAddModal && 
-      <CreateEditCategoryModal 
-          addModalOpen={showAddModal} 
-          setAddModalOpen={closeModal} 
-          dataForUpdate={formData}
-          />}
+      {showAddModal && (
+        <CreateEditCategoryModal addModalOpen={showAddModal} setAddModalOpen={closeModal} dataForUpdate={formData} />
+      )}
     </div>
   );
 };

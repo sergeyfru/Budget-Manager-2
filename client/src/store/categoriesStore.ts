@@ -1,9 +1,11 @@
 import { create } from "zustand";
 import { categoriesApi } from "../api/categoriesApi";
 import type {
-  DefaultCategoriesArrDB,UserCategoriesArrDB,
-  ReqCreateUserCategory, Status,
-  ReqUpdateUserCategory, 
+  DefaultCategoriesArrDB,
+  UserCategoriesArrDB,
+  ReqCreateUserCategory,
+  Status,
+  ReqUpdateUserCategory,
 } from "@shared/core";
 import { toast } from "sonner";
 import { persist } from "zustand/middleware";
@@ -53,20 +55,31 @@ export const useCategoriesStore = create<CategoriesState>()(
         }
         console.log("Default categories:", response.data);
 
-        set({ defaultCategories: response.data.sort((a, b) => a.category_id - b.category_id), defaultCategoriesStatus: "success" });
+        set({
+          defaultCategories: response.data.sort((a, b) => a.category_id - b.category_id),
+          defaultCategoriesStatus: "success",
+        });
       },
 
       getUserCategories: async () => {
         set({ categoriesStatus: "loading", categoriesError: null });
-        const response = await categoriesApi.getUserCategories();
+        try {
+          const response = await categoriesApi.getUserCategories();
 
-        if (response.status === "error") {
-          console.error("Error fetching user categories:", response.message);
-          set({ categoriesStatus: "error", categoriesError: response.message });
-          return;
+          if (response.status === "error") {
+            console.error("Error fetching user categories:", response.message);
+            set({ categoriesStatus: "error", categoriesError: response.message });
+            return;
+          }
+          console.log("User categories:", response.data);
+          set({
+            categories: response.data.sort((a, b) => a.user_category_id - b.user_category_id),
+            categoriesStatus: "success",
+          });
+        } catch (error) {
+          console.error(error);
+          set({ categoriesStatus: "error" });
         }
-        console.log("User categories:", response.data);
-        set({ categories: response.data.sort((a, b) => a.user_category_id - b.user_category_id), categoriesStatus: "success" });
       },
 
       createUserCategory: async (data: ReqCreateUserCategory) => {
@@ -125,7 +138,9 @@ export const useCategoriesStore = create<CategoriesState>()(
       setDefaultCategories: (data: DefaultCategoriesArrDB) => set({ defaultCategories: data }),
 
       getCategoriesByDirection: (direction: "in" | "out") =>
-        get().categories.filter((c) => c.user_category_allowed_direction === direction || c.user_category_allowed_direction === "both"),
+        get().categories.filter(
+          (c) => c.user_category_allowed_direction === direction || c.user_category_allowed_direction === "both",
+        ),
 
       clear: () => set({ categories: [] as UserCategoriesArrDB, defaultCategories: [] as DefaultCategoriesArrDB }),
     }),

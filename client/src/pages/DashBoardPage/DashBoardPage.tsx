@@ -85,7 +85,7 @@ export const DashBoardPage = () => {
 
       <Greeting title="Welcome back!" subtitle="Here's your financial overview" />
 
-      <Loader loading={transactionStore.transactionsStatus === "loading"} center={true} size={48}>
+      {/* <Loader loading={transactionStore.transactionsStatus === "loading"} center={true} size={48}> */}
         <div className="px-4 sm:px-6 lg:px-8 xl:px-12 py-6 lg:py-8 pb-24 lg:pb-8">
           {/* Balance Card */}
           <Loader loading={transactionStore.transactionsStatus === "loading"} overlay={true} center={true} size={48}>
@@ -115,7 +115,7 @@ export const DashBoardPage = () => {
             <div className="xl:col-span-1">
               <Loader loading={transactionStore.transactionsStatus === "loading"} overlay={true} size={48}>
                 <div className="bg-card rounded-2xl p-5 lg:p-6 shadow-sm border border-border xl:sticky xl:top-34">
-                  <h3 className="mb-6">Monthly Spending</h3>
+                  <h2 className="mb-6">Monthly Spending</h2>
 
                   {/* {Object.keys(spendingsGrupedByCategory).length > 0 ? ( */}
                   {spendingsSumByCategory.length > 0 ? (
@@ -131,7 +131,7 @@ export const DashBoardPage = () => {
             </div>
           </div>
         </div>
-      </Loader>
+      {/* </Loader> */}
     </div>
   );
 };
