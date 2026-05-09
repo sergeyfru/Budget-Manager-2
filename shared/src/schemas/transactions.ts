@@ -61,7 +61,7 @@ export const transactionDBSchema = z.object({
   user_payment_method_id: z.number(),
   user_category_id: z.number(),
 
-  transaction_amount: z.string(),
+  transaction_amount: z.string().min(1),
   currency_id: z.number(),
 
   date_of_transaction: z.coerce.date(),
@@ -109,14 +109,27 @@ export type TransactionsDetailedArr = z.infer<
 
 // FORM / REQUEST
 export const createTransactionFormSchema = z.object({
-  transaction_type_id: z.coerce.number(),
-  user_payment_method_id: z.coerce.number(),
-  user_category_id: z.coerce.number(),
-  transaction_amount: z.coerce.number(),
-  currency_id: z.coerce.number(),
+  transaction_type_id: z.number("Transaction type is required").min(1,"Transaction type is required"),
+  user_payment_method_id: z.number("Payment method is required"),
+  user_category_id: z.number("Category is required"),
+  transaction_amount: z.number("Amount is required").min(0.01, "Amount must be greater than 0"),
+  currency_id: z.number().min(1, 'Currency is required'),
   date_of_transaction: z.coerce.date(),
   transaction_note: z.string().optional(),
 });
+export const createTransactionFormSchema2 = z.object({
+  transaction_type_id: z.coerce.number("Transaction type is required").min(1,"Transaction type is required"),
+  user_payment_method_id: z.coerce.number("Payment method is required"),
+  user_category_id: z.coerce.number("Category is required"),
+  transaction_amount: z.coerce.number("Amount is required").min(0.01, "Amount must be greater than 0"),
+  currency_id: z.coerce.number().min(1, 'Currency is required'),
+  date_of_transaction: z.coerce.date(),
+  transaction_note: z.string().optional(),
+});
+
+export type CreateTransactionFormValues = z.infer<
+  typeof createTransactionFormSchema
+>;
 
 export type CreateTransactionForm = z.input<
   typeof createTransactionFormSchema

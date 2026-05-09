@@ -88,7 +88,7 @@ export const useCategoriesStore = create<CategoriesState>()(
       },
       updateUserCategory: async (user_category_id: number, data: ReqUpdateUserCategory) => {
         set({ categoriesStatus: "loading", categoriesError: null });
-        const response = await categoriesApi.updateUserCategory(user_category_id,data);
+        const response = await categoriesApi.updateUserCategory(user_category_id, data);
 
         if (response.status === "error") {
           console.error("Error updating user category:", response.message);

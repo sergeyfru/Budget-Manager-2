@@ -3,7 +3,8 @@ import { create } from "zustand";
 import { transactionsApi } from "../api/trasactionsApi";
 import type { 
   ReqCreateTransaction, ReqUpdateTransaction,
-   Status, TransactionsDetailedArr
+   Status, TransactionsDetailedArr,
+   TransactionTypesArrDB
   } from "@shared/core";
 import { persist } from "zustand/middleware";
 
@@ -12,9 +13,16 @@ type TransactionState = {
   transactionsStatus: Status;
   transactionsError: string | null;
 
+  transactionTypes: TransactionTypesArrDB;
+  transactionTypesStatus: Status;
+  transactionTypesError: string | null;
+  
   // actions
+  getTransactionTypes: () => void;
+
   setTransactions: (data: TransactionsDetailedArr) => void;
   getTransactions: () => void;
+
   addTransaction: (data: ReqCreateTransaction) => void;
   updateTransaction: (transaction_id: number, data: ReqUpdateTransaction) => void;
   deleteTransaction: (id: number) => void;
@@ -31,12 +39,26 @@ export const useTransactionStore = create<TransactionState>()(
       transactions: [] as TransactionsDetailedArr,
       transactionsStatus: "idle",
       transactionsError: null,
+      transactionTypes: [] as TransactionTypesArrDB,
+      transactionTypesStatus: "idle",
+      transactionTypesError: null,
+
+      getTransactionTypes: async () => {
+        set({ transactionTypesStatus: "loading", transactionTypesError: null });
+        const response = await transactionsApi.getTransactionTypes();
+        if (response.status === "error") {
+          set({ transactionTypesStatus: "error", transactionTypesError: response.message || "Failed to fetch transaction types" });
+          return;
+        }
+        set({ transactionTypes: response.data.sort((a,b)=>a.transaction_type_id-b.transaction_type_id), transactionTypesStatus: "success" });
+      },
 
       setTransactions: async (data: TransactionsDetailedArr) => {
         set(() => ({
           transactions: data,
         }));
       },
+
       getTransactions: async () => {
         console.log("In getTransaction");
         set({ transactionsStatus: "loading", transactionsError: null });
@@ -134,6 +156,7 @@ export const useTransactionStore = create<TransactionState>()(
       name: "transaction-storage",
       partialize: (state) => ({
         transactions: state.transactions,
+        transactionTypes: state.transactionTypes,
       }),
     },
   ),

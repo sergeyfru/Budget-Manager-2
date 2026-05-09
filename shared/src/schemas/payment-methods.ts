@@ -54,7 +54,7 @@ export const userPaymentMethodDBSchema = z.object({
   user_payment_method_name: z.string(),
   user_payment_method_icon: z.string().nullable(),
   user_payment_method_color: z.string(),
-  user_payment_method_details: z.string(),
+  user_payment_method_details: z.string().nullable(),
 
   created_at: z.coerce.date(),
 });
