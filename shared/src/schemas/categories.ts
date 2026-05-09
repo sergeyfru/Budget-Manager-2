@@ -110,7 +110,7 @@ export type ReqCreateUserCategory = z.infer<
 //
 
 export const updateUserCategoryFormSchema = createUserCategoryFormSchema.extend({
-  user_category_id: z.number()
+  // user_category_id: z.number()
 });
 
 export type UpdateUserCategoryForm = z.infer<
@@ -119,7 +119,7 @@ export type UpdateUserCategoryForm = z.infer<
 
 // REQUEST
 export const reqUpdateUserCategorySchema = createUserCategoryFormSchema.partial().extend({
-  user_category_id: z.number()
+  // user_category_id: z.number()
 });
 export type ReqUpdateUserCategory = z.infer<
   typeof reqUpdateUserCategorySchema

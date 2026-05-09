@@ -1,0 +1,33 @@
+export const iconOptions = [
+  "ShoppingCart",
+  "Car",
+  "Tv",
+  "FileText",
+  "Coffee",
+  "ShoppingBag",
+  "Heart",
+  "Briefcase",
+  "Code",
+  "TrendingUp",
+  "Home",
+  "Plane",
+  "Book",
+  "Music",
+  "Dumbbell",
+  "Gift",
+  "Phone",
+  "Laptop",
+];
+
+export const colorOptions = [
+  "#10b981",
+  "#3b82f6",
+  "#8b5cf6",
+  "#ef4444",
+  "#f59e0b",
+  "#ec4899",
+  "#06b6d4",
+  "#84cc16",
+  "#f97316",
+  "#6366f1",
+];
