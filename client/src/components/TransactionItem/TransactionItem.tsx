@@ -29,7 +29,7 @@ export function TransactionItem({ transaction, showDate = false }: TransactionIt
           <h4 className="truncate">{transaction.user_category.name}</h4>
           <p className={`flex-shrink-0 font-medium ${
             transaction.transaction_type.direction === 'in' 
-              ? 'text-green-600 dark:text-green-400' 
+              ? 'text-success-foreground dark:text-success-foreground' 
               : 'text-foreground'
           }`}>
             {transaction.transaction_type.direction === 'in' ? '+' : ''}{transaction.transaction_amount.toFixed(2)}{" "}{symbol}

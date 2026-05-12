@@ -53,8 +53,6 @@ export const useCategoriesStore = create<CategoriesState>()(
           set({ defaultCategoriesStatus: "error", defaultCategoriesError: response.message });
           return;
         }
-        console.log("Default categories:", response.data);
-
         set({
           defaultCategories: response.data.sort((a, b) => a.category_id - b.category_id),
           defaultCategoriesStatus: "success",
@@ -71,7 +69,6 @@ export const useCategoriesStore = create<CategoriesState>()(
             set({ categoriesStatus: "error", categoriesError: response.message });
             return;
           }
-          console.log("User categories:", response.data);
           set({
             categories: response.data.sort((a, b) => a.user_category_id - b.user_category_id),
             categoriesStatus: "success",
@@ -90,12 +87,9 @@ export const useCategoriesStore = create<CategoriesState>()(
           set({ categoriesStatus: "error", categoriesError: response.message });
           return;
         }
-
-        console.log("createUserCategory response:", response);
-
         toast.success(response.message);
         set((state) => ({
-          categories: [...state.categories, response.data].sort((a, b) => a.user_category_id - b.user_category_id),
+          categories: [...state.categories, response.data],
           categoriesStatus: "success",
         }));
       },
@@ -108,7 +102,6 @@ export const useCategoriesStore = create<CategoriesState>()(
           set({ categoriesStatus: "error", categoriesError: response.message });
           return;
         }
-        console.log("updateUserCategory response:", response);
         toast.success(response.message);
         set((state) => ({
           categories: state.categories.map((category) =>
@@ -120,9 +113,6 @@ export const useCategoriesStore = create<CategoriesState>()(
       deleteUserCategory: async (user_category_id: number) => {
         set({ categoriesStatus: "loading", categoriesError: null });
         const response = await categoriesApi.deleteUserCategory(user_category_id);
-
-        console.log("deleteUserCategory response:", response);
-
         if (response.status === "error") {
           console.error("Error deleting user category:", response.message);
           set({ categoriesStatus: "error", categoriesError: response.message });

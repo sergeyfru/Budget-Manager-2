@@ -8,9 +8,10 @@ import { create } from "zustand";
 
 import { persist } from "zustand/middleware";
 import { paymentMethodsApi } from "../api/paymentMethodsApi";
+import { toast } from "sonner";
 
 type PaymentMethodsState = {
-  paymntentMethods: UserPaymentMethodsArrDB;
+  paymentMethods: UserPaymentMethodsArrDB;
   paymentMethodsStatus: Status;
   paymentMethodsError: string | null;
   // actions
@@ -26,16 +27,16 @@ type PaymentMethodsState = {
   clear: () => void;
 };
 
-export const usePaymentMethods = create<PaymentMethodsState>()(
+export const usePaymentMethodsStore = create<PaymentMethodsState>()(
   persist(
     (set) => ({
-      paymntentMethods: [] as UserPaymentMethodsArrDB,
+      paymentMethods: [] as UserPaymentMethodsArrDB,
       paymentMethodsStatus: "idle",
       paymentMethodsError: null,
 
       setPaymentMethods: async (data: UserPaymentMethodsArrDB) => {
         set(() => ({
-          paymntentMethods: data,
+          paymentMethods: data,
         }));
       },
 
@@ -49,17 +50,59 @@ export const usePaymentMethods = create<PaymentMethodsState>()(
           });
           return;
         }
-        set({ paymntentMethods: response.data, paymentMethodsStatus: "success" });
+        set({ paymentMethods: response.data.sort((a,b)=>a.user_payment_method_id - b.user_payment_method_id), paymentMethodsStatus: "success" });
       },
 
       createUserPaymentMethod: async (data: ReqCreateUserPaymentMethod) => {
-        console.log("Will create User's Payment Method with data:", data);
+                set({ paymentMethodsStatus: "loading", paymentMethodsError: null });
+                const response = await paymentMethodsApi.createUserPaymentMethod(data);
+                if (response.status === "error") {
+                  console.error("Error creating user category:", response.message);
+                  set({ paymentMethodsStatus: "error", paymentMethodsError: response.message });
+                  return;
+                }
+                toast.success(response.message);
+                set((state) => ({
+                  paymentMethods: [...state.paymentMethods, response.data],
+                  paymentMethodsStatus: "success",
+                }));
       },
       updateUserPaymentMethod: async (user_payment_method_id: number, data: ReqUpdateUserPaymentMethod) => {
-        console.log("Will update Payment Method with ID:", user_payment_method_id, ", and data:", data);
+        set({ paymentMethodsStatus: "loading", paymentMethodsError: null });
+        const response = await paymentMethodsApi.updateUserPaymentMethod(user_payment_method_id, data);
+
+        if (response.status === "error") {
+          console.error("Error updating user category:", response.message);
+          set({ paymentMethodsStatus: "error", paymentMethodsError: response.message });
+          return;
+        }
+        toast.success(response.message);
+        set((state) => ({
+          paymentMethods: state.paymentMethods.map((paymentMethod) =>
+            paymentMethod.user_payment_method_id === response.data.user_payment_method_id
+              ? response.data
+              : paymentMethod,
+          ),
+          paymentMethodsStatus: "success",
+        }));
       },
       deleteUserPaymentMethod: async (user_payment_method_id: number) => {
-        console.log("Will delete Payment Method with ID:", user_payment_method_id);
+        set({ paymentMethodsStatus: "loading", paymentMethodsError: null });
+        const response = await paymentMethodsApi.deleteUserPaymentMethod(user_payment_method_id);
+
+
+        if (response.status === "error") {
+          console.error("Error deleting user category:", response.message);
+          set({ paymentMethodsStatus: "error", paymentMethodsError: response.message });
+          return;
+        }
+        toast.success(response.message);
+        set((state) => ({
+          paymentMethods: state.paymentMethods.filter(
+            (paymentMethod) => paymentMethod.user_payment_method_id !== user_payment_method_id,
+          ),
+          paymentMethodsStatus: "success",
+        }));
       },
 
       setLoading: (value) =>
@@ -76,7 +119,7 @@ export const usePaymentMethods = create<PaymentMethodsState>()(
 
       clear: () =>
         set(() => ({
-          paymntentMethods: [] as UserPaymentMethodsArrDB,
+          paymentMethods: [] as UserPaymentMethodsArrDB,
           paymentMethodsStatus: "idle",
           paymentMethodsError: null,
         })),
@@ -84,7 +127,7 @@ export const usePaymentMethods = create<PaymentMethodsState>()(
     {
       name: "payment-storage",
       partialize: (state) => ({
-        paymntentMethods: state.paymntentMethods,
+        paymentMethods: state.paymentMethods,
       }),
     },
   ),

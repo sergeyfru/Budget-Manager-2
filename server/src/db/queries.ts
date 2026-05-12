@@ -57,11 +57,11 @@ export const getTransactionsQuery = (trx: Knex): Knex.QueryBuilder => {
       trx.raw(`
       json_build_object(
         'id', upm.user_payment_method_id,
-        'type_id', upm.payment_method_type_id,
+        // 'type_id', upm.payment_method_type_id,
         'name', upm.user_payment_method_name,
         'icon', upm.user_payment_method_icon,
         'color', upm.user_payment_method_color,
-        'details', upm.user_payment_method_details
+        // 'details', upm.user_payment_method_details
       ) as user_payment_method
     `),
     ).orderBy("tr.date_of_transaction", "desc");

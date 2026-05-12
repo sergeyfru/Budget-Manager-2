@@ -111,7 +111,7 @@ export function BottomNav({ onAddClick }: BottomNavProps) {
               <Link
                 key={item.path}
                 to={item.path!}
-                className={`flex flex-col items-center justify-center gap-1 py-2 px-3 sm:px-4 transition-colors rounded-lg ${
+                className={`flex flex-col items-center w-32 justify-center gap-1 py-2 px-3 sm:px-4 transition-colors rounded-lg ${
                   isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
                 }`}
               >

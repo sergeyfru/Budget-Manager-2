@@ -49,12 +49,12 @@ export type ResDefaultPaymentMethodTypesArr = z.infer<
 export const userPaymentMethodDBSchema = z.object({
   user_payment_method_id: z.number(),
   user_id: z.number(),
-  payment_method_type_id: z.number(),
+  // payment_method_type_id: z.number(),
 
   user_payment_method_name: z.string(),
-  user_payment_method_icon: z.string().nullable(),
+  user_payment_method_icon: z.string(),
   user_payment_method_color: z.string(),
-  user_payment_method_details: z.string().nullable(),
+  // user_payment_method_details: z.string().nullable(),
 
   created_at: z.coerce.date(),
 });
@@ -97,11 +97,11 @@ export type UserPaymentMethod = z.infer<typeof userPaymentMethodSchema>;
 
 // FORM
 export const createUserPaymentMethodFormSchema = z.object({
-  payment_method_type_id: z.coerce.number(),
+  // payment_method_type_id: z.coerce.number(),
   user_payment_method_name: z.string().min(1),
-  user_payment_method_icon: z.string().nullable().optional(),
+  user_payment_method_icon: z.string(),
   user_payment_method_color: z.string(),
-  user_payment_method_details: z.string(),
+  // user_payment_method_details: z.string(),
 });
 
 export type CreateUserPaymentMethodForm = z.infer<
@@ -111,7 +111,7 @@ export type CreateUserPaymentMethodForm = z.infer<
 // REQUEST
 export const reqCreateUserPaymentMethodSchema =
   createUserPaymentMethodFormSchema.extend({
-    user_id: z.number(),
+    // user_id: z.number(),
   });
 
 export type ReqCreateUserPaymentMethod = z.infer<
@@ -136,7 +136,7 @@ export type UpdateUserPaymentMethodForm = z.infer<
 // REQUEST
 export const reqUpdateUserPaymentMethodSchema =
   updateUserPaymentMethodFormSchema.extend({
-    user_payment_method_id: z.number(),
+    // user_payment_method_id: z.number(),
   });
 
 export type ReqUpdateUserPaymentMethod = z.infer<

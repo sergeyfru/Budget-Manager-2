@@ -126,7 +126,7 @@ export const register = async (newUser: ReqRegister): Promise<UserView> => {
     console.log("Number of default payment methods:", defaultPaymentMethods.length);
     const defaultPaymentMethodsForUser = defaultPaymentMethods.map((paymentMethod) => ({
       user_id: user.user_id,
-      payment_method_type_id: paymentMethod.payment_method_type_id,
+      // payment_method_type_id: paymentMethod.payment_method_type_id,
       user_payment_method_name: paymentMethod.payment_method_type_name,
       user_payment_method_icon: paymentMethod.payment_method_type_icon,
       user_payment_method_color: paymentMethod.payment_method_type_color,

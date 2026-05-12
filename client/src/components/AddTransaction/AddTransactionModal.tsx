@@ -3,10 +3,11 @@ import { createTransactionFormSchema, type ReqCreateTransaction } from "@shared/
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { useTransactionStore } from "../../store/transactionsStore";
 import { useEffect } from "react";
-import { usePaymentMethods } from "../../store/paymentMethodsStore";
+import { usePaymentMethodsStore } from "../../store/paymentMethodsStore";
 import { useSettingsStore } from "../../store/settingsStore";
 import { useCurrenciesStore } from "../../store/currenciesStore";
 import { useCategoriesStore } from "../../store/categoriesStore";
+import { TitleModal } from "../ModalComponents/TitleModale";
 
 interface AddTransactionModalProps {
   open: boolean;
@@ -16,7 +17,7 @@ interface AddTransactionModalProps {
 export function AddTransactionModal({ open, onOpenChange }: AddTransactionModalProps) {
   const { transactionTypes, transactionTypesStatus, getTransactionTypes, addTransaction } = useTransactionStore();
   const { categories, categoriesStatus } = useCategoriesStore();
-  const { paymentMethodsStatus, paymntentMethods, getUserPaymentMethods } = usePaymentMethods();
+  const { paymentMethodsStatus, paymentMethods, getUserPaymentMethods } = usePaymentMethodsStore();
   const { currencies, currenciesStatus, getCurrencies } = useCurrenciesStore();
   const { defaultCurrency } = useSettingsStore();
 
@@ -24,13 +25,13 @@ export function AddTransactionModal({ open, onOpenChange }: AddTransactionModalP
     if (transactionTypes.length === 0) {
       getTransactionTypes();
     }
-    if (paymntentMethods.length === 0) {
+    if (paymentMethods.length === 0) {
       getUserPaymentMethods();
     }
     if (currencies.length === 0) {
       getCurrencies();
     }
-  }, [transactionTypes.length, paymntentMethods.length, currencies.length]);
+  }, [transactionTypes.length, paymentMethods.length, currencies.length]);
 
   const {
     register,
@@ -74,15 +75,8 @@ export function AddTransactionModal({ open, onOpenChange }: AddTransactionModalP
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/50 backdrop-blur-sm p-1">
       <div className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-card rounded-2xl shadow-lg">
-        {/* Header */}
-        <div className="p-6 pb-4 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold">Add Transaction</h2>
-            <button onClick={closeModal} className="rounded-full p-2 hover:bg-gray-100 transition-colors">
-              ✕
-            </button>
-          </div>
-        </div>
+
+        <TitleModal title="Add Transaction" closeModal={closeModal} />
 
         {/* Form */}
         <form onChange={onFormChange} onSubmit={handleSubmit(onFormSubmit)} className="p-6 space-y-6">
@@ -97,7 +91,7 @@ export function AddTransactionModal({ open, onOpenChange }: AddTransactionModalP
                   {transactionTypesStatus === "loading" ? (
                     <p>Loading transaction types...</p>
                   ) : transactionTypesStatus === "error" ? (
-                    <p className="text-sm text-destructive">Failed to load transaction types</p>
+                    <p className="text-sm text-destructive-foreground">Failed to load transaction types</p>
                   ) : (
                     transactionTypes.slice(0, 2).map((type) => {
                       const isActive = field.value === type.transaction_type_id;
@@ -125,7 +119,7 @@ export function AddTransactionModal({ open, onOpenChange }: AddTransactionModalP
               )}
             />
             {errors.transaction_type_id && (
-              <p className="text-sm text-destructive flex items-center gap-1.5">
+              <p className="text-sm text-destructive-foreground flex items-center gap-1.5">
                 {/* <span className="inline-block w-1 h-1 rounded-full bg-destructive" /> */}
                 {errors.transaction_type_id.message}
               </p>
@@ -187,7 +181,7 @@ export function AddTransactionModal({ open, onOpenChange }: AddTransactionModalP
             </div>
             {/* <div className="flex justify-between"> */}
             {errors.transaction_amount && (
-              <p className="text-sm text-destructive flex items-center gap-1.5 ">
+              <p className="text-sm text-destructive-foreground flex items-center gap-1.5 ">
                 {/* <span className="inline-block w-1 h-1 rounded-full bg-destructive" /> */}
                 {errors.transaction_amount.message}
               </p>
@@ -231,7 +225,7 @@ export function AddTransactionModal({ open, onOpenChange }: AddTransactionModalP
               )}
             </select>
             {errors.user_category_id ? (
-              <p className="text-sm text-destructive">{errors.user_category_id.message}</p>
+              <p className="text-sm text-destructive-foreground">{errors.user_category_id.message}</p>
             ) : null}
           </div>
           {/* </div> */}
@@ -259,7 +253,7 @@ export function AddTransactionModal({ open, onOpenChange }: AddTransactionModalP
               ) : paymentMethodsStatus === "error" ? (
                 <option>Failed to load payment methods</option>
               ) : (
-                paymntentMethods.map((method) => (
+                paymentMethods.map((method) => (
                   <option key={method.user_payment_method_id} value={method.user_payment_method_id}>
                     {method.user_payment_method_name}
                   </option>
@@ -267,7 +261,7 @@ export function AddTransactionModal({ open, onOpenChange }: AddTransactionModalP
               )}
             </select>
             {errors.user_payment_method_id ? (
-              <p className="text-sm text-destructive">{errors.user_payment_method_id.message}</p>
+              <p className="text-sm text-destructive-foreground">{errors.user_payment_method_id.message}</p>
             ) : null}
           </div>
 
@@ -287,7 +281,7 @@ export function AddTransactionModal({ open, onOpenChange }: AddTransactionModalP
                         `}
             />
             {errors.date_of_transaction && (
-              <p className="text-sm text-destructive">{errors.date_of_transaction.message}</p>
+              <p className="text-sm text-destructive-foreground">{errors.date_of_transaction.message}</p>
             )}
           </div>
 
@@ -300,7 +294,7 @@ export function AddTransactionModal({ open, onOpenChange }: AddTransactionModalP
               placeholder="Add any additional notes..."
             />
             {errors.transaction_note && (
-              <p className="text-sm text-destructive flex items-center gap-1.5">
+              <p className="text-sm text-destructive-foreground flex items-center gap-1.5">
                 {/* <span className="inline-block w-1 h-1 rounded-full bg-destructive" /> */}
                 {errors.transaction_note.message}
               </p>

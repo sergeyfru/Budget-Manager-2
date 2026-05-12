@@ -39,7 +39,7 @@ export const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
           {children && <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center">{children}</div>}
         </div>
         {error && (
-          <p className="text-sm text-destructive flex items-center gap-1.5">
+          <p className="text-sm text-destructive-foreground flex items-center gap-1.5">
             <span className="inline-block w-1 h-1 rounded-full bg-destructive" />
             {error}
           </p>

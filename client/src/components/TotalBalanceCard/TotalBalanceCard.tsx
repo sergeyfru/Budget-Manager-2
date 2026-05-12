@@ -32,27 +32,27 @@ export const TotalBalanceCard = ({
       </div>
 
       <div className="grid grid-cols-2 gap-3 md:gap-4">
-        <div className="bg-green-500/10 dark:bg-green-500/20 backdrop-blur-sm rounded-xl p-4 md:p-5">
+        <div className="bg-success/20 dark:bg-success/20 backdrop-blur-sm rounded-xl p-4 md:p-5">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-green-500/20 dark:bg-green-500/30 flex items-center justify-center">
-              <ArrowDownLeft className="w-4 h-4 text-green-600 dark:text-green-400" />
+            <div className="w-8 h-8 rounded-lg bg-success/30 dark:bg-success/30 flex items-center justify-center">
+              <ArrowDownLeft className="w-4 h-4 text-success-foreground dark:text-success-foreground" />
             </div>
             <span className="text-sm text-muted-foreground">Income</span>
           </div>
-          <p className="text-lg md:text-xl text-green-600 dark:text-green-400">
-            {currencySimbol}
+          <p className="text-lg md:text-xl text-success-foreground dark:text-success-foreground">
+            {currencySimbol}{" "}
             {monthlyIncome.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
         </div>
 
-        <div className="bg-red-500/10 dark:bg-red-500/20 backdrop-blur-sm rounded-xl p-4 md:p-5">
+        <div className="bg-destructive/20 dark:bg-destructive backdrop-blur-sm rounded-xl p-4 md:p-5">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-red-500/20 dark:bg-red-500/30 flex items-center justify-center">
-              <ArrowUpRight className="w-4 h-4 text-red-600 dark:text-red-400" />
+            <div className="w-8 h-8 rounded-lg bg-destructive/30 dark:bg-destructive/30 flex items-center justify-center">
+              <ArrowUpRight className="w-4 h-4 text-destructive-foreground dark:text-destructive-foreground" />
             </div>
             <span className="text-sm text-muted-foreground">Expenses</span>
           </div>
-          <p className="text-lg md:text-xl text-red-600 dark:text-red-400">
+          <p className="text-lg md:text-xl text-destructive-foreground dark:text-destructive-foreground">
             {currencySimbol}
             {monthlyExpenses.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>

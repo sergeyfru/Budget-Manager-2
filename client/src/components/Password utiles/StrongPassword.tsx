@@ -12,9 +12,9 @@ const getPasswordStrength = (password: string) => {
     if (/\d/.test(password)) strength++;
     if (/[^a-zA-Z0-9]/.test(password)) strength++;
 
-    if (strength <= 2) return { label: "Weak", color: "bg-red-500", width: "33%" };
+    if (strength <= 2) return { label: "Weak", color: "bg-destructive", width: "33%" };
     if (strength <= 3) return { label: "Fair", color: "bg-yellow-500", width: "66%" };
-    return { label: "Strong", color: "bg-green-500", width: "100%" };
+    return { label: "Strong", color: "bg-success", width: "100%" };
   };
 
 const passwordStrength = getPasswordStrength(password);
@@ -27,10 +27,10 @@ if (!passwordStrength) return null;
                     <span
                       className={`font-medium ${
                         passwordStrength.label === "Strong"
-                          ? "text-green-600 dark:text-green-400"
+                          ? "text-success-foreground dark:text-success-foreground"
                           : passwordStrength.label === "Fair"
                             ? "text-yellow-600 dark:text-yellow-400"
-                            : "text-red-600 dark:text-red-400"
+                            : "text-destructive-foreground dark:text-destructive-foreground"
                       }`}
                     >
                       {passwordStrength.label}
