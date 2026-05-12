@@ -79,11 +79,11 @@ export type UserPaymentMethodsArrDB = z.infer<
 
 export const userPaymentMethodSchema = z.object({
   id: z.number(),
-  type_id: z.number(),
+  // type_id: z.number(),
   name: z.string(),
   icon: z.string().nullable(),
   color: z.string(),
-  details: z.string().nullable(),
+  // details: z.string().nullable(),
 });
 
 export type UserPaymentMethod = z.infer<typeof userPaymentMethodSchema>;
