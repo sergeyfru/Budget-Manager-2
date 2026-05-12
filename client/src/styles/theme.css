@@ -17,9 +17,9 @@
   --accent: #e9ebef;
   --accent-foreground: #030213;
   --destructive: #d4183d;
-  --destructive-foreground: #ffffff;
+  --destructive-foreground: #d20000;
   --success: oklch(0.65 0.18 145);
-  --success-foreground: #ffffff;
+  --success-foreground:oklch(52.732% 0.17117 143.259);
   --border: rgba(0, 0, 0, 0.08);
   --input: transparent;
   --input-background: #f3f3f5;
@@ -59,10 +59,10 @@
     --muted-foreground: oklch(0.708 0 0);
     --accent: oklch(0.269 0 0);
     --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.396 0.141 25.723);
+    --destructive: oklch(0.396 0.641 25.723);
     --destructive-foreground: oklch(0.637 0.237 25.331);
-    --success: oklch(0.60 0.20 145);
-    --success-foreground:oklch(0.75 0.18 145);
+    --success: oklch(0.6 0.2 145);
+    --success-foreground: oklch(0.75 0.18 145);
     --border: rgba(255, 255, 255, 0.08);
     --input: oklch(0.269 0 0);
     --ring: oklch(0.439 0 0);
@@ -99,10 +99,10 @@
   --muted-foreground: oklch(0.708 0 0);
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
+  --destructive: oklch(0.396 1.141 25.723);
   --destructive-foreground: oklch(0.637 0.237 25.331);
-  --success: oklch(0.60 0.20 145);
-  --success-foreground:oklch(0.75 0.18 145);
+  --success: oklch(0.6 0.2 145);
+  --success-foreground: oklch(0.75 0.18 145);
   --border: rgba(255, 255, 255, 0.08);
   --input: oklch(0.269 0 0);
   --ring: oklch(0.439 0 0);
@@ -224,13 +224,15 @@
     cursor: pointer;
   }
 
-  input, textarea {
+  input,
+  textarea {
     font-size: var(--text-base);
     font-weight: var(--font-weight-normal);
     line-height: 1.5;
   }
 
-  input:focus, textarea:focus {
+  input:focus,
+  textarea:focus {
     outline: none;
   }
 

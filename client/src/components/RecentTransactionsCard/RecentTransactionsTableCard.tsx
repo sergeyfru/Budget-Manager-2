@@ -1,6 +1,7 @@
 import type { TransactionsDetailedArr } from "@shared/core";
 import { EditDelete } from "../EditDelete/EditDelete";
 import { CustomIcon } from "../CustomIcons/CustomIcons";
+import { useTransactionStore } from "../../store/transactionsStore";
 
 interface RecentTransactionsTableCardProps {
   transactions: TransactionsDetailedArr;
@@ -15,6 +16,11 @@ export const RecentTransactionsTableCard = ({
   showMore,
   toggleShowMore,
 }: RecentTransactionsTableCardProps) => {
+
+  const transactionStore = useTransactionStore()
+  const onDelete =(transaction_id:number)=>{
+      transactionStore.deleteTransaction(transaction_id)
+  }
   return (
     <table className="w-full">
       <thead>
@@ -96,7 +102,7 @@ export const RecentTransactionsTableCard = ({
                     <span
                       className={`font-medium ${
                         transaction.transaction_type.direction === "in"
-                          ? "text-green-600 dark:text-green-400"
+                          ? "text-success-foreground dark:text-success-foreground"
                           : "text-foreground"
                       }`}
                     >
@@ -106,7 +112,7 @@ export const RecentTransactionsTableCard = ({
                     <span
                       className={`font-medium ${
                         transaction.transaction_type.direction === "in"
-                          ? "text-green-600 dark:text-green-400"
+                          ? "text-success-foreground dark:text-success-foreground"
                           : "text-foreground"
                       }`}
                     >
@@ -114,8 +120,8 @@ export const RecentTransactionsTableCard = ({
                     </span>
                   </div>
                 </td>
-                <td className="flex justify-center gap-2 opacity-40 group-hover:opacity-100 transition-opacity flex-col justify-center items-center">
-                  <EditDelete onEdit={() => {}} onDelete={() => {}} />
+                <td className="flex justify-center gap-0.5 opacity-40 group-hover:opacity-100 transition-opacity flex-col justify-center items-center">
+                  <EditDelete onEdit={() => {}} onDelete={() => onDelete(transaction.transaction_id)} />
                 </td>
               </tr>
             );

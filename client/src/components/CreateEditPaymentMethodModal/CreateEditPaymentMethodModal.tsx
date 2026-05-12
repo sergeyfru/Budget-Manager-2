@@ -1,21 +1,25 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createUserCategoryFormSchema, type CreateUserCategoryForm, type UserCategoryDB } from "@shared/core";
+import {
+  createUserPaymentMethodFormSchema,
+  type CreateUserPaymentMethodForm,
+  type UserPaymentMethodDB,
+} from "@shared/core";
 import { useForm } from "react-hook-form";
-import { useCategoriesStore } from "../../store/categoriesStore";
 import type { AxiosError } from "axios";
 import { toast } from "sonner";
 import { CustomIcon } from "../CustomIcons/CustomIcons";
 import { useEffect } from "react";
-import { iconCategoriesOptions, colorOptions } from "../../constants/constants";
+import { iconPaymentMethodsOptions, colorOptions } from "../../constants/constants";
 import { TitleModal } from "../ModalComponents/TitleModale";
+import { usePaymentMethodsStore } from "../../store/paymentMethodsStore";
 
-interface CreateEditCategoryModalProps {
+interface CreateEditPaymentMethodModalProps {
   addModalOpen: boolean;
   setAddModalOpen: () => void;
-  dataForUpdate: UserCategoryDB | undefined;
+  dataForUpdate: UserPaymentMethodDB | undefined;
 }
-export const CreateEditCategoryModal = ({ setAddModalOpen, dataForUpdate }: CreateEditCategoryModalProps) => {
-  const categoryStore = useCategoriesStore();
+export const CreateEditPaymentMethodModal = ({ setAddModalOpen, dataForUpdate }: CreateEditPaymentMethodModalProps) => {
+  const paymentMethodsStore = usePaymentMethodsStore();
 
   const isEditMode = !!dataForUpdate;
 
@@ -27,11 +31,8 @@ export const CreateEditCategoryModal = ({ setAddModalOpen, dataForUpdate }: Crea
     setError,
     watch,
     reset,
-  } = useForm<CreateUserCategoryForm>({
-    resolver: zodResolver(createUserCategoryFormSchema),
-    defaultValues: {
-      user_category_allowed_direction: "both",
-    },
+  } = useForm<CreateUserPaymentMethodForm>({
+    resolver: zodResolver(createUserPaymentMethodFormSchema),
   });
   useEffect(() => {
     if (dataForUpdate) {
@@ -39,16 +40,16 @@ export const CreateEditCategoryModal = ({ setAddModalOpen, dataForUpdate }: Crea
     }
   }, []);
 
-  const onSubmit = async (data: CreateUserCategoryForm) => {
+  const onSubmit = async (data: CreateUserPaymentMethodForm) => {
     try {
       if (isEditMode && dataForUpdate) {
         const dataChanged = Object.fromEntries(
           Object.entries(data).filter(([key, value]) => value !== dataForUpdate[key as keyof typeof dataForUpdate]),
         );
-        await categoryStore.updateUserCategory(dataForUpdate.user_category_id, dataChanged);
+        await paymentMethodsStore.updateUserPaymentMethod(dataForUpdate.user_payment_method_id, dataChanged);
         setAddModalOpen();
       } else {
-        await categoryStore.createUserCategory(data);
+        await paymentMethodsStore.createUserPaymentMethod(data);
         setAddModalOpen();
       }
     } catch (err: any) {
@@ -70,13 +71,16 @@ export const CreateEditCategoryModal = ({ setAddModalOpen, dataForUpdate }: Crea
     }
   };
 
-  const selectedIcon = watch("user_category_icon");
-  const selectedColor = watch("user_category_color");
+  const selectedIcon = watch("user_payment_method_icon");
+  const selectedColor = watch("user_payment_method_color");
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/50 backdrop-blur-sm p-3 pb-20 sm:p-4 sm:pb-18 md:pb-20 lg:pb-4">
       <div className="w-full max-w-md max-h-[85vh] md:max-h-[90vh] overflow-y-auto rounded-2xl bg-card shadow-lg">
-        <TitleModal title={isEditMode ? "Update category" : "Create category"} closeModal={setAddModalOpen} />
+        <TitleModal
+          title={isEditMode ? "Update payment method" : "Create payment method"}
+          closeModal={setAddModalOpen}
+        />
 
         {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-6 md:space-y-8">
@@ -84,35 +88,35 @@ export const CreateEditCategoryModal = ({ setAddModalOpen, dataForUpdate }: Crea
 
           {/* Name Input */}
           <div>
-            <label className="block mb-3">Category Name</label>
+            <label className="block mb-3">Payment Method Name</label>
             <input
               type="text"
-              {...register("user_category_name")}
+              {...register("user_payment_method_name")}
               placeholder="e.g., Groceries"
               className={`w-full p-4 md:p-5 rounded-xl border border-border bg-background focus:border-primary transition-colors
                  ${
-                   errors.user_category_name
+                   errors.user_payment_method_name
                      ? "border-destructive focus:border-destructive"
                      : "border-transparent focus:border-primary focus:bg-card"
                  }`}
             />
-            {errors.user_category_name && (
-              <p className="mt-1 text-sm text-destructive-foreground">{errors.user_category_name.message}</p>
+            {errors.user_payment_method_name && (
+              <p className="mt-1 text-sm text-destructive-foreground">{errors.user_payment_method_name.message}</p>
             )}
           </div>
 
           <div>
             <label
-              className={`block mb-4 ${errors.user_category_icon ? "text-destructive-foreground" : "text-muted-foreground"}`}
+              className={`block mb-4 ${errors.user_payment_method_icon ? "text-destructive-foreground" : "text-muted-foreground"}`}
             >
               Icon
             </label>
             <div className="grid grid-cols-4 md:grid-cols-5 gap-2 md:gap-2">
-              {iconCategoriesOptions.map((icon) => (
+              {iconPaymentMethodsOptions.map((icon) => (
                 <button
                   key={icon}
                   type="button"
-                  onClick={() => setValue("user_category_icon", icon)}
+                  onClick={() => setValue("user_payment_method_icon", icon)}
                   className={`
                     flex items-center justify-center
                     size-18 rounded-xl border
@@ -131,15 +135,15 @@ export const CreateEditCategoryModal = ({ setAddModalOpen, dataForUpdate }: Crea
               ))}
             </div>
 
-            {errors.user_category_icon && (
-              <p className="mt-1 text-sm text-destructive-foreground">{errors.user_category_icon.message}</p>
+            {errors.user_payment_method_icon && (
+              <p className="mt-1 text-sm text-destructive-foreground">{errors.user_payment_method_icon.message}</p>
             )}
           </div>
 
           {/* Color Selection */}
           <div>
             <label
-              className={`block mb-4 ${errors.user_category_color ? "text-destructive-foreground" : "text-muted-foreground"}`}
+              className={`block mb-4 ${errors.user_payment_method_color ? "text-destructive-foreground" : "text-muted-foreground"}`}
             >
               Color *
             </label>
@@ -148,7 +152,7 @@ export const CreateEditCategoryModal = ({ setAddModalOpen, dataForUpdate }: Crea
                 <button
                   key={color}
                   type="button"
-                  onClick={() => setValue("user_category_color", color)}
+                  onClick={() => setValue("user_payment_method_color", color)}
                   className={`w-full aspect-square rounded-xl border-2 transition-all hover:scale-110 ${
                     selectedColor === color ? "border-primary ring-4 ring-primary/20" : "border-border"
                   }`}
@@ -156,8 +160,8 @@ export const CreateEditCategoryModal = ({ setAddModalOpen, dataForUpdate }: Crea
                 />
               ))}
             </div>
-            {errors.user_category_color && (
-              <p className="mt-1 text-sm text-destructive-foreground">{errors.user_category_color.message}</p>
+            {errors.user_payment_method_color && (
+              <p className="mt-1 text-sm text-destructive-foreground">{errors.user_payment_method_color.message}</p>
             )}
           </div>
 
@@ -176,7 +180,7 @@ export const CreateEditCategoryModal = ({ setAddModalOpen, dataForUpdate }: Crea
               type="submit"
               className="flex-1 py-4 bg-primary text-primary-foreground rounded-xl hover:shadow-lg transition-all"
             >
-              {!dataForUpdate ? "Add Category" : "Update Category"}
+              {!dataForUpdate ? "Create" : "Update"}
             </button>
           </div>
         </form>
