@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '../../store/authStore.ts';
 import { Sidebar } from '../Navigation/SideBar.tsx';
 import { AddTransactionModal } from '../AddTransaction/AddTransactionModal.tsx';
+import { useSettingsStore } from '../../store/settingsStore.ts';
 
 export const Layout = () => {
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const {addTransactionModalOpen,setAddTransactionModalOpen} = useSettingsStore()
   const isAutorized = useAuthStore((state) => state.isAuth);
 
   useEffect(() => {
@@ -18,7 +19,7 @@ export const Layout = () => {
 
   const addTransaction = ()=>{
     console.log("Add transaction clicked");
-    setIsAddModalOpen(!isAddModalOpen);
+    setAddTransactionModalOpen(!addTransactionModalOpen);
   }
 
   return (
@@ -42,8 +43,8 @@ export const Layout = () => {
 
       {/* Add Transaction Modal */}
       <AddTransactionModal 
-        open={isAddModalOpen} 
-        onOpenChange={setIsAddModalOpen}
+        open={addTransactionModalOpen} 
+        onOpenChange={setAddTransactionModalOpen}
       />
     </div>
   );

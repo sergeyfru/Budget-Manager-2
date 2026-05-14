@@ -2,6 +2,7 @@ import type { TransactionsDetailedArr } from "@shared/core";
 import { EditDelete } from "../EditDelete/EditDelete";
 import { CustomIcon } from "../CustomIcons/CustomIcons";
 import { useTransactionStore } from "../../store/transactionsStore";
+import { useSettingsStore } from "../../store/settingsStore";
 
 interface RecentTransactionsTableCardProps {
   transactions: TransactionsDetailedArr;
@@ -16,11 +17,12 @@ export const RecentTransactionsTableCard = ({
   showMore,
   toggleShowMore,
 }: RecentTransactionsTableCardProps) => {
+  const { setAddTransactionModalOpen } = useSettingsStore();
 
-  const transactionStore = useTransactionStore()
-  const onDelete =(transaction_id:number)=>{
-      transactionStore.deleteTransaction(transaction_id)
-  }
+  const transactionStore = useTransactionStore();
+  const onDelete = (transaction_id: number) => {
+    transactionStore.deleteTransaction(transaction_id);
+  };
   return (
     <table className="w-full">
       <thead>
@@ -128,9 +130,17 @@ export const RecentTransactionsTableCard = ({
           })
         ) : (
           <tr>
-            <td colSpan={6} className="py-12 text-center">
-              <p className="text-muted-foreground">No transactions yet</p>
-              <p className="text-sm text-muted-foreground mt-2">Add your first transaction to get started</p>
+            <td colSpan={6} className="text-center">
+              <div className="text-center flex flex-col items-center gap-1 py-6">
+                <p className="text-muted-foreground">No transactions yet</p>
+                <p className="text-sm text-muted-foreground mt-2">Add your first transaction to get started</p>
+                <button
+                  className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0"
+                  onClick={() => setAddTransactionModalOpen(true)}
+                >
+                  <CustomIcon name="Plus" />
+                </button>
+              </div>
             </td>
           </tr>
         )}

@@ -3,6 +3,8 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 type SettingsState = {
+  addTransactionModalOpen:boolean
+  setAddTransactionModalOpen:(addTransactionModalOpen:boolean)=>void
   defaultCurrency: CurrencyDB | null;
   setSelectedCurrency: (currency: CurrencyDB) => void;
 
@@ -11,6 +13,10 @@ type SettingsState = {
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
+      addTransactionModalOpen:false,
+      setAddTransactionModalOpen:(addTransactionModalOpen)=>{
+        set({addTransactionModalOpen})
+      },
       defaultCurrency: {
         currency_id: 3,
         currency_code: "ILS",

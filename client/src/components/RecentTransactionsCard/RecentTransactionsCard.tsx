@@ -4,6 +4,7 @@ import { RecentTransactionsTableCard } from "./RecentTransactionsTableCard";
 import { useState } from "react";
 import { CustomIcon } from "../CustomIcons/CustomIcons";
 import { useTransactionStore } from "../../store/transactionsStore";
+import { useSettingsStore } from "../../store/settingsStore";
 
 interface RecentTransactionsCardProps {
   transactions: TransactionsDetailedArr;
@@ -11,6 +12,8 @@ interface RecentTransactionsCardProps {
 }
 
 export const RecentTransactionsCard = ({ transactions, symbol }: RecentTransactionsCardProps) => {
+  const { setAddTransactionModalOpen } = useSettingsStore();
+
   const transactionStore = useTransactionStore();
   const [howManyToShow, setHowManyToShow] = useState(5);
   const transactionsToShow = transactions
@@ -38,9 +41,15 @@ export const RecentTransactionsCard = ({ transactions, symbol }: RecentTransacti
             <TransactionItem key={transaction.transaction_id} transaction={transaction} showDate />
           ))
         ) : (
-          <div className="text-center py-12">
+          <div className="text-center flex flex-col items-center gap-1 py-6">
             <p className="text-muted-foreground">No transactions yet</p>
             <p className="text-sm text-muted-foreground mt-2">Add your first transaction to get started</p>
+            <button
+              className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0"
+              onClick={() => setAddTransactionModalOpen(true)}
+            >
+              <CustomIcon name="Plus" />
+            </button>
           </div>
         )}
         {transactions.length > howManyToShow ? (
@@ -54,7 +63,6 @@ export const RecentTransactionsCard = ({ transactions, symbol }: RecentTransacti
 
       {/* Desktop: Table View */}
       <div className="hidden md:block">
-        {/* <TransactionTable transactions={recentTransactions} /> */}
         <div className="overflow-x-auto">
           <RecentTransactionsTableCard
             transactions={transactionsToShow}
