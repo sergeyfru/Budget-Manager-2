@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from 'react-router';
 import { BottomNav } from '../Navigation/BottomNav.tsx';
-import { useEffect, useState } from 'react';
+import { useEffect} from 'react';
 import { useAuthStore } from '../../store/authStore.ts';
 import { Sidebar } from '../Navigation/SideBar.tsx';
 import { AddTransactionModal } from '../AddTransaction/AddTransactionModal.tsx';
