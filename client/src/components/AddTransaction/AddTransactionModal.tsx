@@ -104,9 +104,9 @@ export function AddTransactionModal({ open, onOpenChange }: AddTransactionModalP
                           className={`flex-1 py-3 rounded-xl font-medium shadow-md transition-all
                 ${
                   isActive && type.transaction_type_direction === "out"
-                    ? "bg-destructive text-destructive-foreground border-destructive"
+                    ? "bg-destructive/40 text-destructive-foreground border-destructive"
                     : isActive && type.transaction_type_direction === "in"
-                      ? "bg-success text-success-foreground border-success hover:bg-success/90"
+                      ? "bg-success/60 text-success-foreground border-success"
                       : "bg-accent text-accent-foreground border-border hover:bg-secondary"
                 }`}
                         >
