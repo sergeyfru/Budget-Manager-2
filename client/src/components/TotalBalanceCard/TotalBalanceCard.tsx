@@ -17,7 +17,8 @@ export const TotalBalanceCard = ({
       <div className="flex items-start justify-between mb-6 md:mb-8">
         <div className="flex-1">
           <h2 className="mb-2">Total Balance</h2>
-          <h3 className="text-3xl sm:text-4xl md:text-5xl tracking-tight">
+          <h3 className={`text-3xl sm:text-4xl md:text-5xl tracking-tight
+            ${totalBalance > 0 ?"text-success": totalBalance < 0 ? "text-destructive" : ""}`}>
             {totalBalance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}{" "}
             {currencySimbol}
           </h3>
