@@ -1,4 +1,3 @@
-
 import { Greeting } from "../../components/Greeting/Greeting";
 import { TotalBalanceCard } from "../../components/TotalBalanceCard/TotalBalanceCard";
 import { SpendingChart } from "../../components/MonthlySpending/MonthlySpending";
@@ -18,10 +17,15 @@ export const DashBoardPage = () => {
     }
   }, []);
 
-  const totalBalance = transactionStore.transactions.reduce(
-    (acc, transaction) => acc + transaction.transaction_amount,
-    0,
-  );
+  const totalBalance = transactionStore.transactions.reduce((acc, transaction) => {
+    if (transaction.transaction_type.direction === "in") {
+      return acc + transaction.transaction_amount;
+    } else if (transaction.transaction_type.direction === "out") {
+      return acc - transaction.transaction_amount;
+    } else {
+      return acc;
+    }
+  }, 0);
   const symbol =
     transactionStore.transactions.length > 0 ? transactionStore.transactions[0].currency.currency_symbol : "₪";
 
@@ -51,8 +55,6 @@ export const DashBoardPage = () => {
       );
     });
   const monthlyIncome = monthlyIncomeTransactions.reduce((acc, transaction) => acc + transaction.transaction_amount, 0);
-
-
 
   const spendingsGrupedByCategory = monthlyExpenseTransactions.reduce(
     (acc, t) => {
@@ -86,51 +88,48 @@ export const DashBoardPage = () => {
       <Greeting title="Welcome back!" subtitle="Here's your financial overview" />
 
       {/* <Loader loading={transactionStore.transactionsStatus === "loading"} center={true} size={48}> */}
-        <div className="px-4 sm:px-6 lg:px-8 xl:px-12 py-6 lg:py-8 pb-24 lg:pb-8">
-          {/* Balance Card */}
-          <Loader loading={transactionStore.transactionsStatus === "loading"} overlay={true} center={true} size={48}>
-            <div className="mb-6 lg:mb-8">
-              <TotalBalanceCard
-                currencySimbol={symbol}
-                totalBalance={totalBalance}
-                monthlyIncome={monthlyIncome}
-                monthlyExpenses={monthlyExpenses}
-              />
-            </div>
-          </Loader>
-          {/* Main Content Grid - Desktop: 2 columns, Mobile: 1 column */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
-            {/* Left Column - Transactions (2/3 width on desktop) */}
+      <div className="px-4 sm:px-6 lg:px-8 xl:px-12 py-6 lg:py-8 pb-24 lg:pb-8">
+        {/* Balance Card */}
+        <Loader loading={transactionStore.transactionsStatus === "loading"} overlay={true} center={true} size={48}>
+          <div className="mb-6 lg:mb-8">
+            <TotalBalanceCard
+              currencySimbol={symbol}
+              totalBalance={totalBalance}
+              monthlyIncome={monthlyIncome}
+              monthlyExpenses={monthlyExpenses}
+            />
+          </div>
+        </Loader>
+        {/* Main Content Grid - Desktop: 2 columns, Mobile: 1 column */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
+          {/* Left Column - Transactions (2/3 width on desktop) */}
 
-            <div className="xl:col-span-2">
-              <Loader loading={transactionStore.transactionsStatus === "loading"} overlay={true} size={48}>
-                <RecentTransactionsCard
-                  symbol={symbol}
-                  transactions={transactions}
-                />
-              </Loader>
-            </div>
+          <div className="xl:col-span-2">
+            <Loader loading={transactionStore.transactionsStatus === "loading"} overlay={true} size={48}>
+              <RecentTransactionsCard symbol={symbol} transactions={transactions} />
+            </Loader>
+          </div>
 
-            {/* Right Column - Spending Chart (1/3 width on desktop) */}
-            <div className="xl:col-span-1">
-              <Loader loading={transactionStore.transactionsStatus === "loading"} overlay={true} size={48}>
-                <div className="bg-card rounded-2xl p-5 lg:p-6 shadow-sm border border-border xl:sticky xl:top-34">
-                  <h2 className="mb-6">Monthly Spending</h2>
+          {/* Right Column - Spending Chart (1/3 width on desktop) */}
+          <div className="xl:col-span-1">
+            <Loader loading={transactionStore.transactionsStatus === "loading"} overlay={true} size={48}>
+              <div className="bg-card rounded-2xl p-5 lg:p-6 shadow-sm border border-border xl:sticky xl:top-34">
+                <h2 className="mb-6">Monthly Spending</h2>
 
-                  {/* {Object.keys(spendingsGrupedByCategory).length > 0 ? ( */}
-                  {spendingsSumByCategory.length > 0 ? (
-                    <SpendingChart spendingsSumByCategory={spendingsSumByCategory} currency={symbol} />
-                  ) : (
-                    <div className="text-center py-12">
-                      <p className="text-muted-foreground">No expenses this month</p>
-                      <p className="text-sm text-muted-foreground mt-2">Start tracking your spending</p>
-                    </div>
-                  )}
-                </div>
-              </Loader>
-            </div>
+                {/* {Object.keys(spendingsGrupedByCategory).length > 0 ? ( */}
+                {spendingsSumByCategory.length > 0 ? (
+                  <SpendingChart spendingsSumByCategory={spendingsSumByCategory} currency={symbol} />
+                ) : (
+                  <div className="text-center py-12">
+                    <p className="text-muted-foreground">No expenses this month</p>
+                    <p className="text-sm text-muted-foreground mt-2">Start tracking your spending</p>
+                  </div>
+                )}
+              </div>
+            </Loader>
           </div>
         </div>
+      </div>
       {/* </Loader> */}
     </div>
   );
