@@ -67,14 +67,11 @@ export const DashBoardPage = () => {
     },
     {} as Record<string, typeof monthlyExpenseTransactions>,
   );
-  console.log("spendingsGrupedByCategory", spendingsGrupedByCategory);
   const spendingsSumByCategory = Object.entries(spendingsGrupedByCategory)
     .map(([category, transactions]) => {
       const totalAmount = transactions.reduce((sum, t) => sum + t.transaction_amount, 0);
       return {
         category,
-        // transaction: transactions[0],
-        // user_category: transactions[0].user_category,
         user_category_color: transactions[0].user_category.color,
         currency: transactions[0].currency.currency_symbol,
         totalAmount,

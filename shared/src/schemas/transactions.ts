@@ -2,7 +2,6 @@ import { z } from "zod";
 import { currencyDBSchema, userCategorySchema, userPaymentMethodSchema } from "@shared/core";
 import { createApiResponseSchema } from "../api_utils.js";
 
-
 //
 // ======================================================
 // 🔹 TRANSACTION TYPES
@@ -26,13 +25,9 @@ export const transactionTypesArrDBSchema = z.array(transactionTypeDBSchema);
 export type TransactionTypesArrDB = z.infer<typeof transactionTypesArrDBSchema>;
 
 // RESPONSE
-export const resTransactionTypesArrSchema = createApiResponseSchema(
-  transactionTypesArrDBSchema
-);
+export const resTransactionTypesArrSchema = createApiResponseSchema(transactionTypesArrDBSchema);
 
-export type ResTransactionTypesArr = z.infer<
-  typeof resTransactionTypesArrSchema
->;
+export type ResTransactionTypesArr = z.infer<typeof resTransactionTypesArrSchema>;
 
 // VIEW (embedded)
 export const transactionTypeSchema = z.object({
@@ -44,7 +39,6 @@ export const transactionTypeSchema = z.object({
 });
 
 export type TransactionTypeSchema = z.infer<typeof transactionTypeSchema>;
-
 
 //
 // ======================================================
@@ -61,7 +55,7 @@ export const transactionDBSchema = z.object({
   user_payment_method_id: z.number(),
   user_category_id: z.number(),
 
-  transaction_amount: z.string().min(1),
+  transaction_amount: z.coerce.number("Amount is required").min(0.01, "Amount must be greater than 0"),
   currency_id: z.number(),
 
   date_of_transaction: z.coerce.date(),
@@ -72,7 +66,6 @@ export const transactionDBSchema = z.object({
 
 export type TransactionDB = z.infer<typeof transactionDBSchema>;
 
-
 //
 // ======================================================
 // 🔹 USER TRANSACTION (DETAILED VIEW)
@@ -81,7 +74,7 @@ export type TransactionDB = z.infer<typeof transactionDBSchema>;
 
 export const transactionDetailedSchema = z.object({
   transaction_id: z.number(),
-  transaction_amount: z.string().transform((val) => parseFloat(val)),
+  transaction_amount: z.coerce.number("Amount is required").min(0.01, "Amount must be greater than 0"),
   date_of_transaction: z.coerce.date(),
   transaction_note: z.string().nullable(),
 
@@ -89,6 +82,7 @@ export const transactionDetailedSchema = z.object({
   transaction_type: transactionTypeSchema,
   user_category: userCategorySchema,
   user_payment_method: userPaymentMethodSchema,
+  created_at: z.coerce.date(),
 });
 
 export type TransactionDetailed = z.infer<typeof transactionDetailedSchema>;
@@ -96,10 +90,7 @@ export type TransactionDetailed = z.infer<typeof transactionDetailedSchema>;
 // ARRAY
 export const transactionsDetailedArrSchema = z.array(transactionDetailedSchema);
 
-export type TransactionsDetailedArr = z.infer<
-  typeof transactionsDetailedArrSchema
->;
-
+export type TransactionsDetailedArr = z.infer<typeof transactionsDetailedArrSchema>;
 
 //
 // ======================================================
@@ -109,34 +100,30 @@ export type TransactionsDetailedArr = z.infer<
 
 // FORM / REQUEST
 export const createTransactionFormSchema = z.object({
-  transaction_type_id: z.number("Transaction type is required").min(1,"Transaction type is required"),
+  transaction_type_id: z.number("Transaction type is required").min(1, "Transaction type is required"),
   user_payment_method_id: z.number("Payment method is required"),
   user_category_id: z.number("Category is required"),
   transaction_amount: z.number("Amount is required").min(0.01, "Amount must be greater than 0"),
-  currency_id: z.number().min(1, 'Currency is required'),
+  currency_id: z.number().min(1, "Currency is required"),
   date_of_transaction: z.coerce.date(),
-  transaction_note: z.string().optional(),
+  transaction_note: z.string().nullable(),
 });
+
 export const createTransactionFormSchema2 = z.object({
-  transaction_type_id: z.coerce.number("Transaction type is required").min(1,"Transaction type is required"),
+  transaction_type_id: z.coerce.number("Transaction type is required").min(1, "Transaction type is required"),
   user_payment_method_id: z.coerce.number("Payment method is required"),
   user_category_id: z.coerce.number("Category is required"),
   transaction_amount: z.coerce.number("Amount is required").min(0.01, "Amount must be greater than 0"),
-  currency_id: z.coerce.number().min(1, 'Currency is required'),
+  currency_id: z.coerce.number().min(1, "Currency is required"),
   date_of_transaction: z.coerce.date(),
-  transaction_note: z.string().optional(),
+  transaction_note: z.string().nullable(),
 });
 
-export type CreateTransactionFormValues = z.infer<
-  typeof createTransactionFormSchema
->;
+export type CreateTransactionFormValues = z.infer<typeof createTransactionFormSchema>;
 
-export type CreateTransactionForm = z.input<
-  typeof createTransactionFormSchema
->;
+export type CreateTransactionForm = z.input<typeof createTransactionFormSchema>;
 
 export type ReqCreateTransaction = z.infer<typeof createTransactionFormSchema>;
-
 
 //
 // ======================================================
@@ -144,20 +131,14 @@ export type ReqCreateTransaction = z.infer<typeof createTransactionFormSchema>;
 // ======================================================
 //
 
-export const updateTransactionFormSchema =
-  createTransactionFormSchema.partial();
+export const updateTransactionFormSchema = createTransactionFormSchema.partial();
 
-export type UpdateTransactionForm = z.infer<
-  typeof updateTransactionFormSchema
->;
+export type UpdateTransactionForm = z.infer<typeof updateTransactionFormSchema>;
 
 // REQUEST
 export const reqUpdateTransactionSchema = updateTransactionFormSchema;
 
-export type ReqUpdateTransaction = z.infer<
-  typeof reqUpdateTransactionSchema
->;
-
+export type ReqUpdateTransaction = z.infer<typeof reqUpdateTransactionSchema>;
 
 //
 // ======================================================
@@ -176,19 +157,11 @@ export type ReqUpdateTransaction = z.infer<
 //
 
 // SINGLE
-export const resTransactionDetailedSchema = createApiResponseSchema(
-  transactionDetailedSchema
-);
+export const resTransactionDetailedSchema = createApiResponseSchema(transactionDetailedSchema);
 
-export type ResTransactionDetailed = z.infer<
-  typeof resTransactionDetailedSchema
->;
+export type ResTransactionDetailed = z.infer<typeof resTransactionDetailedSchema>;
 
 // ARRAY
-export const resTransactionsDetailedArrSchema = createApiResponseSchema(
-  transactionsDetailedArrSchema
-);
+export const resTransactionsDetailedArrSchema = createApiResponseSchema(transactionsDetailedArrSchema);
 
-export type ResTransactionsDetailedArr = z.infer<
-  typeof resTransactionsDetailedArrSchema
->;
+export type ResTransactionsDetailedArr = z.infer<typeof resTransactionsDetailedArrSchema>;

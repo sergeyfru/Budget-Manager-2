@@ -7,7 +7,8 @@ import { toast } from "sonner";
 import { CustomIcon } from "../CustomIcons/CustomIcons";
 import { useEffect } from "react";
 import { iconCategoriesOptions, colorOptions } from "../../constants/constants";
-import { TitleModal } from "../ModalComponents/TitleModale";
+import { ModalTitle } from "../ModalComponents/ModalTitle";
+import { ModalBottom } from "../ModalComponents/ModalBottom";
 
 interface CreateEditCategoryModalProps {
   addModalOpen: boolean;
@@ -33,6 +34,7 @@ export const CreateEditCategoryModal = ({ setAddModalOpen, dataForUpdate }: Crea
       user_category_allowed_direction: "both",
     },
   });
+  
   useEffect(() => {
     if (dataForUpdate) {
       reset(dataForUpdate);
@@ -76,7 +78,7 @@ export const CreateEditCategoryModal = ({ setAddModalOpen, dataForUpdate }: Crea
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/50 backdrop-blur-sm p-3 pb-20 sm:p-4 sm:pb-18 md:pb-20 lg:pb-4">
       <div className="w-full max-w-md max-h-[85vh] md:max-h-[90vh] overflow-y-auto rounded-2xl bg-card shadow-lg">
-        <TitleModal title={isEditMode ? "Update category" : "Create category"} closeModal={setAddModalOpen} />
+        <ModalTitle title={isEditMode ? "Update category" : "Create category"} closeModal={setAddModalOpen} />
 
         {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-6 md:space-y-8">
@@ -161,24 +163,7 @@ export const CreateEditCategoryModal = ({ setAddModalOpen, dataForUpdate }: Crea
             )}
           </div>
 
-          {/* Buttons */}
-          <div className="flex gap-3 md:gap-4 pt-4">
-            <button
-              type="button"
-              onClick={() => setAddModalOpen()}
-              className="flex-1 py-4 bg-muted rounded-xl hover:bg-muted/80 transition-colors"
-            >
-              Cancel
-            </button>
-
-            <button
-              disabled={isSubmitting}
-              type="submit"
-              className="flex-1 py-4 bg-primary text-primary-foreground rounded-xl hover:shadow-lg transition-all"
-            >
-              {!dataForUpdate ? "Add Category" : "Update Category"}
-            </button>
-          </div>
+          <ModalBottom closeModal={setAddModalOpen} title={isEditMode? "Update category" : "Create category"} disabled={isSubmitting} />
         </form>
       </div>
     </div>

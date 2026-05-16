@@ -10,8 +10,9 @@ import { toast } from "sonner";
 import { CustomIcon } from "../CustomIcons/CustomIcons";
 import { useEffect } from "react";
 import { iconPaymentMethodsOptions, colorOptions } from "../../constants/constants";
-import { TitleModal } from "../ModalComponents/TitleModale";
+import { ModalTitle } from "../ModalComponents/ModalTitle";
 import { usePaymentMethodsStore } from "../../store/paymentMethodsStore";
+import { ModalBottom } from "../ModalComponents/ModalBottom";
 
 interface CreateEditPaymentMethodModalProps {
   addModalOpen: boolean;
@@ -77,7 +78,7 @@ export const CreateEditPaymentMethodModal = ({ setAddModalOpen, dataForUpdate }:
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/50 backdrop-blur-sm p-3 pb-20 sm:p-4 sm:pb-18 md:pb-20 lg:pb-4">
       <div className="w-full max-w-md max-h-[85vh] md:max-h-[90vh] overflow-y-auto rounded-2xl bg-card shadow-lg">
-        <TitleModal
+        <ModalTitle
           title={isEditMode ? "Update payment method" : "Create payment method"}
           closeModal={setAddModalOpen}
         />
@@ -166,23 +167,8 @@ export const CreateEditPaymentMethodModal = ({ setAddModalOpen, dataForUpdate }:
           </div>
 
           {/* Buttons */}
-          <div className="flex gap-3 md:gap-4 pt-4">
-            <button
-              type="button"
-              onClick={() => setAddModalOpen()}
-              className="flex-1 py-4 bg-muted rounded-xl hover:bg-muted/80 transition-colors"
-            >
-              Cancel
-            </button>
-
-            <button
-              disabled={isSubmitting}
-              type="submit"
-              className="flex-1 py-4 bg-primary text-primary-foreground rounded-xl hover:shadow-lg transition-all"
-            >
-              {!dataForUpdate ? "Create" : "Update"}
-            </button>
-          </div>
+          <ModalBottom closeModal={setAddModalOpen} disabled={isSubmitting} title={isEditMode ? "Update": "Create"} />
+          
         </form>
       </div>
     </div>

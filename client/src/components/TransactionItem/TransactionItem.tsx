@@ -1,8 +1,9 @@
 
-import type { TransactionDetailed } from '@shared/core';
+import type { TransactionDB, TransactionDetailed } from '@shared/core';
 import { useTransactionStore } from '../../store/transactionsStore';
 import { CustomIcon } from '../CustomIcons/CustomIcons';
 import { EditDelete } from '../EditDelete/EditDelete';
+import { useModalsStore } from '../../store/modalsStore';
 
 interface TransactionItemProps {
   transaction: TransactionDetailed;
@@ -11,10 +12,40 @@ interface TransactionItemProps {
 
 export function TransactionItem({ transaction, showDate = false }: TransactionItemProps) {
   const {  deleteTransaction } = useTransactionStore();
+  const {setEditingTransaction,setAddEditTransactionModalOpen} =useModalsStore();
   const category = transaction.user_category; // Assuming category is a property of TransactionDetailed
 
   const symbol = transaction.currency.currency_symbol || '₪'; // Default to ₪ if symbol is not available
 
+  const handleEdit=(transaction:TransactionDetailed)=>{
+    const { transaction_id,
+    // user_id,
+    transaction_type,
+    user_payment_method,
+    user_category,
+    transaction_amount,
+    currency,
+    date_of_transaction,
+    transaction_note,
+    created_at,
+    } = transaction; 
+
+    const transactionForEdit = {
+      transaction_id,
+      // user_id,
+      transaction_amount,
+      date_of_transaction,
+      transaction_note,
+      transaction_type_id: transaction_type.id,
+      user_category_id:user_category.id,
+      user_payment_method_id: user_payment_method.id,
+      currency_id: currency.currency_id,
+      created_at,
+    } as TransactionDB
+    setEditingTransaction(transactionForEdit);
+    setAddEditTransactionModalOpen(true)
+
+  }
   return (
     <div className="flex items-center gap-3 md:gap-4 py-3 md:py-4 group hover:bg-muted/30 -mx-2 px-2 rounded-lg transition-colors">
       <div 
@@ -48,7 +79,7 @@ export function TransactionItem({ transaction, showDate = false }: TransactionIt
       </div>
 
       <div className='flex flex-col justify-center items-center'>
-        <EditDelete onEdit={() => {}} onDelete={() => deleteTransaction(transaction.transaction_id)} />
+        <EditDelete onEdit={() => {handleEdit(transaction)}} onDelete={() => deleteTransaction(transaction.transaction_id)} />
       </div>
     </div>
   );

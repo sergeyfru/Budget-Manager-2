@@ -1,8 +1,8 @@
-import type { TransactionsDetailedArr } from "@shared/core";
+import type { TransactionDB, TransactionDetailed, TransactionsDetailedArr } from "@shared/core";
 import { EditDelete } from "../EditDelete/EditDelete";
 import { CustomIcon } from "../CustomIcons/CustomIcons";
 import { useTransactionStore } from "../../store/transactionsStore";
-import { useSettingsStore } from "../../store/settingsStore";
+import { useModalsStore } from "../../store/modalsStore";
 
 interface RecentTransactionsTableCardProps {
   transactions: TransactionsDetailedArr;
@@ -17,12 +17,43 @@ export const RecentTransactionsTableCard = ({
   showMore,
   toggleShowMore,
 }: RecentTransactionsTableCardProps) => {
-  const { setAddTransactionModalOpen } = useSettingsStore();
+  const { setEditingTransaction, setAddEditTransactionModalOpen } = useModalsStore();
 
   const transactionStore = useTransactionStore();
   const onDelete = (transaction_id: number) => {
     transactionStore.deleteTransaction(transaction_id);
   };
+
+  const handleEdit = (transaction:TransactionDetailed)=>{
+      const { transaction_id,
+      // user_id,
+      transaction_type,
+      user_payment_method,
+      user_category,
+      transaction_amount,
+      currency,
+      date_of_transaction,
+      transaction_note,
+      created_at,
+      } = transaction; 
+      
+      const transactionForEdit = {
+        transaction_id,
+        // user_id,
+        transaction_amount,
+        date_of_transaction,
+        transaction_note,
+        transaction_type_id: transaction_type.id,
+        user_category_id:user_category.id,
+        user_payment_method_id: user_payment_method.id,
+        currency_id: currency.currency_id,
+        created_at,
+      } as TransactionDB
+
+      setEditingTransaction(transactionForEdit);
+      setAddEditTransactionModalOpen(true);
+      
+    }
   return (
     <table className="w-full">
       <thead>
@@ -87,19 +118,6 @@ export const RecentTransactionsTableCard = ({
                 </td>
                 <td className="py-4 px-4 text-right">
                   <div className="flex items-center justify-end gap-2">
-                    {/* <div
-                                    className={`hidden lg:flex w-6 h-6 rounded-md items-center justify-center ${
-                                      transaction.transaction_type.direction === "in"
-                                        ? "bg-green-500/10"
-                                        : "bg-red-500/10"
-                                    }`}
-                                  >
-                                    {transaction.transaction_type.direction === "in" ? (
-                                      <ArrowDownLeft className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
-                                    ) : (
-                                      <ArrowUpRight className="w-3.5 h-3.5 text-red-600 dark:text-red-400" />
-                                    )}
-                                  </div> */}
 
                     <span
                       className={`font-medium ${
@@ -123,7 +141,7 @@ export const RecentTransactionsTableCard = ({
                   </div>
                 </td>
                 <td className="flex justify-center gap-0.5 opacity-40 group-hover:opacity-100 transition-opacity flex-col justify-center items-center">
-                  <EditDelete onEdit={() => {}} onDelete={() => onDelete(transaction.transaction_id)} />
+                  <EditDelete onEdit={() => {handleEdit(transaction)}} onDelete={() => onDelete(transaction.transaction_id)} />
                 </td>
               </tr>
             );
@@ -136,7 +154,7 @@ export const RecentTransactionsTableCard = ({
                 <p className="text-sm text-muted-foreground mt-2">Add your first transaction to get started</p>
                 <button
                   className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0"
-                  onClick={() => setAddTransactionModalOpen(true)}
+                  onClick={() => setAddEditTransactionModalOpen(true)}
                 >
                   <CustomIcon name="Plus" />
                 </button>
