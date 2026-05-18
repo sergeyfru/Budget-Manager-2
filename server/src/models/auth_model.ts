@@ -6,8 +6,7 @@ import {
   generateAccessToken, generateRefreshToken,
    hashedRefreshToken, maxAgeRefresh
    } from "../utils/token";
-import jwt from "jsonwebtoken";
-import { sendEmail } from "../utils/verification";
+import { sendVerificationEmail } from "../utils/verification";
 import { 
   getDefaultCategoriesQuery, getDefaultPaymentMethodsQuery
  } from "../db/queries";
@@ -43,6 +42,16 @@ export const login = async (
         console.log("Invalid password for email:", email);
         throw new ApiError(401, "Invalid password");
       }
+    }
+
+    if(!user.email_verified){
+      throw {
+        status: 403,
+        message: "Email not verified",
+        data: {
+          email: user.email,
+        },
+      };
     }
 
     const refresh_token = generateRefreshToken();
@@ -144,11 +153,11 @@ export const register = async (newUser: ReqRegister): Promise<UserView> => {
     });
     console.log("Email verification token created for user:", user.user_id);
 
-    await sendEmail(
-      user.email,
-      "Verify your email",
-      `<p>Please click <a href="${process.env.CLIENT_URL}/verify-email?token=${email_verification_token}">here</a> to verify your email.</p>`,
-    );
+    await sendVerificationEmail({
+      to: user.email,
+      subject: "Verify your email",
+      token: email_verification_token
+    });
     console.log("Verification email sent");
 
     await trx.commit();
@@ -201,56 +210,6 @@ export const logout = async (refresh_token: string, session_id: string | null = 
   }
 };
 
-export const verify_email = async (token: string): Promise<boolean> => {
-  const trx = await db.transaction();
-  
-  try {
-    const decoded = jwt.decode(token);
-    if (!decoded || typeof decoded === "string") {
-      throw new ApiError(400, "Invalid token");
-    }
-    const user_id = decoded.user_id;
-    console.log("Decoded user", decoded);
-
-    const user = await trx("users").where({ user_id }).first();
-
-    if (!user) {
-      throw new ApiError(404, "User not found");
-    }
-
-    if (user.email_verified) {
-      await trx.commit();
-      return true;
-    }
-
-    const tokenRecord = await trx("email_verification_tokens").where({ user_id, used: false }).first();
-
-    if (!tokenRecord) {
-      throw new ApiError(404, "Verification token not found");
-    }
-    console.log("Token record from DB", tokenRecord);
-
-    if (tokenRecord.expires_at < new Date()) {
-      throw new ApiError(400, "Verification token expired");
-    }
-
-    console.log("Token is not expired");
-
-    const isTokenValid = await bcrypt.compare(token, tokenRecord.token_hash);
-    if (!isTokenValid) {
-      throw new ApiError(400, "Invalid verification token");
-    }
-    console.log("Token is valid");
-    await trx("users").where({ user_id }).update({ email_verified: true, is_active: true });
-    await trx("email_verification_tokens").where({ user_id }).update({ used: true });
-
-    await trx.commit();
-    return true;
-  } catch (error) {
-    await trx.rollback();
-    throw dbErrorHandler(error);
-  }
-};
 
 export const refresh = async (hashed_refresh_token: string): Promise<RefreshTokenService> => {
   const trx = await db.transaction();

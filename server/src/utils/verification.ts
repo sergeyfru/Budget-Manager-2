@@ -1,9 +1,6 @@
 import nodemailer from "nodemailer";
-// import dotenv from "dotenv";
 import { ApiError } from "../errors/ApiErrors";
 // import client from "twilio"
-
-// dotenv.config();
 
 const transporter = nodemailer.createTransport({
   service: "Gmail",
@@ -13,21 +10,30 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export const sendEmail = async (to: string, subject: string, html: string) => {
+interface VerificationEmailData {
+  to: string;
+  subject: string;
+  token: string;
+}
+
+export const sendVerificationEmail = async ({ to, subject, token }: VerificationEmailData) => {
+  const html = `
+  <p>Please click 
+    <a href="${process.env.CLIENT_URL}/verification/verify-email?token=${token}">here</a> 
+    to verify your email.</p>`;
 
   try {
     await transporter.sendMail({
       from: `"Budget Manager App" <${process.env.EMAIL_USER}>`,
       to,
       subject,
-      html
+      html,
     });
   } catch (error) {
     console.error("Error sending email:", error);
     throw new ApiError(500, "Failed to send email");
   }
 };
-
 
 // export const sendSMS = async (to: string, body: string) => {
 //   const twilioClient = client(process.env.TWILIO_SID!, process.env.TWILIO_AUTH_TOKEN!);

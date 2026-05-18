@@ -7,10 +7,12 @@ import { AnalyticsPage } from "./pages/AnalyticsPage/AnalyticsPage";
 import { CategoriesPage } from "./pages/CategoriesPage/CategoriesPage";
 import { ErrorPage } from "./pages/ErrorPage/ErrorPage";
 import { SettingsPage } from "./pages/SettingsPage/SettingsPage";
+import { EmailVerificationPage } from "./pages/VerificationPages/EmailVerificationPage";
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
   { path: "/register", element: <RegistrationPage /> },
+  { path: "/verify_email", element: <EmailVerificationPage /> },
   {
     path: "/",
     element: <Layout />,

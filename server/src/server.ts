@@ -8,6 +8,7 @@ import transaction_routes from "./routes/transaction_routes";
 import categories_routes from "./routes/categories_routes";
 import payment_methods_routes from "./routes/payment_methods_routes";
 import curriencies_routes from "./routes/currencies_routes";
+import verification_routes from "./routes/verification_routes";
 import { errorHandler } from "./middlewares/middleware";
 import { requestLogger, responseLogger } from "./utils/logger";
 
@@ -49,6 +50,7 @@ app.use("/api/transactions", transaction_routes)
 app.use("/api/categories", categories_routes)
 app.use("/api/paymentmethods", payment_methods_routes)
 app.use("/api/currencies", curriencies_routes)
+app.use("/api/verification", verification_routes)
 
 
 // Start servernpm i @types/cors
