@@ -1,7 +1,7 @@
 import exporess from "express";
 import {
   _login, _register, _logout,
-  _changePassword, _verify_email,
+  _changePassword,
   _verify_phone_number, _refresh,
   _forgotPassword, _resetPassword,
 } from "../controllers/auth_controller";
@@ -20,8 +20,7 @@ router.post("/register", validate(reqRegisterSchema), _register);
 router.post("/logout", _logout);
 router.patch("/change-password", authMiddleware(), validate(reqChangePasswordSchema), _changePassword);
 
-router.get("/verify-email", _verify_email);
-router.put("/verify_phone_number", _verify_phone_number);
+router.put("/verify-phone-number", _verify_phone_number);
 
 router.post("/refresh", _refresh);
 

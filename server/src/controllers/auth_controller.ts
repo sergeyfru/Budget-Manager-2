@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { changePassword, login, logout, refresh, register, verify_email } from "../models/auth_model";
+import { changePassword, login, logout, refresh, register } from "../models/auth_model";
 import { hashedRefreshToken, maxAgeRefresh } from "../utils/token";
 import {
   ReqLogin, ReqRegister,
   ResLogin, ResRefresh,
-  ResRegister, ResSimple 
+  ResSimple 
 } from "@shared/core";
 // const UAParser = require("ua-parser-js");
 
@@ -38,6 +38,14 @@ export const _login = async (req: Request, res: Response<ResLogin>) => {
       message: "Login successful",
     });
   } catch (error: any) {
+    if(error.status === 403){
+      
+      res.status(error.status).json({
+        status: "success",
+        data: error.data,
+        message: error.message || "The account email has not been verified.",
+      });
+    }
     res.status(error.status || 500).json({
       status: "error",
       message: error.message || "An unexpected error occurred during login",
@@ -79,14 +87,6 @@ export const _logout = async (req: Request, res: Response<ResSimple>) => {
   res.clearCookie("refresh_token");
 
   res.status(200).json({ status: "success", message: "You have been logged out successfully" });
-};
-
-export const _verify_email = async (req: Request, res: Response<ResSimple>) => {
-  const token = req.query.token as string;
-  console.log("Verification token:", token);
-  await verify_email(token);
-
-  res.status(200).json({ status: "success", message: "Email verified successfully" });
 };
 
 export const _verify_phone_number = async (req: Request, res: Response<ResSimple>) => {

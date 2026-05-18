@@ -7,6 +7,11 @@ export const dbErrorHandler = (err: any): ApiError => {
     throw err;
   }
 
+  if(err.status === 403){
+    console.log("Database error with status 403, rethrowing:", err);
+    throw err;
+  }
+
   if (err.code === "23505") {
     throw new ApiError(409, "Duplicate value");
   }

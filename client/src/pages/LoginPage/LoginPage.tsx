@@ -6,11 +6,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
 import { loginFormSchema, type LoginFormValue, type ReqLogin } from "@shared/core";
-import { Lock, Mail, TrendingUp } from "lucide-react";
+import { Lock, Mail } from "lucide-react";
 import { AuthInput } from "../../components/Auth/AuthInput";
 import { useState } from "react";
 import { ShowPassword } from "../../components/Password utiles/ShowPassword";
 import { Spinner } from "../../components/Loading/Spiner";
+import { LogoGreeting } from "../../components/Logo/LogoGreting";
 
 export const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -34,6 +35,12 @@ export const LoginPage = () => {
       navigate("/");
     } catch (err: any) {
       const data = (err as AxiosError)?.response?.data || err;
+
+      if (err.status == 403) {
+        navigate("/verify_email", { state: { email: data?.data.email } });
+        return;
+      }
+
       if (data?.errors) {
         data.errors.forEach((e: any) => {
           console.log(e.field, { message: e.message });
@@ -60,13 +67,7 @@ export const LoginPage = () => {
       {/* Auth Card */}
       <div className="w-full max-w-md relative z-10">
         {/* Logo/Brand */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-600 shadow-lg mb-4">
-            <TrendingUp className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="mb-2">Welcome back</h1>
-          <p className="text-muted-foreground">Sign in to continue to your account</p>
-        </div>
+        <LogoGreeting title="Welcome back" subtitle="Sign in to continue to your account" />
 
         {/* Form Card */}
         <div className="bg-card/70 backdrop-blur-xl rounded-2xl shadow-xl border border-border p-6 sm:p-8">
@@ -135,7 +136,6 @@ export const LoginPage = () => {
             </Link>
           </p>
         </div>
-
       </div>
     </div>
   );

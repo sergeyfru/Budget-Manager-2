@@ -54,7 +54,6 @@ export const useAuthStore = create<AuthState>()(
         toast.error(response.message);
         return;
       }
-      console.log(response);
       
       toast.success("Login successful");
       localStorage.setItem("access_token", response.data.access_token);
@@ -62,6 +61,12 @@ export const useAuthStore = create<AuthState>()(
       localStorage.setItem("user", JSON.stringify(response.data.user));
       set({ user: response.data.user, access_token: response.data.access_token, isAuth: true , authStatus: "success"});
     } catch (err: AxiosError | any) {
+      if(err.status === 403){
+        set({ authStatus: "error", authError: "Your account is not activated yet. Please check your email for the activation link." });
+        toast.warning("Your account is not activated yet. Please check your email for the activation link.");
+        throw err;
+      }
+      
       set({ authStatus: "error", authError: err.response?.data?.message || err.message || "An unexpected error occurred during login" });
       toast.error(err.response?.data?.message || err.message || "An unexpected error occurred during login");
       throw err;
