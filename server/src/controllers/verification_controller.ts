@@ -6,14 +6,9 @@ export const _verify_email = async (req: Request, res: Response<ResSimple>) => {
   const token = req.query.token as string;
   console.log("Verification token:", token);
   try {
-
     const result = await verify_email(token);
-    console.log("result of verify email:", result);
-    
     res.status(200).json({ status: "success", message: "Email verified successfully" });
-
   } catch (error: any) {
-
     console.log("Error in verify email:", error);
 
     res.status(error.status || 500).json({
@@ -24,9 +19,8 @@ export const _verify_email = async (req: Request, res: Response<ResSimple>) => {
 };
 
 export const _resend_verification_email = async (req: Request, res: Response<ResSimple>) => {
-  const { email } = req.body as { email: string };
   try {
-    console.log("in resend controller");
+    const { email } = req.body as { email: string };
 
     await resend_verification_email(email);
 

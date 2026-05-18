@@ -1,5 +1,9 @@
 import express from "express";
-import { _resend_verification_email, _check_email_verification, _verify_email } from "../controllers/verification_controller";
+import {
+  _resend_verification_email,
+  _check_email_verification,
+  _verify_email,
+} from "../controllers/verification_controller";
 import { validate } from "../middlewares/middleware";
 import { reqVerificationEmailSchema } from "@shared/core";
 

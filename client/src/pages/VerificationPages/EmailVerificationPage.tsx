@@ -25,18 +25,15 @@ export const EmailVerificationPage = ({}: EmailVerificationPageProps) => {
       const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
       return () => clearTimeout(timer);
     }
-    recheckTimer = setInterval(handleCheckStatus,45000)
-    return ()=> clearInterval(recheckTimer);
+    recheckTimer = setInterval(handleCheckStatus, 45000);
+    return () => clearInterval(recheckTimer);
   }, [resendCooldown]);
 
-  const handleResend = async (email:string) => {
+  const handleResend = async (email: string) => {
     if (resendCooldown > 0) return;
+    setResendCooldown(60);
     try {
-      console.log("start of resent email with email:",email);
-      
       const response = await verificationApi.resendVerificationEmail({ email });
-      console.log(response);
-      
       if (response.status === "error") {
         toast.error(response.message);
         throw response;
@@ -48,14 +45,9 @@ export const EmailVerificationPage = ({}: EmailVerificationPageProps) => {
       );
       throw err;
     }
-
-    setResendCooldown(60);
   };
-
-
-  
   const handleChangeEmail = () => {
-    toast.info('Redirecting to change email...');
+    toast.info("Redirecting to change email...");
     navigate("/login");
   };
 
@@ -65,27 +57,26 @@ export const EmailVerificationPage = ({}: EmailVerificationPageProps) => {
   // };
 
   const handleCheckStatus = async () => {
-    setIsChecking(true);
+    try {
+      setIsChecking(true);
 
-      try {
-        const checkingStatus = await verificationApi.checkVerificationStatus({email})
+      const checkingStatus = await verificationApi.checkVerificationStatus({ email });
 
-        if(checkingStatus.status === "error"){
-          toast.error(checkingStatus.message);
-          throw checkingStatus;
-        }
-
-        toast.info(checkingStatus.message);
-  
-        setIsChecking(false);
-        if(checkingStatus.data.email_verified){
-          navigate('/login');
-        }
-      } catch (error) {
-        setIsChecking(false);
-        console.error("An error occurred while checking verification status");
-        
+      if (checkingStatus.status === "error") {
+        toast.error(checkingStatus.message);
+        throw checkingStatus;
       }
+
+      toast.info(checkingStatus.message);
+
+      setIsChecking(false);
+      if (checkingStatus.data.email_verified) {
+        navigate("/login");
+      }
+    } catch (error) {
+      setIsChecking(false);
+      console.error("An error occurred while checking verification status");
+    }
   };
 
   return (
@@ -116,7 +107,6 @@ export const EmailVerificationPage = ({}: EmailVerificationPageProps) => {
             <p className="font-medium">{emailToShow}</p>
           </div>
 
-
           {/* Actions */}
           <div className="space-y-3">
             {/* // Primary: Resend  */}
@@ -139,7 +129,6 @@ export const EmailVerificationPage = ({}: EmailVerificationPageProps) => {
             <button
               type="button"
               className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg flex items-center justify-center gap-2"
-              
               onClick={handleChangeEmail}
             >
               Change email address
@@ -149,12 +138,14 @@ export const EmailVerificationPage = ({}: EmailVerificationPageProps) => {
             <button
               type="button"
               className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg flex items-center justify-center gap-2"
-              
               onClick={handleCheckStatus}
               disabled={isChecking}
             >
-              
-              {isChecking? <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" /> : <CustomIcon name="CheckCircle2" />}
+              {isChecking ? (
+                <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <CustomIcon name="CheckCircle2" />
+              )}
               Check verification status
             </button>
           </div>
