@@ -3,7 +3,16 @@ import { ApiError } from "../errors/ApiErrors";
 // import client from "twilio"
 
 const transporter = nodemailer.createTransport({
-  service: "Gmail",
+  // service: "Gmail",
+  host: "smtp.gmail.com",
+
+  port: 587,
+
+  secure: false,
+  // tls:{},
+  
+  tls:{family: 4,} as any, // Force IPv4
+
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
