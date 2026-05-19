@@ -44,7 +44,7 @@ export const _check_email_verification = async (req: Request, res: Response<ResV
   try {
     const response = await check_email_verification(email);
     console.log(response);
-    const textStatus = response.email_verified ? "Email is verified." : "Email is not verified yet.";
+    const textStatus = response.email_verified ? "Email verified." : "Email not verified yet.";
 
     res.status(200).json({
       status: "success",

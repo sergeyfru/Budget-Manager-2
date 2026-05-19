@@ -38,18 +38,18 @@ export const _login = async (req: Request, res: Response<ResLogin>) => {
       message: "Login successful",
     });
   } catch (error: any) {
-    if(error.status === 403){
-      
+    if (error.status === 403) {
       res.status(error.status).json({
         status: "success",
         data: error.data,
         message: error.message || "The account email has not been verified.",
       });
+    } else {
+      res.status(error.status || 500).json({
+        status: "error",
+        message: error.message || "An unexpected error occurred during login",
+      });
     }
-    res.status(error.status || 500).json({
-      status: "error",
-      message: error.message || "An unexpected error occurred during login",
-    });
   }
 };
 
@@ -100,7 +100,7 @@ export const _refresh = async (req: Request, res: Response<ResRefresh>) => {
   const refreshTokenHeader = req.headers["x-refresh-token"];
   console.log("Refresh token from header:", refreshTokenHeader);
 
-  const refreshToken =  refreshTokenCookie || refreshTokenHeader;
+  const refreshToken = refreshTokenCookie || refreshTokenHeader;
 
   const hashed_refresh_token = hashedRefreshToken(refreshToken);
   const newTokens = await refresh(hashed_refresh_token);

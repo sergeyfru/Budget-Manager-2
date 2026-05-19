@@ -12,7 +12,7 @@ import verification_routes from "./routes/verification_routes";
 import { errorHandler } from "./middlewares/middleware";
 import { requestLogger, responseLogger } from "./utils/logger";
 
-// dotenv.config();    
+// dotenv.config();
 
 const app = express();
 
@@ -28,16 +28,15 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(
-    cors({
-        origin: [
-            "http://localhost:5173",
-            "http://localhost:5174",
-            "http://127.0.0.1:5500",
-            "https://budget-manager-2.onrender.com"
-            
-        ],
-        credentials: true,
-    })
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "http://127.0.0.1:5500",
+      "https://budget-manager-2.onrender.com",
+    ],
+    credentials: true,
+  }),
 );
 
 app.use(express.urlencoded({ extended: true }));
@@ -46,16 +45,15 @@ app.use(express.static(path.join(root, "client/dist")));
 
 app.use("/api/auth", auth_routes);
 
-app.use("/api/transactions", transaction_routes)
-app.use("/api/categories", categories_routes)
-app.use("/api/paymentmethods", payment_methods_routes)
-app.use("/api/currencies", curriencies_routes)
-app.use("/api/verification", verification_routes)
-
+app.use("/api/transactions", transaction_routes);
+app.use("/api/categories", categories_routes);
+app.use("/api/paymentmethods", payment_methods_routes);
+app.use("/api/currencies", curriencies_routes);
+app.use("/api/verification", verification_routes);
 
 // Start servernpm i @types/cors
 app.listen(process.env.PORT || 3001, () => {
-    console.log(`Run on ${process.env.PORT || 3001}`);
+  console.log(`Run on ${process.env.PORT || 3001}`);
 });
 
 app.get(/.*/, (req, res) => {

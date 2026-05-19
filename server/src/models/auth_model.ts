@@ -4,8 +4,8 @@ import { dbErrorHandler } from "../errors/db_errors";
 import { ApiError } from "../errors/ApiErrors";
 import { 
   generateAccessToken, generateRefreshToken,
-   hashedRefreshToken, maxAgeRefresh
-   } from "../utils/token";
+  hashedRefreshToken, maxAgeRefresh
+} from "../utils/token";
 import { sendVerificationEmail } from "../utils/verification";
 import { 
   getDefaultCategoriesQuery, getDefaultPaymentMethodsQuery
@@ -14,7 +14,7 @@ import {
   LoginService, RefreshTokenService,
   defaultPaymentMethodTypesArrDBSchema,
   defaultCategoriesArrDBSchema,
-  RefreshTokenDB,ReqRegister, UserView
+  RefreshTokenDB, ReqRegister, UserView,
 } from "@shared/core";
 import { validateDB } from "../utils/validation";
 
@@ -44,7 +44,7 @@ export const login = async (
       }
     }
 
-    if(!user.email_verified){
+    if (!user.email_verified) {
       throw {
         status: 403,
         message: "Email not verified",
@@ -115,7 +115,7 @@ export const register = async (newUser: ReqRegister): Promise<UserView> => {
     });
     console.log("User created, now inserting default categories and payment methods...");
     const ResponseOfDefaultCategories = await getDefaultCategoriesQuery(trx);
-    
+
     const defaultCategories = validateDB(defaultCategoriesArrDBSchema, ResponseOfDefaultCategories);
     console.log("Number of default categories:", defaultCategories.length);
 
@@ -156,7 +156,7 @@ export const register = async (newUser: ReqRegister): Promise<UserView> => {
     await sendVerificationEmail({
       to: user.email,
       subject: "Verify your email",
-      token: email_verification_token
+      token: email_verification_token,
     });
     console.log("Verification email sent");
 
@@ -209,7 +209,6 @@ export const logout = async (refresh_token: string, session_id: string | null = 
     throw dbErrorHandler(error);
   }
 };
-
 
 export const refresh = async (hashed_refresh_token: string): Promise<RefreshTokenService> => {
   const trx = await db.transaction();
