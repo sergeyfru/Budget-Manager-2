@@ -179,7 +179,7 @@ export type ReqForgotPassword = z.infer<typeof reqForgotPasswordSchema>;
 // RESET PASSWORD
 export const reqResetPasswordSchema = z
   .object({
-    token: z.string(),
+    // token: z.string(),
     new_password: passwordSchema,
     confirm_new_password: z.string().min(6, "Password must be at least 6 characters"),
   })

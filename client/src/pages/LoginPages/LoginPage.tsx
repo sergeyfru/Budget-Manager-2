@@ -104,7 +104,7 @@ export const LoginPage = () => {
               <button
                 type="button"
                 className="text-sm text-primary hover:underline transition-all"
-                onClick={() => toast.info("Password reset coming soon!")}
+                onClick={() => navigate("/forgot_password")}
               >
                 Forgot password?
               </button>

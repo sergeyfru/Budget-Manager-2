@@ -1,6 +1,6 @@
 
 import axios from "axios";
-import type { ReqChangePassword, ReqLogin, ReqRegister, ResLogin, ResRefresh, ResSimple } from "@shared/core";
+import type { ReqChangePassword, ReqLogin, ReqRegister, ReqResetPassword, ResLogin, ResRefresh, ResSimple } from "@shared/core";
 
 export const apiAuth = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api",
@@ -24,6 +24,9 @@ export const authApi = {
   changePassword: (data: ReqChangePassword ): Promise<ResSimple> =>
     apiAuth.post("/auth/change-password", data).then((res) => res.data),
 
+  resetPassword: (data: ReqResetPassword, token: string): Promise<ResSimple> =>
+    apiAuth.post(`/auth/reset-password?token=${token}`, data).then((res) => res.data),
+
   logout: (): Promise<ResSimple> => apiAuth.post("/auth/logout").then((res) => res.data),
 
-};
+}; 

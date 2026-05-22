@@ -1,11 +1,15 @@
 import { Request, Response } from "express";
-import { changePassword, login, logout, refresh, register } from "../models/auth_model";
-import { hashedRefreshToken, maxAgeRefresh } from "../utils/token";
 import {
-  ReqLogin, ReqRegister,
-  ResLogin, ResRefresh,
-  ResSimple 
-} from "@shared/core";
+  change_password,
+  login,
+  logout,
+  refresh,
+  register,
+  forgot_password,
+  reset_password,
+} from "../models/auth_model";
+import { hashedRefreshToken, maxAgeRefresh } from "../utils/token";
+import { ReqLogin, ReqRegister, ResLogin, ResRefresh, ResSimple } from "@shared/core";
 // const UAParser = require("ua-parser-js");
 
 export const _login = async (req: Request, res: Response<ResLogin>) => {
@@ -28,7 +32,7 @@ export const _login = async (req: Request, res: Response<ResLogin>) => {
 
     res.cookie("refresh_token", refresh_token, {
       httpOnly: true,
-      secure: false, // for development, set to true in production
+      secure: process.env.COOKIE_SECURE === "true", // for development, set to true in production
       maxAge: maxAgeRefresh * 1000, // convert to milliseconds
     });
 
@@ -67,10 +71,10 @@ export const _register = async (req: Request, res: Response<ResSimple>) => {
   }
 };
 
-export const _changePassword = async (req: Request, res: Response<ResSimple>) => {
+export const _change_password = async (req: Request, res: Response<ResSimple>) => {
   const user_id = req.user.user_id;
   const { old_password, new_password } = req.body;
-  await changePassword(user_id, old_password, new_password);
+  await change_password(user_id, old_password, new_password);
 
   res.status(200).json({
     status: "success",
@@ -107,7 +111,7 @@ export const _refresh = async (req: Request, res: Response<ResRefresh>) => {
 
   res.cookie("refresh_token", newTokens.refresh_token, {
     httpOnly: true,
-    secure: false, // for development, set to true in production
+    secure: process.env.COOKIE_SECURE === "true", // for development, set to true in production
     maxAge: maxAgeRefresh * 1000, // convert to milliseconds
   });
 
@@ -118,10 +122,40 @@ export const _refresh = async (req: Request, res: Response<ResRefresh>) => {
   });
 };
 
-export const _forgotPassword = (req: Request, res: Response<ResSimple>) => {
-  res.status(200).json({ status: "success", message: "This is a placeholder for forgot password functionality" });
+export const _forgot_password = async (req: Request, res: Response<ResSimple>) => {
+  const { email } = req.body as { email: string };
+  try {
+    await forgot_password(email);
+
+    res.status(200).json({ status: "success", message: "The password reset email has been sent. Check your inbox." });
+    // res.redirect(`${process.env.CLIENT_URL || "http://localhost:5173"}/reset-password`);
+  } catch (error: any) {
+    res.status(error.status || 500).json({
+      status: "error",
+      message: error.message || "An unexpected error occurred during registration",
+    });
+  }
 };
 
-export const _resetPassword = (req: Request, res: Response<ResSimple>) => {
-  res.status(200).json({ status: "success", message: "This is a placeholder for reset password functionality" });
+export const _reset_password = async (req: Request, res: Response<ResSimple>) => {
+  const token = (req.query.token as string) || "";
+
+  console.log("Reset password token:", token);
+
+  const { new_password } = req.body as { new_password: string };
+
+  try {
+    console.log("TOKEN:", token);
+    await reset_password(token, new_password);
+    console.log("Password reset successful");
+    res.status(200).json({ status: "success", message: "The password has been reset successfully." });
+
+    // res.redirect(`${process.env.CLIENT_URL || "http://localhost:5173"}/login`);
+  } catch (error: any) {
+    console.log("Error in reset password controller:", error);
+    res.status(error.status || 500).json({
+      status: "error",
+      message: error.message || "An unexpected error occurred during registration",
+    });
+  }
 };

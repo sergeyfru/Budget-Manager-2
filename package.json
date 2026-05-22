@@ -10,16 +10,16 @@
     "dev": "concurrently -n server,client -c blue,green \"npm run dev -w server\" \"npm run dev -w client\"",
     "dev:server": "npm run dev -w server",
     "dev:client": "npm run dev -w client",
-
     "build": "npm run build -w shared && npm run build -w server && npm run build -w client",
     "build:shared": "npm run build -w shared",
     "build:server": "npm run build -w shared && npm run build -w server",
-
     "start": "npm run start -w server",
-
     "clean": "rm -rf node_modules */node_modules */package-lock.json */dist"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"
+  },
+  "dependencies": {
+    "resend": "^6.12.3"
   }
 }

@@ -1,64 +1,37 @@
 import { db } from "../config/db";
 import { ApiError } from "../errors/ApiErrors";
 import { dbErrorHandler } from "../errors/db_errors";
-import { generateAccessToken } from "../utils/token";
+import { generateAccessToken, generateRefreshToken, hashedRefreshToken } from "../utils/token";
 import bcrypt from "bcryptjs";
-import { sendVerificationEmail } from "../utils/verification";
+import { sendVerificationEmail } from "../utils/emailSender";
 import { validateDB } from "../utils/validation";
 import { userDBSchema } from "@shared/core";
-import jwt from "jsonwebtoken";
 
 export const verify_email = async (token: string): Promise<boolean> => {
   const trx = await db.transaction();
 
   try {
-    const decoded = jwt.decode(token);
+    const token_hash = hashedRefreshToken(token);
 
-    if (!decoded || typeof decoded === "string") {
-      throw new ApiError(400, "Invalid token");
-    }
-
-    const user_id = decoded.user_id;
-
-    const user = await trx("users").where({ user_id }).first();
-
-    if (!user) {
-      throw new ApiError(404, "User not found");
-    }
-
-    if (user.email_verified) {
-      await trx.commit();
-      throw new ApiError(409, "Email already verified");
-    }
-
-    const tokenRecord = await trx("email_verification_tokens").where({ user_id, used: false }).first();
+    const tokenRecord = await trx("email_verification_tokens").where({ token_hash, used: false }).first();
+    console.log("Token record from DB:", tokenRecord);
 
     if (!tokenRecord) {
-      throw new ApiError(404, "Verification token not found");
+      throw new ApiError(404, "Verification token not found or invalid. Please request a new verification email.");
     }
 
     if (tokenRecord.expires_at < new Date()) {
       throw new ApiError(400, "Verification token expired");
     }
 
-    console.log("Token is not expired");
+    await trx("users").where({ user_id: tokenRecord.user_id }).update({ email_verified: true, is_active: true });
 
-    const isTokenValid = await bcrypt.compare(token, tokenRecord.token_hash);
-
-    console.log("isTokenValid",isTokenValid);
-    
-
-    if (!isTokenValid) {
-      throw new ApiError(400, "Invalid verification token");
-    }
-
-    await trx("users").where({ user_id }).update({ email_verified: true, is_active: true });
-
-    await trx("email_verification_tokens").where({ user_id }).update({ used: true });
+    await trx("email_verification_tokens").where({ user_id: tokenRecord.user_id }).update({ used: true });
 
     await trx.commit();
     return true;
   } catch (error) {
+    console.error("Error in verify_email:", error);
     await trx.rollback();
     throw dbErrorHandler(error);
   }
@@ -67,10 +40,8 @@ export const verify_email = async (token: string): Promise<boolean> => {
 export const resend_verification_email = async (email: string) => {
   const trx = await db.transaction();
   try {
-    const user = await trx({ u: "users" })
-      // .innerJoin({ evt: "email_verification_tokens" }, "u.user_id", "evt.user_id")
-      .where({ "u.email": email })
-      .first();
+    const user = await trx({ u: "users" }).where({ "u.email": email }).first();
+
     if (user && user.email_verified) {
       throw new ApiError(409, "Email already verified");
     }
@@ -78,21 +49,21 @@ export const resend_verification_email = async (email: string) => {
     if (user && Date.now() - user.last_email_verification_sent < 60000) {
       throw new ApiError(429, "Verification email already sent. Please wait before requesting another one.");
     }
+
+    await trx("email_verification_tokens").where({ user_id: user.user_id, used: false }).update({ used: true });
+
     if (user) {
-      const salt = await bcrypt.genSalt(10);
-      const email_verification_token = generateAccessToken({ user_id: user.user_id }, 60 * 60 * 1000); // 1 hour expiration
-      const token_hash = await bcrypt.hash(email_verification_token, salt);
+      const email_verification_token = generateRefreshToken();
+      const token_hash = hashedRefreshToken(email_verification_token);
       console.log("Token created and hashed");
 
-      await trx("email_verification_tokens")
-        // .where({ user_id: user.user_id })
-        .insert({
-          user_id: user.user_id,
-          token_hash,
-          expires_at: new Date(Date.now() + 60 * 60 * 1000), // 1 hour from now
-          used: false,
-          created_at: new Date(Date.now()),
-        });
+      await trx("email_verification_tokens").insert({
+        user_id: user.user_id,
+        token_hash,
+        expires_at: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes from now
+        used: false,
+        created_at: new Date(Date.now()),
+      });
 
       console.log("Email verification token inserted");
 
@@ -120,14 +91,11 @@ export const resend_verification_email = async (email: string) => {
 };
 
 export const check_email_verification = async (email: string) => {
-  console.log("in check model");
 
   try {
     const responseFromDB = await db("users").where({ email }).first();
 
     const user = validateDB(userDBSchema, responseFromDB);
-
-    console.log("User is existing in DB with email:", email);
 
     return { email_verified: user.email_verified };
   } catch (error) {

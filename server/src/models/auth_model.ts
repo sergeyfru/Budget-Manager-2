@@ -2,21 +2,27 @@ import { db } from "../config/db";
 import bcrypt from "bcryptjs";
 import { dbErrorHandler } from "../errors/db_errors";
 import { ApiError } from "../errors/ApiErrors";
-import { 
-  generateAccessToken, generateRefreshToken,
-  hashedRefreshToken, maxAgeRefresh
-} from "../utils/token";
-import { sendVerificationEmail } from "../utils/verification";
-import { 
-  getDefaultCategoriesQuery, getDefaultPaymentMethodsQuery
- } from "../db/queries";
 import {
-  LoginService, RefreshTokenService,
+  generateAccessToken,
+  generateRefreshToken,
+  hashedRefreshToken,
+  maxAgeAccess,
+  maxAgeRefresh,
+} from "../utils/token";
+import { sendPasswordResetEmail, sendVerificationEmail } from "../utils/emailSender";
+import { getDefaultCategoriesQuery, getDefaultPaymentMethodsQuery } from "../db/queries";
+import {
+  LoginService,
+  RefreshTokenService,
   defaultPaymentMethodTypesArrDBSchema,
   defaultCategoriesArrDBSchema,
-  RefreshTokenDB, ReqRegister, UserView,
+  RefreshTokenDB,
+  ReqRegister,
+  UserView,
 } from "@shared/core";
 import { validateDB } from "../utils/validation";
+import { tr } from "zod/locales";
+import { errorMonitor } from "node:events";
 
 export const login = async (
   email: string,
@@ -144,12 +150,13 @@ export const register = async (newUser: ReqRegister): Promise<UserView> => {
     await trx("user_payment_methods").insert(defaultPaymentMethodsForUser);
     console.log("Default payment methods inserted for user");
 
-    const email_verification_token = generateAccessToken({ user_id: user.user_id }, 60 * 60 * 1000); // 1 hour expiration
-    const token_hash = await bcrypt.hash(email_verification_token, salt);
+    const email_verification_token = generateRefreshToken();
+    const token_hash = hashedRefreshToken(email_verification_token);
+
     await trx("email_verification_tokens").insert({
       user_id: user.user_id,
       token_hash,
-      expires_at: new Date(Date.now() + 60 * 60 * 1000), // 1 hour from now
+      expires_at: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes from now
     });
     console.log("Email verification token created for user:", user.user_id);
 
@@ -169,7 +176,11 @@ export const register = async (newUser: ReqRegister): Promise<UserView> => {
   }
 };
 
-export const changePassword = async (user_id: number, old_password: string, new_password: string): Promise<boolean> => {
+export const change_password = async (
+  user_id: number,
+  old_password: string,
+  new_password: string,
+): Promise<boolean> => {
   const trx = await db.transaction();
   console.log("Changing password for user_id:", user_id);
   try {
@@ -185,7 +196,7 @@ export const changePassword = async (user_id: number, old_password: string, new_
     }
     const salt = await bcrypt.genSalt(10);
     const new_password_hash = await bcrypt.hash(new_password, salt);
-    await trx("users_auth").where({ user_id }).update({ password_hash: new_password_hash });
+    await trx("users_auth").where({ user_id }).update({ password_hash: new_password_hash, updated_at: new Date() });
     await trx.commit();
     return true;
   } catch (error) {
@@ -227,7 +238,7 @@ export const refresh = async (hashed_refresh_token: string): Promise<RefreshToke
     await trx("refresh_tokens").insert({
       hashed_refresh_token: hashedNewRefreshToken,
       user_id: dbResponse.user_id,
-      expires_at: new Date(Date.now() + maxAgeRefresh * 1000),
+      expires_at: new Date(Date.now() + 15 * 60 * 1000),
       session_id: null,
     });
     await trx("refresh_tokens").where({ token_id: dbResponse.token_id }).delete();
@@ -243,6 +254,73 @@ export const refresh = async (hashed_refresh_token: string): Promise<RefreshToke
   }
 };
 
-export const forgotPassword = async () => {};
+export const forgot_password = async (email: string) => {
+  const trx = await db.transaction();
+  try {
+    const user = await db("users").where({ email }).first();
+    if (!user) {
+      console.log("User not found with email:", email);
+      throw new ApiError(404, "User not found");
+    }
+    const newResetToken = generateRefreshToken();
+    const token_hash = hashedRefreshToken(newResetToken);
+    const expires_at = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes from now
+    await trx("password_reset_tokens").where({ user_id: user.user_id, used: false }).update({ used: true });
 
-export const resetPassword = async () => {};
+    await trx("password_reset_tokens").insert({
+      user_id: user.user_id,
+      token_hash,
+      expires_at,
+    });
+
+    console.log("Password reset token created for user:", user.user_id);
+
+    await sendPasswordResetEmail({
+      to: user.email,
+      subject: "Password reset request",
+      token: newResetToken,
+    });
+    console.log("Password reset email sent");
+    await trx.commit();
+  } catch (error) {
+    await trx.rollback();
+    console.log("Error in forgot password:", error);
+    throw dbErrorHandler(error);
+  }
+};
+
+export const reset_password = async (token: string, new_password: string) => {
+  const trx = await db.transaction();
+
+  try {
+    const token_hash = hashedRefreshToken(token);
+
+    const tokenRecord = await trx("password_reset_tokens").where({ token_hash, used: false }).first();
+
+    console.log("Token record from DB:", tokenRecord);
+
+    if (!tokenRecord) {
+      throw new ApiError(
+        404,
+        "Password reset token not found, or is invalid. Please request a new password reset email.",
+      );
+    }
+
+    if (tokenRecord.expires_at < new Date()) {
+      throw new ApiError(400, "Password reset token expired, please request a new password reset email.");
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const new_password_hash = await bcrypt.hash(new_password, salt);
+    await trx("users_auth").where({ user_id: tokenRecord.user_id }).update({ password_hash: new_password_hash, updated_at: new Date() });
+
+    await trx("password_reset_tokens").where({ user_id: tokenRecord.user_id }).update({ used: true });
+
+    await trx.commit();
+
+  } catch (error) {
+    trx.rollback();
+    console.log("Error in reset password:", error);
+    throw dbErrorHandler(error);
+  }
+};

@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router";
-import { LoginPage } from "./pages/LoginPage/LoginPage";
+import { LoginPage } from "./pages/LoginPages/LoginPage";
 import { RegistrationPage } from "./pages/RegistrationPage/RegistrationPage";
 import { Layout } from "./components/Layout/Layout";
 import { DashBoardPage } from "./pages/DashBoardPage/DashBoardPage";
@@ -8,11 +8,15 @@ import { CategoriesPage } from "./pages/CategoriesPage/CategoriesPage";
 import { ErrorPage } from "./pages/ErrorPage/ErrorPage";
 import { SettingsPage } from "./pages/SettingsPage/SettingsPage";
 import { EmailVerificationPage } from "./pages/VerificationPages/EmailVerificationPage";
+import { ForgotPasswordPage } from "./pages/LoginPages/ForgotPasswordPage";
+import { ResetPasswordPage } from "./pages/LoginPages/ResetPasswordPage";
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
   { path: "/register", element: <RegistrationPage /> },
   { path: "/verify_email", element: <EmailVerificationPage /> },
+  { path: "/forgot_password", element: <ForgotPasswordPage /> },
+  { path: "/reset-password", element: <ResetPasswordPage /> },
   {
     path: "/",
     element: <Layout />,
