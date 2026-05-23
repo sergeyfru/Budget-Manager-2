@@ -72,14 +72,22 @@ export const _register = async (req: Request, res: Response<ResSimple>) => {
 };
 
 export const _change_password = async (req: Request, res: Response<ResSimple>) => {
-  const user_id = req.user.user_id;
-  const { old_password, new_password } = req.body;
-  await change_password(user_id, old_password, new_password);
+  try {
+    const user_id = req.user.user_id;
+    const { old_password, new_password } = req.body;
+    await change_password(user_id, old_password, new_password);
 
-  res.status(200).json({
-    status: "success",
-    message: "Password changed successfully",
-  });
+    res.status(200).json({
+      status: "success",
+      message: "Password changed successfully",
+    });
+  } catch (error: any) {
+    console.log("Error in change password:", error);
+    res.status(error.status || 500).json({
+      status: "error",
+      message: error.message || "An unexpected error occurred during registration",
+    });
+  }
 };
 
 export const _logout = async (req: Request, res: Response<ResSimple>) => {

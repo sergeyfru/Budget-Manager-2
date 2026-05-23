@@ -4,6 +4,7 @@ import { Greeting } from "../../components/Greeting/Greeting";
 import { useAuthStore } from "../../store/authStore";
 import { CategoriesCard } from "../../components/CategoriesCard/CategoriesCard";
 import { PaymentMethodsCard } from "../../components/PaymentMethodsCard/PaymentMethodsCard";
+import { UserCard } from "../../components/UserCard/UserCard";
 
 export const SettingsPage = () => {
   const authStore = useAuthStore();
@@ -17,6 +18,7 @@ export const SettingsPage = () => {
     <div className="min-h-screen pb-20 lg:pb-8">
       <Greeting title="Settings" subtitle="Manage your preferences" />
       <div className="px-4 sm:px-6 lg:px-8 xl:px-12 py-6 lg:py-8 flex flex-col gap-3">
+        <UserCard />
         <CategoriesCard />
         <PaymentMethodsCard />
         <div className="px-4 sm:px-6 lg:px-8 xl:px-12 py-6 lg:py-8 pb-24 lg:pb-8">

@@ -46,18 +46,18 @@ export const CategoriesCard = () => {
 
   return (
     <div className="bg-card flex flex-col gap-4 border border-border rounded-2xl p-5 sm:p-6 md:p-8 shadow-sm">
-              <CardsTitleInSettings
-                 title="Categories" 
-                 cardIsClose={callapseCategoriesCard} 
-                 setCardIsClose={openCard} 
-                 refreshCard={refreshCategories}
-                 setShowAddModal={setShowAddModal}
-                 />
+      <CardsTitleInSettings
+        title="Categories"
+        cardIsClose={callapseCategoriesCard}
+        setCardIsClose={openCard}
+        refreshCard={refreshCategories}
+        setShowAddModal={setShowAddModal}
+      />
 
       {!callapseCategoriesCard && (
         <div>
           <Loader loading={categoriesStore.categoriesStatus === "loading"} center size={48}>
-            {categoriesStore.categoriesStatus === "error" ?  <p>Something went wrong.</p> : null}  
+            {categoriesStore.categoriesStatus === "error" ? <p>Something went wrong.</p> : null}
             {categories.length === 0 ? (
               <div className="flex flex-col gap-2 items-center">
                 <p className="text-sm text-muted-foreground">No categories yet. Click "Add" to create one!</p>
@@ -104,7 +104,10 @@ export const CategoriesCard = () => {
 
       {/* Add/Edit Modal */}
       {showAddModal && (
-        <CreateEditCategoryModal addModalOpen={showAddModal} setAddModalOpen={closeModal} dataForUpdate={formData} />
+        <CreateEditCategoryModal 
+          addModalOpen={showAddModal} 
+          setAddModalOpen={closeModal} 
+          dataForUpdate={formData} />
       )}
     </div>
   );
