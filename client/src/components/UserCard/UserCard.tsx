@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { CardsTitleInSettings } from "../CardsTitleInSettings/CardsTitleInSettings";
 import { useSettingsStore } from "../../store/settingsStore";
-import { ModalFormContainer } from "../ModalComponents/ModalContainer";
 import { ChangePasswordModal } from "../ChangePasswordModal/ChangePasswordModal";
 
 export const UserCard = () => {
