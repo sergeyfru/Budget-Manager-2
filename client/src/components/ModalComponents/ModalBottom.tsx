@@ -20,7 +20,7 @@ export const ModalBottom = ({ closeModal, title, disabled }: ModalBottomProps) =
         type="submit"
         className=" flex flex-1 items-center justify-center gap-2 h-12 rounded-xl bg-primary text-primary-foreground hover:opacity-70 transition-opacity"
       >
-        {!disabled ? (
+        {disabled ? (
           <>
             <Spinner />
             <span>{title}</span>
