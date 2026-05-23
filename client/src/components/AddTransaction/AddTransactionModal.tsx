@@ -16,7 +16,7 @@ interface AddTransactionModalProps {
   dataForUpdate: TransactionDB | null;
 }
 
-export function AddTransactionModal({ dataForUpdate }: AddTransactionModalProps) {
+const AddTransactionModal = ({ dataForUpdate }: AddTransactionModalProps) => {
   const { transactionTypes, transactionTypesStatus, getTransactionTypes, addTransaction, updateTransaction } =
     useTransactionStore();
   const { categories, categoriesStatus } = useCategoriesStore();
@@ -331,4 +331,6 @@ export function AddTransactionModal({ dataForUpdate }: AddTransactionModalProps)
       </div>
     </ModalFormContainer>
   );
-}
+};
+
+export default AddTransactionModal;

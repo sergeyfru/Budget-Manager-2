@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router";
-import { CustomIcon } from "../../components/CustomIcons/CustomIcons";
 import { Greeting } from "../../components/Greeting/Greeting";
 import { useAuthStore } from "../../store/authStore";
 import { CategoriesCard } from "../../components/CategoriesCard/CategoriesCard";
 import { PaymentMethodsCard } from "../../components/PaymentMethodsCard/PaymentMethodsCard";
 import { UserCard } from "../../components/UserCard/UserCard";
+import { LogOut } from "lucide-react";
 
-export const SettingsPage = () => {
+const SettingsPage = () => {
   const authStore = useAuthStore();
   const navigate = useNavigate();
 
@@ -23,7 +23,7 @@ export const SettingsPage = () => {
         <PaymentMethodsCard />
         <div className="px-4 sm:px-6 lg:px-8 xl:px-12 py-6 lg:py-8 pb-24 lg:pb-8">
           <button onClick={handleLogout} className="flex gap-2">
-            <CustomIcon name="LogOut" />
+            <LogOut />
             <span>Sing Out</span>
           </button>
         </div>
@@ -31,3 +31,5 @@ export const SettingsPage = () => {
     </div>
   );
 };
+
+export default SettingsPage

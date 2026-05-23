@@ -13,7 +13,7 @@ import { ShowPassword } from "../../components/Password utiles/ShowPassword";
 import { StrongPassword } from "../../components/Password utiles/StrongPassword";
 import { CorrectConfirmPassword } from "../../components/Password utiles/CorrectConfirmPassword";
 
-export const RegistrationPage = () => {
+const RegistrationPage = () => {
   const authStore = useAuthStore();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -211,3 +211,5 @@ export const RegistrationPage = () => {
     </div>
   );
 };
+
+export default RegistrationPage

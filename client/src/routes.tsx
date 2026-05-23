@@ -1,30 +1,32 @@
+import { lazy } from "react";
 import { createBrowserRouter } from "react-router";
 import { LoginPage } from "./pages/LoginPages/LoginPage";
-import { RegistrationPage } from "./pages/RegistrationPage/RegistrationPage";
+const RegistrationPage = lazy(() => import("./pages/RegistrationPage/RegistrationPage"));
 import { Layout } from "./components/Layout/Layout";
-import { DashBoardPage } from "./pages/DashBoardPage/DashBoardPage";
+const DashBoardPage = lazy(() => import("./pages/DashBoardPage/DashBoardPage"));
+const SettingsPage = lazy(() => import("./pages/SettingsPage/SettingsPage"));
 import { AnalyticsPage } from "./pages/AnalyticsPage/AnalyticsPage";
 import { CategoriesPage } from "./pages/CategoriesPage/CategoriesPage";
 import { ErrorPage } from "./pages/ErrorPage/ErrorPage";
-import { SettingsPage } from "./pages/SettingsPage/SettingsPage";
-import { EmailVerificationPage } from "./pages/VerificationPages/EmailVerificationPage";
 import { ForgotPasswordPage } from "./pages/LoginPages/ForgotPasswordPage";
+const EmailVerificationPage = lazy(() => import("./pages/VerificationPages/EmailVerificationPage"));
 import { ResetPasswordPage } from "./pages/LoginPages/ResetPasswordPage";
+import { withSuspense } from "./utils/utils";
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
-  { path: "/register", element: <RegistrationPage /> },
-  { path: "/verify_email", element: <EmailVerificationPage /> },
-  { path: "/forgot_password", element: <ForgotPasswordPage /> },
+  { path: "/register", element: withSuspense(<RegistrationPage />) },
+  { path: "/verify-email", element: withSuspense(<EmailVerificationPage />) },
+  { path: "/forgot-password", element: <ForgotPasswordPage /> },
   { path: "/reset-password", element: <ResetPasswordPage /> },
   {
     path: "/",
     element: <Layout />,
     children: [
-      { index: true, element: <DashBoardPage /> },
+      { index: true, element: withSuspense(<DashBoardPage />) },
       { path: "categories", element: <CategoriesPage /> },
       { path: "analytics", element: <AnalyticsPage /> },
-      { path: "settings", element: <SettingsPage /> },
+      { path: "settings", element: withSuspense(<SettingsPage />) },
       { path: "error", element: <ErrorPage /> },
     ],
   },

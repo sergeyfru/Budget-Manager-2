@@ -2,34 +2,38 @@ import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { LogoGreeting } from "../../components/Logo/LogoGreting";
-import { CustomIcon } from "../../components/CustomIcons/CustomIcons";
 import type { AxiosError } from "axios";
 import { verificationApi } from "../../api/verificationApi";
+import { CheckCircle2, Mail } from "lucide-react";
 
 interface EmailVerificationPageProps {
   // email:string
 }
 
-export const EmailVerificationPage = ({}: EmailVerificationPageProps) => {
+const EmailVerificationPage = ({}: EmailVerificationPageProps) => {
   const navigate = useNavigate();
   const email = useLocation().state?.email as string;
   const [resendCooldown, setResendCooldown] = useState(0);
   const [isChecking, setIsChecking] = useState(false);
 
-  const emailToShow = email ? `${email.slice(0, 3)}****${email.slice(email.indexOf("@"))}` : "your email";
+  const emailToShow = email ? `${email.slice(0, 3)}****${email.slice(email.indexOf("@"))}` : null;
 
   // Cooldown timer
   useEffect(() => {
-    let recheckTimer: ReturnType<typeof setTimeout>;
+    if (email) {
+      let recheckTimer: ReturnType<typeof setTimeout>;
+
+      recheckTimer = setInterval(handleCheckStatus, 15000);
+      return () => clearInterval(recheckTimer);
+    }
     if (resendCooldown > 0) {
       const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
       return () => clearTimeout(timer);
     }
-    recheckTimer = setInterval(handleCheckStatus, 45000);
-    return () => clearInterval(recheckTimer);
   }, [resendCooldown]);
 
   const handleResend = async (email: string) => {
+    if (!email) return;
     if (resendCooldown > 0) return;
     setResendCooldown(60);
     try {
@@ -51,12 +55,8 @@ export const EmailVerificationPage = ({}: EmailVerificationPageProps) => {
     navigate("/login");
   };
 
-  // const handleLogout = () => {
-  //   toast.success("Logged out successfully");
-  //   navigate("/login");
-  // };
-
   const handleCheckStatus = async () => {
+    if (!email) return;
     try {
       setIsChecking(true);
 
@@ -89,7 +89,7 @@ export const EmailVerificationPage = ({}: EmailVerificationPageProps) => {
           {/* Icon */}
           <div className="flex justify-center mb-6">
             <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
-              <CustomIcon name="Mail" className="w-10 h-10 text-primary" />
+              <Mail className="w-10 h-10 text-primary" />
             </div>
           </div>
 
@@ -113,7 +113,7 @@ export const EmailVerificationPage = ({}: EmailVerificationPageProps) => {
             <button
               type="button"
               className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg flex items-center justify-center gap-2"
-              disabled={resendCooldown > 0}
+              disabled={!email || resendCooldown > 0}
               onClick={() => handleResend(email)}
               // disabled={isSubmitting}
             >
@@ -139,12 +139,12 @@ export const EmailVerificationPage = ({}: EmailVerificationPageProps) => {
               type="button"
               className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg flex items-center justify-center gap-2"
               onClick={handleCheckStatus}
-              disabled={isChecking}
+              disabled={!email || isChecking}
             >
               {isChecking ? (
                 <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
               ) : (
-                <CustomIcon name="CheckCircle2" />
+                <CheckCircle2 />
               )}
               Check verification status
             </button>
@@ -169,3 +169,5 @@ export const EmailVerificationPage = ({}: EmailVerificationPageProps) => {
     </div>
   );
 };
+
+export default EmailVerificationPage;

@@ -6,6 +6,7 @@ import { EditDelete } from "../EditDelete/EditDelete";
 import { CardsTitleInSettings } from "../CardsTitleInSettings/CardsTitleInSettings";
 import type { UserPaymentMethodDB } from "@shared/core";
 import { CreateEditPaymentMethodModal } from "../CreateEditPaymentMethodModal/CreateEditPaymentMethodModal";
+import { Plus } from "lucide-react";
 
 export const PaymentMethodsCard = () => {
   const paymentMethodStore = usePaymentMethodsStore();
@@ -68,7 +69,7 @@ export const PaymentMethodsCard = () => {
                   className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-primary/80 text-primary-foreground flex items-center justify-center flex-shrink-0"
                   onClick={() => setShowAddModal(true)}
                 >
-                  <CustomIcon name={"Plus"} />
+                  <Plus />
                 </button>
                 {/* </div> */}
               </div>

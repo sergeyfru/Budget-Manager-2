@@ -1,4 +1,4 @@
-import { CustomIcon } from "../CustomIcons/CustomIcons";
+import { X } from "lucide-react";
 
 interface ModalTitleProps {
   title: string;
@@ -10,7 +10,7 @@ export const ModalTitle = ({ title, closeModal }: ModalTitleProps) => {
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">{title}</h2>
         <button onClick={() => closeModal()} className="rounded-full p-2 hover:bg-muted transition-colors">
-          <CustomIcon name="X" />
+          <X />
         </button>
       </div>
     </div>

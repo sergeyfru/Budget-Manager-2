@@ -6,7 +6,7 @@ import { useTransactionStore } from "../../store/transactionsStore";
 import { Loader } from "../../components/Loading/Loader";
 import { RecentTransactionsCard } from "../../components/RecentTransactionsCard/RecentTransactionsCard";
 
-export const DashBoardPage = () => {
+const DashBoardPage = () => {
   const transactionStore = useTransactionStore();
   const transactions = transactionStore.transactions;
 
@@ -131,3 +131,6 @@ export const DashBoardPage = () => {
     </div>
   );
 };
+
+
+export default DashBoardPage

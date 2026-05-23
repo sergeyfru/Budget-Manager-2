@@ -6,7 +6,7 @@ import type { AxiosError } from "axios";
 import { toast } from "sonner";
 import { CustomIcon } from "../CustomIcons/CustomIcons";
 import { useEffect } from "react";
-import { iconCategoriesOptions, colorOptions } from "../../constants/constants";
+import { iconCategoriesOptions, colorOptions} from "../../constants/constants";
 import { ModalFormContainer } from "../ModalComponents/ModalContainer";
 
 interface CreateEditCategoryModalProps {

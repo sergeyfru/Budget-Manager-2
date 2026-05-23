@@ -2,9 +2,9 @@ import type { TransactionsDetailedArr } from "@shared/core";
 import { TransactionItem } from "../TransactionItem/TransactionItem";
 import { RecentTransactionsTableCard } from "./RecentTransactionsTableCard";
 import { useState } from "react";
-import { CustomIcon } from "../CustomIcons/CustomIcons";
 import { useTransactionStore } from "../../store/transactionsStore";
 import { useSettingsStore } from "../../store/settingsStore";
+import { Plus, RefreshCw } from "lucide-react";
 
 interface RecentTransactionsCardProps {
   transactions: TransactionsDetailedArr;
@@ -30,7 +30,7 @@ export const RecentTransactionsCard = ({ transactions, symbol }: RecentTransacti
       <div className="flex items-center justify-between p-5 lg:p-6 border-b border-border">
         <h2>Recent Transactions</h2>
         <button onClick={() => transactionStore.getTransactions()}>
-          <CustomIcon name={"RefreshCw"} />
+          <RefreshCw />
         </button>
       </div>
 
@@ -48,7 +48,7 @@ export const RecentTransactionsCard = ({ transactions, symbol }: RecentTransacti
               className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0"
               onClick={() => setAddTransactionModalOpen(true)}
             >
-              <CustomIcon name="Plus" />
+              <Plus />
             </button>
           </div>
         )}

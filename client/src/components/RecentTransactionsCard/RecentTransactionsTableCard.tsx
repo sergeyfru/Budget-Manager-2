@@ -3,6 +3,7 @@ import { EditDelete } from "../EditDelete/EditDelete";
 import { CustomIcon } from "../CustomIcons/CustomIcons";
 import { useTransactionStore } from "../../store/transactionsStore";
 import { useModalsStore } from "../../store/modalsStore";
+import { Plus } from "lucide-react";
 
 interface RecentTransactionsTableCardProps {
   transactions: TransactionsDetailedArr;
@@ -156,7 +157,7 @@ export const RecentTransactionsTableCard = ({
                   className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0"
                   onClick={() => setAddEditTransactionModalOpen(true)}
                 >
-                  <CustomIcon name="Plus" />
+                  <Plus />
                 </button>
               </div>
             </td>

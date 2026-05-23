@@ -48,7 +48,7 @@ export const LoginPage = () => {
       const data = (err as AxiosError)?.response?.data || err;
 
       if (err.status == 403) {
-        navigate("/verify_email", { state: { email: data?.data.email } });
+        navigate("/verify-email", { state: { email: data?.data.email } });
         return;
       }
 
@@ -115,7 +115,7 @@ export const LoginPage = () => {
               <button
                 type="button"
                 className="text-sm text-primary hover:underline transition-all"
-                onClick={() => navigate("/forgot_password")}
+                onClick={() => navigate("/forgot-password")}
               >
                 Forgot password?
               </button>

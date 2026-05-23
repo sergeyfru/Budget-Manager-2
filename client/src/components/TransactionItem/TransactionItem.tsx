@@ -52,7 +52,7 @@ export function TransactionItem({ transaction, showDate = false }: TransactionIt
         className="w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center flex-shrink-0" 
         style={{ backgroundColor: category?.color + '20' }}
       >
-        <CustomIcon name={category?.icon || 'DollarSign'} color={category?.color || '#666'} size={20} />
+        <CustomIcon name={category?.icon || 'ImageOff'} color={category?.color || '#666'} size={20} />
       </div>
       
       <div className="flex-1 min-w-0">

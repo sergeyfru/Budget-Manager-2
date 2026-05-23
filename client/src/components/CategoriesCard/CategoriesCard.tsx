@@ -6,6 +6,7 @@ import { EditDelete } from "../EditDelete/EditDelete";
 import { Loader } from "../Loading/Loader";
 import type { UserCategoryDB } from "@shared/core";
 import { CardsTitleInSettings } from "../CardsTitleInSettings/CardsTitleInSettings";
+import { Plus } from "lucide-react";
 
 export const CategoriesCard = () => {
   const categoriesStore = useCategoriesStore();
@@ -65,7 +66,7 @@ export const CategoriesCard = () => {
                   className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0"
                   onClick={() => setShowAddModal(true)}
                 >
-                  <CustomIcon name={"Plus"} />
+                  <Plus />
                 </button>
               </div>
             ) : (
