@@ -9,7 +9,7 @@ export const _verify_email = async (req: Request, res: Response<ResSimple>) => {
     await verify_email(token);
 
     // res.status(200).json({ status: "success", message: "Email verified successfully" });
-    res.redirect(`${process.env.CLIENT_URL || "http://localhost:5173"}/login`);
+    res.redirect(`${process.env.CLIENT_URL || "http://localhost:5173"}/login?verified=true`);
   } catch (error: any) {
     console.log("Error in verify email:", error);
 

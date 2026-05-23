@@ -9,33 +9,29 @@ import { Mail } from "lucide-react";
 import { authApi } from "../../api/authApi";
 import { toast } from "sonner";
 
+export const ForgotPasswordPage = () => {
+  const navigate = useNavigate();
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<ReqForgotPassword>({
+    resolver: zodResolver(reqForgotPasswordSchema),
+  });
 
-export const ForgotPasswordPage =()=>{
-    const navigate = useNavigate();
+  const onSubmit = async (data: ReqForgotPassword) => {
+    try {
+      const response = await authApi.forgotPassword(data.email);
+      toast.success(response.message);
+      navigate("/login");
+    } catch (err: any) {
+      console.error("Forgot password error:", err);
+      toast.error(err?.response?.data?.message || "An unexpected error occurred");
+    }
+  };
 
-     const {
-       register,
-       handleSubmit,
-       formState: { errors, isSubmitting },
-     } = useForm<ReqForgotPassword>({
-       resolver: zodResolver(reqForgotPasswordSchema),
-     });
-
-     const onSubmit = async (data: ReqForgotPassword) => {
-        try{
-            const response = await authApi.forgotPassword(data.email);
-            toast.success(response.message);
-            navigate("/login")
-        }catch(err :any){
-            console.error("Forgot password error:", err);
-            toast.error(err?.response?.data?.message || "An unexpected error occurred");
-        }
-     }
-
-
-    return(
-        
+  return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
       {/* Animated Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-background to-blue-500/10 dark:from-purple-900/20 dark:via-background dark:to-blue-900/20" />
@@ -45,7 +41,10 @@ export const ForgotPasswordPage =()=>{
       {/* Auth Card */}
       <div className="w-full max-w-md relative z-10">
         {/* Logo/Brand */}
-        <LogoGreeting title="Welcome back" subtitle="Sign in to continue to your account" />
+        <LogoGreeting
+          title="Forgot your password?"
+          subtitle="Enter your email address and we'll send you a link to reset your password."
+        />
 
         {/* Form Card */}
         <div className="bg-card/70 backdrop-blur-xl rounded-2xl shadow-xl border border-border p-6 sm:p-8">
@@ -60,9 +59,6 @@ export const ForgotPasswordPage =()=>{
               error={errors.email?.message}
               disabled={isSubmitting}
             />
-
-           
-           
 
             <button
               type="submit"
@@ -93,5 +89,4 @@ export const ForgotPasswordPage =()=>{
       </div>
     </div>
   );
-    
-}
+};

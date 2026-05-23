@@ -1,8 +1,9 @@
 import { useForm } from "react-hook-form";
+import { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useAuthStore } from "../../store/authStore";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
 import { loginFormSchema, type LoginFormValue, type ReqLogin } from "@shared/core";
@@ -14,9 +15,19 @@ import { Spinner } from "../../components/Loading/Spiner";
 import { LogoGreeting } from "../../components/Logo/LogoGreting";
 
 export const LoginPage = () => {
+  const [searchParams] = useSearchParams();
+  const verifiedParam = searchParams.get("verified") ;
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const authStore = useAuthStore();
+
+  useEffect(() => {
+    if (verifiedParam) {
+      setTimeout(() => {
+        toast.success("Email verified successfully! You can now log in.");
+      }, 0);
+    }
+  }, []);
 
   const {
     register,

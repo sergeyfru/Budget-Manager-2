@@ -3,44 +3,39 @@ import { Spinner } from "../../components/Loading/Spiner";
 import { LogoGreeting } from "../../components/Logo/LogoGreting";
 import { AuthInput } from "../../components/Auth/AuthInput";
 
-import {  reqResetPasswordSchema, type ReqResetPassword } from "@shared/core";
+import { reqResetPasswordSchema, type ReqResetPassword } from "@shared/core";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { authApi } from "../../api/authApi";
 import { toast } from "sonner";
 import { Lock } from "lucide-react";
 
+export const ResetPasswordPage = () => {
+  const navigate = useNavigate();
 
-export const ResetPasswordPage =()=>{
-    const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token") || "";
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<ReqResetPassword>({
+    resolver: zodResolver(reqResetPasswordSchema),
+  });
 
-    const [searchParams] = useSearchParams();
-    const token = searchParams.get("token") || '';
+  const onSubmit = async (data: ReqResetPassword) => {
+    try {
+      const response = await authApi.resetPassword({ ...data }, token);
+      toast.success(response.message);
+      navigate("/login");
+    } catch (err: any) {
+      console.error("Forgot password error:", err);
+      toast.error(err?.response?.data?.message || "An unexpected error occurred");
+    }
+  };
 
-
-const {
-       register,
-       handleSubmit,
-       formState: { errors, isSubmitting },
-     } = useForm<ReqResetPassword>({
-       resolver: zodResolver(reqResetPasswordSchema),
-     });
-
-     const onSubmit = async (data: ReqResetPassword) => {
-        try{
-            const response = await authApi.resetPassword({ ...data }, token);
-            toast.success(response.message);
-            navigate("/login")
-        }catch(err :any){
-            console.error("Forgot password error:", err);
-            toast.error(err?.response?.data?.message || "An unexpected error occurred");
-        }
-     }
-
-
-    return(
-        
+  return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
       {/* Animated Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-background to-blue-500/10 dark:from-purple-900/20 dark:via-background dark:to-blue-900/20" />
@@ -50,7 +45,7 @@ const {
       {/* Auth Card */}
       <div className="w-full max-w-md relative z-10">
         {/* Logo/Brand */}
-        <LogoGreeting title="Welcome back" subtitle="Sign in to continue to your account" />
+        <LogoGreeting title="Reset your password" subtitle="Create a new password for your account." />
 
         {/* Form Card */}
         <div className="bg-card/70 backdrop-blur-xl rounded-2xl shadow-xl border border-border p-6 sm:p-8">
@@ -75,9 +70,6 @@ const {
               error={errors.confirm_new_password?.message}
               disabled={isSubmitting}
             />
-
-           
-           
 
             <button
               type="submit"
@@ -107,5 +99,5 @@ const {
         </div>
       </div>
     </div>
-    )
-}
+  );
+};
