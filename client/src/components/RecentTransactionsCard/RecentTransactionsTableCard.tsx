@@ -123,7 +123,7 @@ export const RecentTransactionsTableCard = ({
                     <span
                       className={`font-medium ${
                         transaction.transaction_type.direction === "in"
-                          ? "text-success-foreground dark:text-success-foreground"
+                          ? "text-success-foreground"
                           : "text-foreground"
                       }`}
                     >
@@ -133,7 +133,7 @@ export const RecentTransactionsTableCard = ({
                     <span
                       className={`font-medium ${
                         transaction.transaction_type.direction === "in"
-                          ? "text-success-foreground dark:text-success-foreground"
+                          ? "text-success-foreground"
                           : "text-foreground"
                       }`}
                     >

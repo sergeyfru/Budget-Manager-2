@@ -33,27 +33,27 @@ export const TotalBalanceCard = ({
       </div>
 
       <div className="grid grid-cols-2 gap-3 md:gap-4">
-        <div className="bg-success/20 dark:bg-success/20 backdrop-blur-sm rounded-xl p-4 md:p-5">
+        <div className="bg-success/20 backdrop-blur-sm rounded-xl p-4 md:p-5">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-success/30 dark:bg-success/30 flex items-center justify-center">
-              <ArrowDownLeft className="w-4 h-4 text-success-foreground dark:text-success-foreground" />
+            <div className="w-8 h-8 rounded-lg bg-success/30 flex items-center justify-center">
+              <ArrowDownLeft className="w-4 h-4 text-success-foreground" />
             </div>
             <span className="text-sm text-muted-foreground">Income</span>
           </div>
-          <p className="text-lg md:text-xl text-success-foreground dark:text-success-foreground">
+          <p className="text-lg md:text-xl text-success-foreground">
             {currencySimbol}{" "}
             {monthlyIncome.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
         </div>
 
-        <div className="bg-destructive/20 dark:bg-destructive backdrop-blur-sm rounded-xl p-4 md:p-5">
+        <div className="bg-destructive/20 backdrop-blur-sm rounded-xl p-4 md:p-5">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-destructive/30 dark:bg-destructive/30 flex items-center justify-center">
-              <ArrowUpRight className="w-4 h-4 text-destructive-foreground dark:text-destructive-foreground" />
+            <div className="w-8 h-8 rounded-lg bg-destructive/30 flex items-center justify-center">
+              <ArrowUpRight className="w-4 h-4 text-destructive-foreground" />
             </div>
             <span className="text-sm text-muted-foreground">Expenses</span>
           </div>
-          <p className="text-lg md:text-xl text-destructive-foreground dark:text-destructive-foreground">
+          <p className="text-lg md:text-xl text-destructive-foreground">
             {currencySimbol}
             {monthlyExpenses.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>

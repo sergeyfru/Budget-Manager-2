@@ -7,16 +7,18 @@ type SettingsState = {
   setAddTransactionModalOpen: (addTransactionModalOpen: boolean) => void;
   defaultCurrency: CurrencyDB | null;
   setSelectedCurrency: (currency: CurrencyDB) => void;
-  darkTheme: boolean;
-  setDarkTheme: (darkTheme: boolean) => void;
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
 };
+
+export type Theme = "light"|"dark"
 
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
-      darkTheme: false,
-      setDarkTheme: (darkTheme) => {
-        set({ darkTheme });
+      theme: "light",
+      setTheme: (theme) => {
+        set({ theme });
       },
       addTransactionModalOpen: false,
 

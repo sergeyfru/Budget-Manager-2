@@ -27,10 +27,10 @@ if (!passwordStrength) return null;
                     <span
                       className={`font-medium ${
                         passwordStrength.label === "Strong"
-                          ? "text-success-foreground dark:text-success-foreground"
+                          ? "text-success-foreground"
                           : passwordStrength.label === "Fair"
                             ? "text-yellow-600 dark:text-yellow-400"
-                            : "text-destructive-foreground dark:text-destructive-foreground"
+                            : "text-destructive-foreground"
                       }`}
                     >
                       {passwordStrength.label}

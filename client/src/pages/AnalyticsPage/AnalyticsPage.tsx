@@ -39,15 +39,15 @@ export const AnalyticsPage = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6 mb-6 lg:mb-8">
           <div className="bg-card rounded-xl p-5 lg:p-6 border border-border shadow-sm">
             <p className="text-sm text-muted-foreground mb-2">Total Income</p>
-            <p className="text-2xl lg:text-3xl text-success-foreground dark:text-success-foreground font-medium">{symbol}</p>
+            <p className="text-2xl lg:text-3xl text-success-foreground font-medium">{symbol}</p>
           </div>
           <div className="bg-card rounded-xl p-5 lg:p-6 border border-border shadow-sm">
             <p className="text-sm text-muted-foreground mb-2">Total Expenses</p>
-            <p className="text-2xl lg:text-3xl text-destructive-foreground dark:text-destructive-foreground font-medium">{symbol}</p>
+            <p className="text-2xl lg:text-3xl text-destructive-foreground font-medium">{symbol}</p>
           </div>
           <div className="bg-card rounded-xl p-5 lg:p-6 border border-border shadow-sm">
             <p className="text-sm text-muted-foreground mb-2">Net Balance</p>
-            <p className={`text-2xl lg:text-3xl font-medium text-success-foreground dark:text-success-foreground`}>{symbol}</p>
+            <p className={`text-2xl lg:text-3xl font-medium text-success-foreground`}>{symbol}</p>
           </div>
         </div>
 

@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { CardsTitleInSettings } from "../CardsTitleInSettings/CardsTitleInSettings";
-import { useSettingsStore } from "../../store/settingsStore";
+
 import { ChangePasswordModal } from "../ChangePasswordModal/ChangePasswordModal";
+import { ChangeDefaultCurrencyModal } from "../ChangeDefaultCurrencyModal/ChangeDefaultCurrencyModal";
+import { useTheme, type Theme } from "../../utils/utils";
 
 export const UserCard = () => {
   const [callapseCategoriesCard, setCallapseCategoriesCard] = useState(true);
-  const { setDarkTheme, darkTheme } = useSettingsStore();
+  const { theme, setTheme } = useTheme();
+
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showDefaultCurrencyModal, setDefaultCurrencyModal] = useState(false);
 
   const openCard = () => {
     setCallapseCategoriesCard(!callapseCategoriesCard);
@@ -23,15 +27,13 @@ export const UserCard = () => {
       />
 
       {!callapseCategoriesCard && (
-        <div className="flex items-start flex-col gap-3 pt-2">
-          <button
-            type="button"
-            className="p-2 rounded-xl border border-border bg-card text-foreground hover:bg-muted transition-colors"
-            onClick={() => setDarkTheme(!darkTheme)}
-          >
-            <h2>Theme</h2>
-            <h3>{darkTheme ? "Dark" : "Light"} Mode</h3>
-          </button>
+        <div className="flex items-start  gap-3 pt-3">
+          <select value={theme} onChange={(e) => setTheme(e.target.value as Theme)}>
+            <option value="light">☀️ Light</option>
+            <option value="dark">🌙 Dark</option>
+            <option value="system">System</option>
+          </select>
+
           <button
             type="button"
             className="p-2 rounded-xl border border-border bg-card text-foreground hover:bg-muted transition-colors"
@@ -39,9 +41,17 @@ export const UserCard = () => {
           >
             <h2>Change Password</h2>
           </button>
+          <button
+            type="button"
+            className="p-2 rounded-xl border border-border bg-card text-foreground hover:bg-muted transition-colors"
+            onClick={() => setDefaultCurrencyModal(true)}
+          >
+            <h2>Set default currency</h2>
+          </button>
         </div>
       )}
       {showPasswordModal && <ChangePasswordModal setModalOpen={setShowPasswordModal} />}
+      {showDefaultCurrencyModal && <ChangeDefaultCurrencyModal setModalOpen={setDefaultCurrencyModal} />}
     </div>
   );
 };
