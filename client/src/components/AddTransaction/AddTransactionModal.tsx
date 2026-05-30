@@ -24,6 +24,7 @@ const AddTransactionModal = ({ dataForUpdate }: AddTransactionModalProps) => {
   const { currencies, currenciesStatus, getCurrencies } = useCurrenciesStore();
   const { defaultCurrency } = useSettingsStore();
   const { resetTransactionModalStore } = useModalsStore();
+  const {getUserCategories} = useCategoriesStore()
 
   useEffect(() => {
     if (transactionTypes.length === 0) {
@@ -34,6 +35,9 @@ const AddTransactionModal = ({ dataForUpdate }: AddTransactionModalProps) => {
     }
     if (currencies.length === 0) {
       getCurrencies();
+    }
+    if(categories.length === 0){
+      getUserCategories()
     }
     if (dataForUpdate) {
       reset({
@@ -100,6 +104,7 @@ const AddTransactionModal = ({ dataForUpdate }: AddTransactionModalProps) => {
       closeModal={closeModal}
       disabled={isSubmitting}
       onSubmit={handleSubmit(onFormSubmit)}
+      fullScrin
     >
       <div className="space-y-2">
         <Controller

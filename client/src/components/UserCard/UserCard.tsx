@@ -3,11 +3,9 @@ import { CardsTitleInSettings } from "../CardsTitleInSettings/CardsTitleInSettin
 
 import { ChangePasswordModal } from "../ChangePasswordModal/ChangePasswordModal";
 import { ChangeDefaultCurrencyModal } from "../ChangeDefaultCurrencyModal/ChangeDefaultCurrencyModal";
-import { useTheme, type Theme } from "../../utils/utils";
 
 export const UserCard = () => {
   const [callapseCategoriesCard, setCallapseCategoriesCard] = useState(true);
-  const { theme, setTheme } = useTheme();
 
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showDefaultCurrencyModal, setDefaultCurrencyModal] = useState(false);
@@ -28,12 +26,6 @@ export const UserCard = () => {
 
       {!callapseCategoriesCard && (
         <div className="flex items-start  gap-3 pt-3">
-          <select value={theme} onChange={(e) => setTheme(e.target.value as Theme)}>
-            <option value="light">☀️ Light</option>
-            <option value="dark">🌙 Dark</option>
-            <option value="system">System</option>
-          </select>
-
           <button
             type="button"
             className="p-2 rounded-xl border border-border bg-card text-foreground hover:bg-muted transition-colors"
