@@ -81,7 +81,12 @@ const EmailVerificationPage = ({}: EmailVerificationPageProps) => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+         
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-background to-blue-500/10 dark:from-purple-900/20 dark:via-background dark:to-blue-900/20" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(124,58,237,0.1),transparent_50%)] dark:bg-[radial-gradient(circle_at_30%_50%,rgba(124,58,237,0.2),transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(59,130,246,0.1),transparent_50%)] dark:bg-[radial-gradient(circle_at_70%_80%,rgba(59,130,246,0.2),transparent_50%)]" />
+
+      <div className="w-full max-w-md relative z-10">
         <LogoGreeting title="Budget Manager" subtitle=" " />
 
         {/* Verification Card */}
@@ -166,7 +171,7 @@ const EmailVerificationPage = ({}: EmailVerificationPageProps) => {
           Didn't receive an email? Check your spam folder or try resending.
         </p>
       </div>
-    </div>
+     </div>
   );
 };
 

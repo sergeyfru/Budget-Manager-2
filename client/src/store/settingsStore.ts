@@ -7,11 +7,20 @@ type SettingsState = {
   setAddTransactionModalOpen: (addTransactionModalOpen: boolean) => void;
   defaultCurrency: CurrencyDB | null;
   setSelectedCurrency: (currency: CurrencyDB) => void;
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
 };
+
+export type Theme = "light" | "system" | "dark";
 
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
+      theme: (localStorage.getItem("theme") as Theme) || "system",
+      setTheme: (theme) => {
+        localStorage.setItem('theme',theme)
+        set({ theme });
+      },
       addTransactionModalOpen: false,
 
       setAddTransactionModalOpen: (addTransactionModalOpen) => {
