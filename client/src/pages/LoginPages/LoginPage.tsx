@@ -14,7 +14,7 @@ import { ShowPassword } from "../../components/Password utiles/ShowPassword";
 import { Spinner } from "../../components/Loading/Spiner";
 import { LogoGreeting } from "../../components/Logo/LogoGreting";
 
-export const LoginPage = () => {
+const LoginPage = () => {
   const [searchParams] = useSearchParams();
   const verifiedParam = searchParams.get("verified") ;
   const [showPassword, setShowPassword] = useState(false);
@@ -151,3 +151,5 @@ export const LoginPage = () => {
     </div>
   );
 };
+
+export default LoginPage

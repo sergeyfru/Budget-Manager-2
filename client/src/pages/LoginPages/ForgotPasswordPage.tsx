@@ -9,7 +9,7 @@ import { Mail } from "lucide-react";
 import { authApi } from "../../api/authApi";
 import { toast } from "sonner";
 
-export const ForgotPasswordPage = () => {
+const ForgotPasswordPage = () => {
   const navigate = useNavigate();
 
   const {
@@ -90,3 +90,5 @@ export const ForgotPasswordPage = () => {
     </div>
   );
 };
+
+export default ForgotPasswordPage

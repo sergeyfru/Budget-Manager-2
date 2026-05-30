@@ -9,6 +9,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { paymentMethodsApi } from "../api/paymentMethodsApi";
 import { toast } from "sonner";
+import type { AxiosError } from "axios";
 
 type PaymentMethodsState = {
   paymentMethods: UserPaymentMethodsArrDB;
@@ -41,68 +42,117 @@ export const usePaymentMethodsStore = create<PaymentMethodsState>()(
       },
 
       getUserPaymentMethods: async () => {
-        set({ paymentMethodsStatus: "loading", paymentMethodsError: null });
-        const response = await paymentMethodsApi.getUserPaymentMethods();
-        if (response.status === "error") {
+        try {
+          set({ paymentMethodsStatus: "loading", paymentMethodsError: null });
+          const response = await paymentMethodsApi.getUserPaymentMethods();
+          if (response.status === "error") {
+            set({
+              paymentMethodsStatus: "error",
+              paymentMethodsError: response.message || "Failed to fetch user payment methods",
+            });
+            return;
+          }
+          set({
+            paymentMethods: response.data.sort((a, b) => a.user_payment_method_id - b.user_payment_method_id),
+            paymentMethodsStatus: "success",
+          });
+        } catch (error: AxiosError | any) {
+          console.error(error);
           set({
             paymentMethodsStatus: "error",
-            paymentMethodsError: response.message || "Failed to fetch user payment methods",
+            paymentMethodsError: error.response?.data?.message || error.message || "Failed to fetch payment methods",
           });
-          return;
+          toast.error("Failed to fetch user payment methods");
         }
-        set({ paymentMethods: response.data.sort((a,b)=>a.user_payment_method_id - b.user_payment_method_id), paymentMethodsStatus: "success" });
       },
 
       createUserPaymentMethod: async (data: ReqCreateUserPaymentMethod) => {
-                set({ paymentMethodsStatus: "loading", paymentMethodsError: null });
-                const response = await paymentMethodsApi.createUserPaymentMethod(data);
-                if (response.status === "error") {
-                  console.error("Error creating user category:", response.message);
-                  set({ paymentMethodsStatus: "error", paymentMethodsError: response.message });
-                  return;
-                }
-                toast.success(response.message);
-                set((state) => ({
-                  paymentMethods: [...state.paymentMethods, response.data],
-                  paymentMethodsStatus: "success",
-                }));
+        try {
+          set({ paymentMethodsStatus: "loading", paymentMethodsError: null });
+          const response = await paymentMethodsApi.createUserPaymentMethod(data);
+          if (response.status === "error") {
+            console.error("Error creating user payment method:", response.message);
+            set({
+              paymentMethodsStatus: "error",
+              paymentMethodsError: response.message || "Failed to add new payment method",
+            });
+            return;
+          }
+          toast.success(response.message);
+          set((state) => ({
+            paymentMethods: [...state.paymentMethods, response.data],
+            paymentMethodsStatus: "success",
+          }));
+        } catch (error: AxiosError | any) {
+          console.error(error);
+          set({
+            paymentMethodsStatus: "error",
+            paymentMethodsError: error.response?.data?.message || error.message || "Failed to add new payment method",
+          });
+          toast.error("Failed to add new payment method");
+        }
       },
+
       updateUserPaymentMethod: async (user_payment_method_id: number, data: ReqUpdateUserPaymentMethod) => {
-        set({ paymentMethodsStatus: "loading", paymentMethodsError: null });
-        const response = await paymentMethodsApi.updateUserPaymentMethod(user_payment_method_id, data);
+        try {
+          set({ paymentMethodsStatus: "loading", paymentMethodsError: null });
+          const response = await paymentMethodsApi.updateUserPaymentMethod(user_payment_method_id, data);
 
-        if (response.status === "error") {
-          console.error("Error updating user category:", response.message);
-          set({ paymentMethodsStatus: "error", paymentMethodsError: response.message });
-          return;
+          if (response.status === "error") {
+            console.error("Error updating user payment method:", response.message);
+            set({
+              paymentMethodsStatus: "error",
+              paymentMethodsError: response.message || "Failed to update the payment method",
+            });
+            return;
+          }
+          toast.success(response.message);
+          set((state) => ({
+            paymentMethods: state.paymentMethods.map((paymentMethod) =>
+              paymentMethod.user_payment_method_id === response.data.user_payment_method_id
+                ? response.data
+                : paymentMethod,
+            ),
+            paymentMethodsStatus: "success",
+          }));
+        } catch (error: AxiosError | any) {
+          console.error(error);
+          set({
+            paymentMethodsStatus: "error",
+            paymentMethodsError: error.response?.data?.message || error.message || "Failed to update the payment method",
+          });
+          toast.error("Failed to update the payment method");
         }
-        toast.success(response.message);
-        set((state) => ({
-          paymentMethods: state.paymentMethods.map((paymentMethod) =>
-            paymentMethod.user_payment_method_id === response.data.user_payment_method_id
-              ? response.data
-              : paymentMethod,
-          ),
-          paymentMethodsStatus: "success",
-        }));
       },
+
       deleteUserPaymentMethod: async (user_payment_method_id: number) => {
-        set({ paymentMethodsStatus: "loading", paymentMethodsError: null });
-        const response = await paymentMethodsApi.deleteUserPaymentMethod(user_payment_method_id);
+        try {
+          set({ paymentMethodsStatus: "loading", paymentMethodsError: null });
+          const response = await paymentMethodsApi.deleteUserPaymentMethod(user_payment_method_id);
 
-
-        if (response.status === "error") {
-          console.error("Error deleting user category:", response.message);
-          set({ paymentMethodsStatus: "error", paymentMethodsError: response.message });
-          return;
+          if (response.status === "error") {
+            console.error("Error deleting user payment method:", response.message);
+            set({
+              paymentMethodsStatus: "error",
+              paymentMethodsError: response.message || "Failed to delete the payment method",
+            });
+            return;
+          }
+          toast.success(response.message);
+          set((state) => ({
+            paymentMethods: state.paymentMethods.filter(
+              (paymentMethod) => paymentMethod.user_payment_method_id !== user_payment_method_id,
+            ),
+            paymentMethodsStatus: "success",
+          }));
+        } catch (error: AxiosError | any) {
+          console.error(error);
+          set({
+            paymentMethodsStatus: "error",
+            paymentMethodsError: error.response?.data?.message || error.message || "Failed to delete the payment method",
+          });
+          toast.error("Failed to delete the payment method");
         }
-        toast.success(response.message);
-        set((state) => ({
-          paymentMethods: state.paymentMethods.filter(
-            (paymentMethod) => paymentMethod.user_payment_method_id !== user_payment_method_id,
-          ),
-          paymentMethodsStatus: "success",
-        }));
       },
 
       setLoading: (value) =>

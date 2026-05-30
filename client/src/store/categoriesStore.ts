@@ -9,6 +9,7 @@ import type {
 } from "@shared/core";
 import { toast } from "sonner";
 import { persist } from "zustand/middleware";
+import type { AxiosError } from "axios";
 
 type CategoriesState = {
   defaultCategories: DefaultCategoriesArrDB;
@@ -46,84 +47,135 @@ export const useCategoriesStore = create<CategoriesState>()(
       defaultCategoriesError: null,
 
       getDefaultCategories: async () => {
-        set({ defaultCategoriesStatus: "loading", defaultCategoriesError: null });
-        const response = await categoriesApi.getDefaultCategoryTypes();
-        if (response.status === "error") {
-          console.error("Error fetching default categories:", response.message);
-          set({ defaultCategoriesStatus: "error", defaultCategoriesError: response.message });
-          return;
-        }
-        set({
-          defaultCategories: response.data.sort((a, b) => a.category_id - b.category_id),
-          defaultCategoriesStatus: "success",
-        });
-      },
-
-      getUserCategories: async () => {
-        set({ categoriesStatus: "loading", categoriesError: null });
         try {
-          const response = await categoriesApi.getUserCategories();
-
+          set({ defaultCategoriesStatus: "loading", defaultCategoriesError: null });
+          const response = await categoriesApi.getDefaultCategoryTypes();
           if (response.status === "error") {
-            console.error("Error fetching user categories:", response.message);
-            set({ categoriesStatus: "error", categoriesError: response.message });
+            console.error("Error fetching default categories:", response.message);
+            set({
+              defaultCategoriesStatus: "error",
+              defaultCategoriesError: response.message || "Failed to fetch default categories",
+            });
             return;
           }
           set({
-            categories: response.data.sort((a, b) => a.user_category_id - b.user_category_id),
-            categoriesStatus: "success",
+            defaultCategories: response.data.sort((a, b) => a.category_id - b.category_id),
+            defaultCategoriesStatus: "success",
           });
-        } catch (error) {
+        } catch (error: AxiosError | any) {
           console.error(error);
-          set({ categoriesStatus: "error" });
+          set({
+            categoriesStatus: "error",
+            categoriesError: error.response?.data?.message || error.message || "Failed to fetch default categories",
+          });
+          toast.error("Failed to fetch default categories");
+        }
+      },
+
+      getUserCategories: async () => {
+        try {
+          set({ categoriesStatus: "loading", categoriesError: null });
+          try {
+            const response = await categoriesApi.getUserCategories();
+
+            if (response.status === "error") {
+              console.error("Error fetching user categories:", response.message);
+              set({ categoriesStatus: "error", categoriesError: response.message || "Failed to fetch categories" });
+              return;
+            }
+            set({
+              categories: response.data.sort((a, b) => a.user_category_id - b.user_category_id),
+              categoriesStatus: "success",
+            });
+          } catch (error) {
+            console.error(error);
+            set({ categoriesStatus: "error" });
+          }
+        } catch (error: AxiosError | any) {
+          console.error(error);
+          set({
+            categoriesStatus: "error",
+            categoriesError: error.response?.data?.message || error.message || "Failed to fetch categories",
+          });
+          toast.error("Failed to fetch categories");
         }
       },
 
       createUserCategory: async (data: ReqCreateUserCategory) => {
-        set({ categoriesStatus: "loading", categoriesError: null });
-        const response = await categoriesApi.createUserCategory(data);
-        if (response.status === "error") {
-          console.error("Error creating user category:", response.message);
-          set({ categoriesStatus: "error", categoriesError: response.message });
-          return;
+        try {
+          set({ categoriesStatus: "loading", categoriesError: null });
+          const response = await categoriesApi.createUserCategory(data);
+          if (response.status === "error") {
+            console.error("Error creating user category:", response.message);
+            set({ categoriesStatus: "error", categoriesError: response.message || "Failed to add new category" });
+            return;
+          }
+          toast.success(response.message);
+          set((state) => ({
+            categories: [...state.categories, response.data],
+            categoriesStatus: "success",
+          }));
+        } catch (error: AxiosError | any) {
+          console.error(error);
+          set({
+            categoriesStatus: "error",
+            categoriesError: error.response?.data?.message || error.message || "Failed to add new category",
+          });
+          toast.error("Failed to add new category");
         }
-        toast.success(response.message);
-        set((state) => ({
-          categories: [...state.categories, response.data],
-          categoriesStatus: "success",
-        }));
       },
-      updateUserCategory: async (user_category_id: number, data: ReqUpdateUserCategory) => {
-        set({ categoriesStatus: "loading", categoriesError: null });
-        const response = await categoriesApi.updateUserCategory(user_category_id, data);
 
-        if (response.status === "error") {
-          console.error("Error updating user category:", response.message);
-          set({ categoriesStatus: "error", categoriesError: response.message });
-          return;
+      updateUserCategory: async (user_category_id: number, data: ReqUpdateUserCategory) => {
+        try {
+          set({ categoriesStatus: "loading", categoriesError: null });
+          const response = await categoriesApi.updateUserCategory(user_category_id, data);
+
+          if (response.status === "error") {
+            console.error("Error updating user category:", response.message);
+            set({ categoriesStatus: "error", categoriesError: response.message || "Failed to update the category" });
+            return;
+          }
+          toast.success(response.message);
+          set((state) => ({
+            categories: state.categories.map((category) =>
+              category.user_category_id === response.data.user_category_id ? response.data : category,
+            ),
+            categoriesStatus: "success",
+          }));
+        } catch (error: AxiosError | any) {
+          console.error(error);
+          set({
+            categoriesStatus: "error",
+            categoriesError: error.response?.data?.message || error.message || "Failed to update the category",
+          });
+          toast.error("Failed to update the category");
         }
-        toast.success(response.message);
-        set((state) => ({
-          categories: state.categories.map((category) =>
-            category.user_category_id === response.data.user_category_id ? response.data : category,
-          ),
-          categoriesStatus: "success",
-        }));
       },
+
       deleteUserCategory: async (user_category_id: number) => {
-        set({ categoriesStatus: "loading", categoriesError: null });
-        const response = await categoriesApi.deleteUserCategory(user_category_id);
-        if (response.status === "error") {
-          console.error("Error deleting user category:", response.message);
-          set({ categoriesStatus: "error", categoriesError: response.message });
-          return;
+        try {
+          set({ categoriesStatus: "loading", categoriesError: null });
+          const response = await categoriesApi.deleteUserCategory(user_category_id);
+          if (response.status === "error") {
+            console.error("Error deleting user category:", response.message);
+            set({ categoriesStatus: "error", categoriesError: response.message || "Failed to delete the category" });
+            return;
+          }
+          toast.success(response.message);
+          set((state) => ({
+            categories: state.categories.filter((category) => category.user_category_id !== user_category_id),
+            categoriesStatus: "success",
+          }));
+        } catch (error: AxiosError | any) {
+          console.error(error);
+          set({
+            categoriesStatus: "error",
+            categoriesError: error.response?.data?.message || error.message || "Failed to delete the category",
+          });
+          toast.error("Failed to delete the category");
         }
-        toast.success(response.message);
-        set((state) => ({
-          categories: state.categories.filter((category) => category.user_category_id !== user_category_id),
-          categoriesStatus: "success",
-        }));
       },
+
       setUserCategories: (data: UserCategoriesArrDB) => set({ categories: data }),
       setDefaultCategories: (data: DefaultCategoriesArrDB) => set({ defaultCategories: data }),
 

@@ -7,7 +7,14 @@ import {
   updateTransaction,
   getTransactionTypes,
 } from "../models/transaction_models";
-import { ReqCreateTransaction, ReqUpdateTransaction, ResSimple, ResTransactionDetailed, ResTransactionsDetailedArr, ResTransactionTypesArr } from "@shared/core";
+import {
+  ReqCreateTransaction,
+  ReqUpdateTransaction,
+  ResSimple,
+  ResTransactionDetailed,
+  ResTransactionsDetailedArr,
+  ResTransactionTypesArr,
+} from "@shared/core";
 
 export const _getTransactions = async (req: Request, res: Response<ResTransactionsDetailedArr>) => {
   const user_id = req.user?.user_id as number;
@@ -119,7 +126,7 @@ export const _updateTransaction = async (req: Request, res: Response<ResTransact
 };
 
 export const _deleteTransaction = async (req: Request, res: Response<ResSimple>) => {
-  const transaction_id = parseInt(req.params.id as string)
+  const transaction_id = parseInt(req.params.id as string);
 
   try {
     await deleteTransaction(transaction_id);

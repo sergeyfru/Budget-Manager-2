@@ -10,7 +10,7 @@ import { authApi } from "../../api/authApi";
 import { toast } from "sonner";
 import { Lock } from "lucide-react";
 
-export const ResetPasswordPage = () => {
+const ResetPasswordPage = () => {
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
@@ -101,3 +101,6 @@ export const ResetPasswordPage = () => {
     </div>
   );
 };
+
+
+export default ResetPasswordPage
