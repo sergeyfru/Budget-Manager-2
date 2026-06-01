@@ -11,7 +11,7 @@ export function Sidebar({ onAddClick }: SidebarProps) {
 
   const navItems = [
     { path: "/", icon: Home, label: "Home" },
-    { path: "/categories", icon: Grid3x3, label: "Categories" },
+    { path: "/manage", icon: Grid3x3, label: "Manage" },
     { path: "/analytics", icon: BarChart3, label: "Analytics" },
     { path: "/settings", icon: Settings, label: "Settings" },
   ];

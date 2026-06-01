@@ -97,7 +97,7 @@ export const useAuthStore = create<AuthState>()(
     await authApi.logout();
     localStorage.clear();
     // set({ user: null, access_token: null, isAuth: false, authStatus: "idle" });
-    toast.success("You have been logged out successfully\nPlease log in again to continue using the app");
+    toast.success("You have been logged out successfully.\nPlease log in again to continue using the app");
   },
 
 }),{

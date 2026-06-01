@@ -79,7 +79,7 @@ export function BottomNav({ onAddClick }: BottomNavProps) {
     { path: '/', icon: Home, label: 'Home' },
     { path: '/analytics', icon: BarChart3, label: 'Analytics' },
     { icon: Plus, label: 'Add', isButton: true },
-    { path: '/categories', icon: Grid3x3, label: 'Categories' },
+    { path: '/manage', icon: Grid3x3, label: 'Manage' },
     { path: '/settings', icon: Settings, label: 'Settings' },
   ];
 
