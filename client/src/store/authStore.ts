@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import type {AxiosError } from "axios";
 import { persist } from "zustand/middleware";
 import type { ReqLogin, ReqRegister, Status, UserDB } from "@shared/core";
+import { clearStores } from "../utils/utils";
 
 type AuthState = {
   user: UserDB | null;
@@ -95,6 +96,7 @@ export const useAuthStore = create<AuthState>()(
   logout: async () => {
 
     await authApi.logout();
+    clearStores()
     localStorage.clear();
     // set({ user: null, access_token: null, isAuth: false, authStatus: "idle" });
     toast.success("You have been logged out successfully.\nPlease log in again to continue using the app");

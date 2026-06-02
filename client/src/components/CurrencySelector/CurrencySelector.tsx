@@ -6,7 +6,7 @@ import { useSettingsStore } from "../../store/settingsStore";
 
 
 export const CurrencySelector = () => {
-  const { currencies, currenciesStatus } = useCurrenciesStore()
+  const { currencies } = useCurrenciesStore()
   const {defaultCurrency,setSelectedCurrency} = useSettingsStore()
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
