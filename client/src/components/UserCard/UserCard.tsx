@@ -24,7 +24,6 @@ export const UserCard = () => {
   };
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 xl:px-10 py-6 max-w-2xl space-y-6">
       <SectionWrapper title="Account">
         <SectionRow
           icon={Mail}
@@ -44,8 +43,7 @@ export const UserCard = () => {
           onClick={handleLogout}
           disabled={logOutLoading}
         />
-      </SectionWrapper>
       {showPasswordModal && <ChangePasswordModal setModalOpen={setShowPasswordModal} />}
-    </div>
+      </SectionWrapper>
   );
 };

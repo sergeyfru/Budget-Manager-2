@@ -1,17 +1,28 @@
 import { ChevronRight } from "lucide-react";
 import { Spinner } from "../Loading/Spiner";
+import { type ElementType, type ReactNode } from "react";
 
 interface SectionRowProps {
-  icon?: React.ElementType;
+  icon?: ElementType;
   label: string;
   description?: string;
-  right?: React.ReactNode;
+  right?: ReactNode;
   onClick?: () => void;
   danger?: boolean;
-  disabled?:boolean;
+  disabled?: boolean;
+  children?: ReactNode;
 }
 
-export const SectionRow = ({ icon: Icon, label, description, danger, right, onClick,disabled }: SectionRowProps) => {
+export const SectionRow = ({
+  icon: Icon,
+  label,
+  description,
+  danger,
+  right,
+  onClick,
+  disabled,
+  children,
+}: SectionRowProps) => {
   const Wrapper = onClick ? "button" : "div";
 
   return (
@@ -22,7 +33,7 @@ export const SectionRow = ({ icon: Icon, label, description, danger, right, onCl
         onClick ? (danger ? "hover:bg-destructive/5 text-destructive" : "hover:bg-muted/40") : ""
       }`}
     >
-      <div className="flex items-center gap-3.5">
+      <div className="flex flex-1 items-center gap-3.5">
         {Icon && (
           <div
             className={`w-9 h-9 rounded-xl flex items-center justify-center ${danger ? "bg-destructive/10" : "bg-muted"}`}
@@ -35,7 +46,9 @@ export const SectionRow = ({ icon: Icon, label, description, danger, right, onCl
           {description && <p className="text-xs text-muted-foreground mt-0.5">{description}</p>}
         </div>
       </div>
-      {right ?? (onClick && disabled ? <Spinner/>: <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />)}
+      {right ??
+        (onClick && (disabled ? <Spinner /> : <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />))}
+      {children}
     </Wrapper>
   );
 };

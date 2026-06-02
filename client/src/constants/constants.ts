@@ -1,3 +1,5 @@
+import { BarChart3, Grid3x3, Home, Plus, Settings } from "lucide-react";
+
 export const categoryIconOptions = [
   "ShoppingCart",
   "Car",
@@ -104,3 +106,11 @@ export const BREAKPOINTS = {
   xl: 1280,
   "2xl": 1536,
 };
+
+ export const navItems = [
+    { path: '/', icon: Home, label: 'Home' },
+    { path: '/analytics', icon: BarChart3, label: 'Analytics' },
+    { icon: Plus, label: 'Add', isButton: true },
+    { path: '/manage', icon: Grid3x3, label: 'Manage' },
+    { path: '/settings', icon: Settings, label: 'Settings' },
+  ];

@@ -3,6 +3,7 @@ import { UserCard } from "../../components/UserCard/UserCard";
 import { ThemeSwitcher } from "../../components/ThemeSwitcher/ThemeSwitcher";
 import { useMediaQuery } from "react-responsive";
 import { BREAKPOINTS } from "../../constants/constants";
+import { PreferencesCard } from "../../components/PreferencesCard/PreferencesCard";
 
 const SettingsPage = () => {
   const isDesktop = useMediaQuery({ minWidth: BREAKPOINTS.lg });
@@ -12,10 +13,10 @@ const SettingsPage = () => {
       <Greeting title="Settings" subtitle="Manage your preferences">
         {!isDesktop && <ThemeSwitcher />}
       </Greeting>
-      {/* <div className="px-4 sm:px-6 lg:px-8 xl:px-12 py-6 lg:py-8 flex flex-col gap-3"> */}
      
         <UserCard />
-      {/* </div> */}
+        <PreferencesCard />
+
     </div>
   );
 };
