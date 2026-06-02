@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router";
-import { Home, BarChart3, Grid3x3, Settings, TrendingUp, Plus } from "lucide-react";
+import { TrendingUp, Plus } from "lucide-react";
 import { ThemeSwitcher } from "../ThemeSwitcher/ThemeSwitcher";
+import { navItems } from "../../constants/constants";
 
 interface SidebarProps {
   onAddClick: () => void;
@@ -8,13 +9,6 @@ interface SidebarProps {
 
 export function Sidebar({ onAddClick }: SidebarProps) {
   const location = useLocation();
-
-  const navItems = [
-    { path: "/", icon: Home, label: "Home" },
-    { path: "/categories", icon: Grid3x3, label: "Categories" },
-    { path: "/analytics", icon: BarChart3, label: "Analytics" },
-    { path: "/settings", icon: Settings, label: "Settings" },
-  ];
 
   return (
     <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 xl:w-72 bg-card border-r border-border flex-col z-40">
@@ -38,7 +32,8 @@ export function Sidebar({ onAddClick }: SidebarProps) {
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
-
+          if(item?.isButton) return
+          if(!item.path) return
           return (
             <Link
               key={item.path}

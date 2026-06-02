@@ -1,49 +1,49 @@
+import { Lock, LogOut, Mail } from "lucide-react";
+import { SectionWrapper } from "../SettingsComponents/SectionWrapper";
+import { SectionRow } from "../SettingsComponents/SectionRow";
+import { useAuthStore } from "../../store/authStore";
 import { useState } from "react";
-import { CardsTitleInSettings } from "../CardsTitleInSettings/CardsTitleInSettings";
-
 import { ChangePasswordModal } from "../ChangePasswordModal/ChangePasswordModal";
-import { ChangeDefaultCurrencyModal } from "../ChangeDefaultCurrencyModal/ChangeDefaultCurrencyModal";
+import { useNavigate } from "react-router";
 
 export const UserCard = () => {
-  const [callapseCategoriesCard, setCallapseCategoriesCard] = useState(true);
-
+  const navigate = useNavigate();
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [showDefaultCurrencyModal, setDefaultCurrencyModal] = useState(false);
+  const [logOutLoading, setLogOutLoading] = useState(false);
 
-  const openCard = () => {
-    setCallapseCategoriesCard(!callapseCategoriesCard);
+  const authStore = useAuthStore();
+
+  const handleLogout = async () => {
+    setLogOutLoading(true);
+    try {
+      await authStore.logout();
+      navigate("/login");
+    } finally {
+      setLogOutLoading(false);
+    }
   };
 
   return (
-    <div className="bg-card flex flex-col gap-4 border border-border rounded-2xl p-5 sm:p-6 md:p-8 shadow-sm">
-      <CardsTitleInSettings
-        title="User Settings"
-        cardIsClose={callapseCategoriesCard}
-        setCardIsClose={openCard}
-        //  refreshCard={refreshCategories}
-        //  setShowAddModal={setShowAddModal}
-      />
-
-      {!callapseCategoriesCard && (
-        <div className="flex items-start  gap-3 pt-3">
-          <button
-            type="button"
-            className="p-2 rounded-xl border border-border bg-card text-foreground hover:bg-muted transition-colors"
-            onClick={() => setShowPasswordModal(true)}
-          >
-            <h2>Change Password</h2>
-          </button>
-          <button
-            type="button"
-            className="p-2 rounded-xl border border-border bg-card text-foreground hover:bg-muted transition-colors"
-            onClick={() => setDefaultCurrencyModal(true)}
-          >
-            <h2>Set default currency</h2>
-          </button>
-        </div>
-      )}
+      <SectionWrapper title="Account">
+        <SectionRow
+          icon={Mail}
+          label={authStore.user?.email || "youremail@example.com"}
+          description="Your account email"
+        />
+        <SectionRow
+          icon={Lock}
+          label="Change Password"
+          description="Update your account password"
+          onClick={() => setShowPasswordModal(true)}
+        />
+        <SectionRow
+          icon={LogOut}
+          label="Log out"
+          description="Sign out of your account"
+          onClick={handleLogout}
+          disabled={logOutLoading}
+        />
       {showPasswordModal && <ChangePasswordModal setModalOpen={setShowPasswordModal} />}
-      {showDefaultCurrencyModal && <ChangeDefaultCurrencyModal setModalOpen={setDefaultCurrencyModal} />}
-    </div>
+      </SectionWrapper>
   );
 };

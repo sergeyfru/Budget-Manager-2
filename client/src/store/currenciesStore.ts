@@ -11,6 +11,7 @@ type currenciesState = {
   currenciesError: string | null;
 
   getCurrencies: () => void;
+  clear: () => void;
 };
 
 export const useCurrenciesStore = create<currenciesState>()(
@@ -38,6 +39,10 @@ export const useCurrenciesStore = create<currenciesState>()(
           });
           toast.error("Failed to fetch currencies");
         }
+      },
+
+      clear: () => {
+        set({ currencies: [] as CurrenciesArrDB, currenciesStatus: "idle", currenciesError: null });
       },
     }),
     {

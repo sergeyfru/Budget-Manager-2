@@ -2,7 +2,7 @@ import { lazy } from "react";
 import { createBrowserRouter } from "react-router";
 import { Layout } from "./components/Layout/Layout";
 import { AnalyticsPage } from "./pages/AnalyticsPage/AnalyticsPage";
-import { CategoriesPage } from "./pages/CategoriesPage/CategoriesPage";
+import { ManagePage } from "./pages/ManagePage/ManagePage";
 import { ErrorPage } from "./pages/ErrorPage/ErrorPage";
 import { withSuspense } from "./utils/utils";
 
@@ -33,7 +33,7 @@ export const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: withSuspense(<DashBoardPage />), errorElement: <ErrorPage /> },
-      { path: "categories", element: <CategoriesPage />, errorElement: <ErrorPage /> },
+      { path: "manage", element: <ManagePage />, errorElement: <ErrorPage /> },
       { path: "analytics", element: <AnalyticsPage />, errorElement: <ErrorPage /> },
       { path: "settings", element: withSuspense(<SettingsPage />), errorElement: <ErrorPage /> },
       { path: "error", element: <ErrorPage /> },

@@ -9,6 +9,7 @@ type SettingsState = {
   setSelectedCurrency: (currency: CurrencyDB) => void;
   theme: Theme;
   setTheme: (theme: Theme) => void;
+  clear: ()=>void;
 };
 
 export type Theme = "light" | "system" | "dark";
@@ -38,6 +39,10 @@ export const useSettingsStore = create<SettingsState>()(
       setSelectedCurrency: (currency: CurrencyDB) => {
         set({ defaultCurrency: currency });
       },
+
+      clear:()=>{
+        set({defaultCurrency:null, theme:"system"})
+      }
     }),
     {
       name: "settings-storage",
