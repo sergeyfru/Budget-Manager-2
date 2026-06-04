@@ -15,8 +15,7 @@ export function TransactionItem({ transaction, showDate = false }: TransactionIt
   const {setEditingTransaction,setAddEditTransactionModalOpen} =useModalsStore();
   const category = transaction.user_category; // Assuming category is a property of TransactionDetailed
 
-  const symbol = transaction.currency.currency_symbol || '₪'; // Default to ₪ if symbol is not available
-
+  const symbol = transaction.currency.currency_symbol || ''; 
   const handleEdit=(transaction:TransactionDetailed)=>{
     const { transaction_id,
     // user_id,

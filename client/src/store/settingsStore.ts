@@ -29,12 +29,18 @@ export const useSettingsStore = create<SettingsState>()(
       },
 
       defaultCurrency: {
-        currency_id: 3,
-        currency_code: "ILS",
-        currency_symbol: "₪",
-        currency_name: "Israeli New Shekel",
-        created_at: new Date("2026-03-14T18:15:09"),
-      },
+            "currency_id": 3,
+            "currency_code": "ILS",
+            "currency_symbol": "₪",
+            "currency_name": "Israeli New Shekel",
+            "currency_country": "Israel",
+            "currency_flag": null,
+            "currency_time_last_update_unix": 1780531201,
+            "currency_time_next_update_unix": 1780617601,
+            "currency_exchange_rate_usd": 2.87,
+            "currency_rate_updated_at": new Date("2026-06-04T00:00:01.000Z"),
+            "created_at": new Date("2026-06-03T06:54:59.888Z")
+        },
 
       setSelectedCurrency: (currency: CurrencyDB) => {
         set({ defaultCurrency: currency });

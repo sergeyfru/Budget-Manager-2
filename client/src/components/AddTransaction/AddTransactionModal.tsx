@@ -159,7 +159,7 @@ const AddTransactionModal = ({ dataForUpdate }: AddTransactionModalProps) => {
             {/* Icon */}
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
               {currenciesStatus === "error" ? null : (
-                <span>{currencies.find((c) => c.currency_id === selectedCurrency)?.currency_symbol || "₪"}</span>
+                <span>{currencies.find((c) => c.currency_id === selectedCurrency)?.currency_symbol || ""}</span>
               )}
             </div>
 

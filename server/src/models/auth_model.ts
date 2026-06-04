@@ -21,7 +21,6 @@ import {
   UserView,
 } from "@shared/core";
 import { validateDB } from "../utils/validation";
-import { tr } from "zod/locales";
 import { errorMonitor } from "node:events";
 
 export const login = async (
@@ -223,14 +222,16 @@ export const logout = async (refresh_token: string, session_id: string | null = 
 
 export const refresh = async (hashed_refresh_token: string): Promise<RefreshTokenService> => {
   const trx = await db.transaction();
+  const now = new Date();
   try {
-    const dbResponse: RefreshTokenDB = await trx("refresh_tokens")
-      .where({ hashed_refresh_token })
-      .where("expires_at", ">", new Date())
-      .first();
+    const dbResponse: RefreshTokenDB = await trx("refresh_tokens").where({ hashed_refresh_token }).first();
 
     if (!dbResponse) {
       throw new ApiError(401, "Invalid refresh token");
+    }
+
+    if (new Date(dbResponse.expires_at) < now) {
+      throw new ApiError(401, "Reset token has expired");
     }
 
     const newRefreshToken = generateRefreshToken();
@@ -312,12 +313,13 @@ export const reset_password = async (token: string, new_password: string) => {
 
     const salt = await bcrypt.genSalt(10);
     const new_password_hash = await bcrypt.hash(new_password, salt);
-    await trx("users_auth").where({ user_id: tokenRecord.user_id }).update({ password_hash: new_password_hash, updated_at: new Date() });
+    await trx("users_auth")
+      .where({ user_id: tokenRecord.user_id })
+      .update({ password_hash: new_password_hash, updated_at: new Date() });
 
     await trx("password_reset_tokens").where({ user_id: tokenRecord.user_id }).update({ used: true });
 
     await trx.commit();
-
   } catch (error) {
     trx.rollback();
     console.log("Error in reset password:", error);

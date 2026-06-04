@@ -30,6 +30,12 @@ export const getTransactionsQuery = (trx: Knex): Knex.QueryBuilder => {
           'currency_code', c.currency_code,
           'currency_symbol', c.currency_symbol,
           'currency_name', c.currency_name,
+          'currency_country', c.currency_country,
+          'currency_flag', c.currency_flag,
+          'currency_exchange_rate_usd', c.currency_exchange_rate_usd,
+          'currency_time_last_update_unix', c.currency_time_last_update_unix,
+          'currency_time_next_update_unix', c.currency_time_next_update_unix,
+          'currency_rate_updated_at', c.currency_rate_updated_at,
           'created_at', c.created_at
         ) as currency
       `),
@@ -62,7 +68,8 @@ export const getTransactionsQuery = (trx: Knex): Knex.QueryBuilder => {
         'color', upm.user_payment_method_color
       ) as user_payment_method
     `),
-    ).orderBy("tr.date_of_transaction", "desc");
+    )
+    .orderBy("tr.date_of_transaction", "desc");
 };
 
 export const getDefaultCategoriesQuery = (trx: Knex): Knex.QueryBuilder => {
@@ -81,6 +88,5 @@ export const getDefaultPaymentMethodsQuery = (trx: Knex): Knex.QueryBuilder => {
     "payment_method_type_name",
     "payment_method_type_icon",
     "payment_method_type_color",
-
   );
 };

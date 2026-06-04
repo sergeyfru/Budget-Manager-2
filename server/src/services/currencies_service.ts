@@ -1,0 +1,229 @@
+import { exchangeRateApiResponseSchema } from "@shared/core";
+import { getNotExpiredCurrencies, updateCurrencyRateExchange } from "../models/currencies_model";
+import { validateDB } from "../utils/validation";
+
+export const updateRateExchange = async () => {
+  const now = Math.floor(Date.now() / 1000);
+
+  try {
+    const dbResponse = await getNotExpiredCurrencies(now);
+
+    if (dbResponse.length > 0) {
+      console.log("Exchange rates are already up to date");
+      return;
+    }
+
+    // const rateExchangeApiResponce = await fetch(updatedRateExchangeAPI).then(res=> res.json())
+
+    const rateExchangeApiResponce = {
+      result: "success",
+      documentation: "https://www.exchangerate-api.com/docs",
+      terms_of_use: "https://www.exchangerate-api.com/terms",
+      time_last_update_unix: 1780444801,
+      time_last_update_utc: "Wed, 04 Jun 2026 00:00:01 +0000",
+      time_next_update_unix: 1780531201,
+      time_next_update_utc: "Thu, 05 Jun 2026 00:00:01 +0000",
+      base_code: "USD",
+      conversion_rates: {
+        USD: 1,
+        AED: 3.6725,
+        AFN: 63.2026,
+        ALL: 81.9465,
+        AMD: 368.5003,
+        ANG: 1.79,
+        AOA: 927.638,
+        ARS: 1426.9788,
+        AUD: 1.3937,
+        AWG: 1.79,
+        AZN: 1.6993,
+        BAM: 1.6817,
+        BBD: 2,
+        BDT: 122.7857,
+        BGN: 1.6817,
+        BHD: 0.376,
+        BIF: 2985.0801,
+        BMD: 1,
+        BND: 1.2794,
+        BOB: 6.9159,
+        BRL: 5.0189,
+        BSD: 1,
+        BTN: 95.3406,
+        BWP: 13.7516,
+        BYN: 2.7573,
+        BZD: 2,
+        CAD: 1.3838,
+        CDF: 2259.284,
+        CHF: 0.7873,
+        CLF: 0.02258,
+        CLP: 892.4599,
+        CNH: 6.7637,
+        CNY: 6.7786,
+        COP: 3563.9783,
+        CRC: 455.1351,
+        CUP: 24,
+        CVE: 94.8101,
+        CZK: 20.8278,
+        DJF: 177.721,
+        DKK: 6.415,
+        DOP: 58.3887,
+        DZD: 132.9214,
+        EGP: 51.9367,
+        ERN: 15,
+        ETB: 157.4144,
+        EUR: 0.8598,
+        FJD: 2.1966,
+        FKP: 0.7428,
+        FOK: 6.4149,
+        GBP: 0.7428,
+        GEL: 2.6631,
+        GGP: 0.7428,
+        GHS: 11.784,
+        GIP: 0.7428,
+        GMD: 74.2054,
+        GNF: 8766.583,
+        GTQ: 7.623,
+        GYD: 209.1319,
+        HKD: 7.8376,
+        HNL: 26.5966,
+        HRK: 6.4785,
+        HTG: 130.7324,
+        HUF: 305.1566,
+        IDR: 17822.8432,
+        ILS: 2.8434,
+        IMP: 0.7428,
+        INR: 95.3411,
+        IQD: 1311.0752,
+        IRR: 1236453.3135,
+        ISK: 123.2494,
+        JEP: 0.7428,
+        JMD: 157.7513,
+        JOD: 0.709,
+        JPY: 159.8746,
+        KES: 129.4138,
+        KGS: 87.4698,
+        KHR: 4036.5322,
+        KID: 1.3934,
+        KMF: 423.013,
+        KRW: 1516.8678,
+        KWD: 0.3087,
+        KYD: 0.8333,
+        KZT: 489.4353,
+        LAK: 21945.8475,
+        LBP: 89500,
+        LKR: 331.5673,
+        LRD: 182.5529,
+        LSL: 16.2403,
+        LYD: 6.3516,
+        MAD: 9.1847,
+        MDL: 17.2661,
+        MGA: 4196.5391,
+        MKD: 52.9736,
+        MMK: 2099.3189,
+        MNT: 3604.9748,
+        MOP: 8.0728,
+        MRU: 40.0763,
+        MUR: 47.3612,
+        MVR: 15.435,
+        MWK: 1743.3113,
+        MXN: 17.3031,
+        MYR: 3.965,
+        MZN: 63.5769,
+        NAD: 16.2403,
+        NGN: 1364.8808,
+        NIO: 36.7511,
+        NOK: 9.2807,
+        NPR: 152.5449,
+        NZD: 1.6878,
+        OMR: 0.3845,
+        PAB: 1,
+        PEN: 3.4045,
+        PGK: 4.3612,
+        PHP: 61.6681,
+        PKR: 278.7907,
+        PLN: 3.6397,
+        PYG: 6019.3176,
+        QAR: 3.64,
+        RON: 4.5145,
+        RSD: 100.8429,
+        RUB: 72.3547,
+        RWF: 1467.1659,
+        SAR: 3.75,
+        SBD: 7.9121,
+        SCR: 14.7637,
+        SDG: 449.4371,
+        SEK: 9.311,
+        SGD: 1.2794,
+        SHP: 0.7428,
+        SLE: 24.5811,
+        SLL: 24581.0852,
+        SOS: 571.3166,
+        SRD: 37.2092,
+        SSP: 4700.9649,
+        STN: 21.0661,
+        SYP: 112.2674,
+        SZL: 16.2403,
+        THB: 32.6296,
+        TJS: 9.2305,
+        TMT: 3.5,
+        TND: 2.9091,
+        TOP: 2.363,
+        TRY: 45.9603,
+        TTD: 6.7511,
+        TVD: 1.3934,
+        TWD: 31.462,
+        TZS: 2619.3121,
+        UAH: 44.3375,
+        UGX: 3745.7787,
+        UYU: 40.1781,
+        UZS: 11908.1123,
+        VES: 558.6436,
+        VND: 26173.8745,
+        VUV: 118.0493,
+        WST: 2.6788,
+        XAF: 564.0174,
+        XCD: 2.7,
+        XCG: 1.79,
+        XDR: 0.7304,
+        XOF: 564.0174,
+        XPF: 102.6063,
+        YER: 238.4826,
+        ZAR: 16.2401,
+        ZMW: 18.0701,
+        ZWG: 26.8893,
+        ZWL: 26.8893,
+      },
+    };
+
+    const newRatesExchange = validateDB(exchangeRateApiResponseSchema, rateExchangeApiResponce);
+
+    if (newRatesExchange.result === "error") {
+      throw new Error(`Exchange API error: ${newRatesExchange["error-type"]}`);
+    }
+
+    const {
+      conversion_rates,
+      time_last_update_unix,
+      time_next_update_unix,
+      time_last_update_utc: currency_rate_updated_at,
+    } = newRatesExchange;
+
+    let updatedCount = 0;
+    for (const currency_code in conversion_rates) {
+      const rate = conversion_rates[currency_code];
+
+      if (rate === undefined) continue;
+
+      const affectedRow = await updateCurrencyRateExchange(currency_code, {
+        currency_exchange_rate_usd: rate,
+        currency_rate_updated_at,
+        currency_time_last_update_unix: time_last_update_unix,
+        currency_time_next_update_unix: time_next_update_unix,
+      });
+
+      updatedCount += affectedRow;
+    }
+    console.log(`Updated ${updatedCount} currencies. Source date: ${currency_rate_updated_at}`);
+  } catch (error) {
+    console.error("Error updating rate exchange:", error);
+  }
+};

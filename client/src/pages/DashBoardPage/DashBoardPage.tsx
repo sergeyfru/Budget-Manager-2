@@ -5,10 +5,12 @@ import { useEffect } from "react";
 import { useTransactionStore } from "../../store/transactionsStore";
 import { Loader } from "../../components/Loading/Loader";
 import { RecentTransactionsCard } from "../../components/RecentTransactionsCard/RecentTransactionsCard";
+import { useSettingsStore } from "../../store/settingsStore";
 
 const DashBoardPage = () => {
   const transactionStore = useTransactionStore();
   const transactions = transactionStore.transactions;
+  const settingsStore = useSettingsStore()
 
   useEffect(() => {
     document.title = "Budget Manager - Home";
@@ -26,8 +28,7 @@ const DashBoardPage = () => {
       return acc;
     }
   }, 0);
-  const symbol =
-    transactionStore.transactions.length > 0 ? transactionStore.transactions[0].currency.currency_symbol : "₪";
+  const symbol = settingsStore.defaultCurrency?.currency_symbol || "";
 
   const monthlyExpenseTransactions = transactionStore.transactions
     .filter((transaction) => transaction.transaction_type.direction === "out")

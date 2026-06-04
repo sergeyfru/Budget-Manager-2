@@ -30,7 +30,9 @@
     "pg": "^8.20.0",
     "ua-parser-js": "^2.0.9",
     "zod": "^4.3.6",
-    "@shared/core": "*"
+    "@shared/core": "*",
+    "node-cron": "^4.2.1",
+    "resend": "^6.12.3"
   },
   "devDependencies": {
     "@ljharb/tsconfig": "^0.3.2",

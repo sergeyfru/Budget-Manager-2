@@ -54,7 +54,7 @@ export const TotalBalanceCard = ({
             <span className="text-sm text-muted-foreground">Expenses</span>
           </div>
           <p className="text-lg md:text-xl text-destructive-foreground">
-            {currencySimbol}
+            {currencySimbol}{" "}
             {monthlyExpenses.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
         </div>

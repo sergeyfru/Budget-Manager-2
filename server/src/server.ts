@@ -2,7 +2,6 @@ import path from "path";
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-// import dotenv from "dotenv";
 import auth_routes from "./routes/auth_routes";
 import transaction_routes from "./routes/transaction_routes";
 import categories_routes from "./routes/categories_routes";
@@ -11,8 +10,7 @@ import curriencies_routes from "./routes/currencies_routes";
 import verification_routes from "./routes/verification_routes";
 import { errorHandler } from "./middlewares/middleware";
 import { requestLogger, responseLogger } from "./utils/logger";
-
-// dotenv.config();
+import { startBackgroundJobs } from "./jobs/jobs_index";
 
 const app = express();
 
@@ -51,9 +49,10 @@ app.use("/api/paymentmethods", payment_methods_routes);
 app.use("/api/currencies", curriencies_routes);
 app.use("/api/verification", verification_routes);
 
-// Start servernpm i @types/cors
+// Start server 
 app.listen(process.env.PORT || 3001, () => {
   console.log(`Run on ${process.env.PORT || 3001}`);
+  startBackgroundJobs()
 });
 
 app.get(/.*/, (req, res) => {
