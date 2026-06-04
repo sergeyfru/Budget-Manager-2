@@ -50,8 +50,8 @@ export const currencyDBSchema = z.object({
   currency_flag: z.string().nullable(),
   currency_time_last_update_unix: z.number().int().nonnegative(),
   currency_time_next_update_unix: z.number().int().nonnegative(),
-  currency_exchange_rate_usd: z.coerce.number().nullable(),
-  currency_rate_updated_at: z.coerce.date().nullable(),
+  currency_exchange_rate_usd: z.coerce.number(),
+  currency_rate_updated_at: z.coerce.date(),
   created_at: z.coerce.date(),
 });
 

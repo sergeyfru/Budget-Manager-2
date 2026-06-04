@@ -28,16 +28,16 @@ export const useSettingsStore = create<SettingsState>()(
         set({ addTransactionModalOpen });
       },
 
-      defaultCurrency: {
-            "currency_id": 3,
-            "currency_code": "ILS",
-            "currency_symbol": "₪",
-            "currency_name": "Israeli New Shekel",
-            "currency_country": "Israel",
+      defaultCurrency:    {
+            "currency_id": 1,
+            "currency_code": "USD",
+            "currency_symbol": "$",
+            "currency_name": "United States Dollar",
+            "currency_country": "United States",
             "currency_flag": null,
             "currency_time_last_update_unix": 1780531201,
             "currency_time_next_update_unix": 1780617601,
-            "currency_exchange_rate_usd": 2.87,
+            "currency_exchange_rate_usd": 1,        
             "currency_rate_updated_at": new Date("2026-06-04T00:00:01.000Z"),
             "created_at": new Date("2026-06-03T06:54:59.888Z")
         },
@@ -47,7 +47,19 @@ export const useSettingsStore = create<SettingsState>()(
       },
 
       clear:()=>{
-        set({defaultCurrency:null, theme:"system"})
+        set({defaultCurrency:{
+            "currency_id": 1,
+            "currency_code": "USD",
+            "currency_symbol": "$",
+            "currency_name": "United States Dollar",
+            "currency_country": "United States",
+            "currency_flag": null,
+            "currency_time_last_update_unix": 1780531201,
+            "currency_time_next_update_unix": 1780617601,
+            "currency_exchange_rate_usd": 1,        
+            "currency_rate_updated_at": new Date("2026-06-04T00:00:01.000Z"),
+            "created_at": new Date("2026-06-03T06:54:59.888Z")
+        }, theme:"system"})
       }
     }),
     {

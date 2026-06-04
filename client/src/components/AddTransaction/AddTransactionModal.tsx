@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createTransactionFormSchema, type ReqCreateTransaction, type TransactionDB } from "@shared/core";
 import { Controller, useForm } from "react-hook-form";
 import { useTransactionStore } from "../../store/transactionsStore";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePaymentMethodsStore } from "../../store/paymentMethodsStore";
 import { useSettingsStore } from "../../store/settingsStore";
 import { useCurrenciesStore } from "../../store/currenciesStore";
@@ -24,7 +24,7 @@ const AddTransactionModal = ({ dataForUpdate }: AddTransactionModalProps) => {
   const { currencies, currenciesStatus, getCurrencies } = useCurrenciesStore();
   const { defaultCurrency } = useSettingsStore();
   const { resetTransactionModalStore } = useModalsStore();
-  const {getUserCategories} = useCategoriesStore()
+  const { getUserCategories } = useCategoriesStore();
 
   useEffect(() => {
     if (transactionTypes.length === 0) {
@@ -36,8 +36,8 @@ const AddTransactionModal = ({ dataForUpdate }: AddTransactionModalProps) => {
     if (currencies.length === 0) {
       getCurrencies();
     }
-    if(categories.length === 0){
-      getUserCategories()
+    if (categories.length === 0) {
+      getUserCategories();
     }
     if (dataForUpdate) {
       reset({
@@ -64,6 +64,28 @@ const AddTransactionModal = ({ dataForUpdate }: AddTransactionModalProps) => {
   });
 
   const selectedCurrency = watch("currency_id");
+  const enteredAmount = watch("transaction_amount");
+  const [fullSelectedCurrency, setFullSelectedCurrency] = useState(defaultCurrency);
+
+  const calculatingAmountInBaseCurrency = useMemo(() => {
+    const amount = Number(enteredAmount || 0);
+
+    const rateExchange = currencies.find((currency) => currency.currency_id === selectedCurrency);
+    if (!rateExchange || !defaultCurrency)
+      return {
+        baseAmount: 0,
+        rate: 0,
+      };
+    setFullSelectedCurrency(rateExchange);
+
+    const rate = Number(defaultCurrency.currency_exchange_rate_usd) / Number(rateExchange.currency_exchange_rate_usd);
+
+    const baseAmount = amount * rate;
+    console.log(rate, typeof rate);
+    console.log(baseAmount, typeof baseAmount);
+    return { baseAmount, rate };
+  }, [selectedCurrency, enteredAmount]);
+
   const isEditing = !!dataForUpdate;
   const onFormSubmit = async (data: ReqCreateTransaction) => {
     try {
@@ -151,13 +173,21 @@ const AddTransactionModal = ({ dataForUpdate }: AddTransactionModalProps) => {
         )}
       </div>
 
-      {/* Amount */}
       <div className="space-y-2">
         <label className="text-sm font-medium">
           Amount *
-          <div className="relative">
+          <div
+            className={`flex items-center justify-between gap-1 w-full h-16 p-2 font-semibold border rounded-xl 
+                  ${
+                    errors.transaction_amount
+                      ? "border-destructive focus:border-destructive"
+                      : // : "border-transparent focus:border-primary focus:bg-card"
+                        "focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  }
+                  `}
+          >
             {/* Icon */}
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+            <div className="w-10 text-lg flex justify-center text-muted-foreground">
               {currenciesStatus === "error" ? null : (
                 <span>{currencies.find((c) => c.currency_id === selectedCurrency)?.currency_symbol || ""}</span>
               )}
@@ -169,21 +199,14 @@ const AddTransactionModal = ({ dataForUpdate }: AddTransactionModalProps) => {
               type="number"
               min="0"
               placeholder="0.00"
-              className={`w-full text-3xl h-16 pl-12 pr-24 font-semibold border rounded-xl 
-                  ${
-                    errors.transaction_amount
-                      ? "border-destructive focus:border-destructive"
-                      : // : "border-transparent focus:border-primary focus:bg-card"
-                        "focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  }
-                  `}
+              className={`w-full text-3xl h-16 pl-3 font-semibold`}
             />
 
             {/* Currency */}
             <select
               {...register("currency_id", { valueAsNumber: true })}
               className={`
-                  absolute right-2 top-1/2 -translate-y-1/2
+                  
                   h-10 px-2 pr-8 rounded-md bg-accent
                   text-foreground border border-border text-sm
                   focus:outline-none focus:ring-2 focus:ring-ring/50
@@ -213,8 +236,14 @@ const AddTransactionModal = ({ dataForUpdate }: AddTransactionModalProps) => {
           </p>
         )}
         {selectedCurrency !== defaultCurrency?.currency_id && (
-          <p className="mt-2 text-sm text-muted-foreground">
-            The amount will be converted and displayed in your preferred currency.
+          <p className="m-2  text-sm text-muted-foreground">
+            ≈ {calculatingAmountInBaseCurrency.baseAmount.toFixed(2)}{" "}
+            {defaultCurrency?.currency_symbol || defaultCurrency?.currency_code} {""}
+            <span className="text-xs opacity-70">
+              ( 1 {fullSelectedCurrency?.currency_symbol || fullSelectedCurrency?.currency_code} ={" "}
+              {calculatingAmountInBaseCurrency.rate.toFixed(3)}{" "}
+              {defaultCurrency?.currency_symbol || defaultCurrency?.currency_code})
+            </span>
           </p>
         )}
         {/* </div> */}
