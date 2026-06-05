@@ -5,11 +5,12 @@ export const startBackgroundJobs = async () => {
   try {
     updateRateExchange();
 
-    cron.schedule("5 * * * *", () => {
-      updateRateExchange();
+    cron.schedule("5 * * * *", async () => {
+      console.log(`[CRON] Starting exchange rate update: ${new Date().toISOString()}`);
+      await updateRateExchange();
+      console.log(`[CRON] Exchange rate update completed: ${new Date().toISOString()}`);
     });
-    
   } catch (error) {
-    console.error(error);
+    console.error(`[CRON] Exchange rates update failed`, error);
   }
 };
