@@ -14,7 +14,8 @@
     "build:shared": "npm run build -w shared",
     "build:server": "npm run build -w shared && npm run build -w server",
     "start": "npm run start -w server",
-    "clean": "rm -rf node_modules */node_modules */package-lock.json */dist"
+    "clean": "rm -rf node_modules */node_modules */package-lock.json */dist",
+    "reset": "rm -rf node_modules */node_modules */package-lock.json */dist && npm i && npm run build -w shared"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"
