@@ -8,7 +8,7 @@ import {
   forgot_password,
   reset_password,
 } from "../models/auth_model";
-import { hashedRefreshToken, maxAgeRefresh } from "../utils/token";
+import { hashedRefreshToken, maxAgeRefreshInSec } from "../utils/token";
 import { ReqLogin, ReqRegister, ResLogin, ResRefresh, ResSimple } from "@shared/core";
 // const UAParser = require("ua-parser-js");
 
@@ -33,7 +33,7 @@ export const _login = async (req: Request, res: Response<ResLogin>) => {
     res.cookie("refresh_token", refresh_token, {
       httpOnly: true,
       secure: process.env.COOKIE_SECURE === "true", // for development, set to true in production
-      maxAge: maxAgeRefresh * 1000, // convert to milliseconds
+      maxAge: maxAgeRefreshInSec * 1000, // convert to milliseconds
     });
 
     res.status(201).json({
@@ -120,7 +120,7 @@ export const _refresh = async (req: Request, res: Response<ResRefresh>) => {
   res.cookie("refresh_token", newTokens.refresh_token, {
     httpOnly: true,
     secure: process.env.COOKIE_SECURE === "true", // for development, set to true in production
-    maxAge: maxAgeRefresh * 1000, // convert to milliseconds
+    maxAge: maxAgeRefreshInSec * 1000, // convert to milliseconds
   });
 
   res.status(200).json({

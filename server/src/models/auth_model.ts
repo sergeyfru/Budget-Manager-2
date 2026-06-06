@@ -6,8 +6,8 @@ import {
   generateAccessToken,
   generateRefreshToken,
   hashedRefreshToken,
-  maxAgeAccess,
-  maxAgeRefresh,
+  maxAgeAccessInSec,
+  maxAgeRefreshInSec,
 } from "../utils/token";
 import { sendPasswordResetEmail, sendVerificationEmail } from "../utils/emailSender";
 import { getDefaultCategoriesQuery, getDefaultPaymentMethodsQuery } from "../db/queries";
@@ -63,7 +63,7 @@ export const login = async (
     const refresh_token = generateRefreshToken();
 
     const hashed_refresh_token = hashedRefreshToken(refresh_token);
-    const expires_at = new Date(Date.now() + maxAgeRefresh * 1000);
+    const expires_at = new Date(Date.now() + maxAgeRefreshInSec * 1000);
 
     await trx("refresh_tokens").insert({
       user_id: user.user_id,
@@ -232,13 +232,13 @@ export const refresh = async (hashed_refresh_token: string): Promise<RefreshToke
     if (!dbResponse) {
       throw new ApiError(401, "Invalid refresh token");
     }
-
+    const expires_at = new Date(Date.now() + maxAgeRefreshInSec * 1000)
     const newRefreshToken = generateRefreshToken();
     const hashedNewRefreshToken = hashedRefreshToken(newRefreshToken);
     await trx("refresh_tokens").insert({
       hashed_refresh_token: hashedNewRefreshToken,
       user_id: dbResponse.user_id,
-      expires_at: new Date(Date.now() + 15 * 60 * 1000),
+      expires_at,
       session_id: null,
     });
     await trx("refresh_tokens").where({ token_id: dbResponse.token_id }).delete();

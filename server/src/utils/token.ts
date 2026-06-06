@@ -10,16 +10,16 @@ import { UserDB, userDBSchema } from "@shared/core";
 // dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET!;
 
-export const maxAgeAccess = process.env.JWT_EXPIRES_ACCESS
+export const maxAgeAccessInSec = process.env.JWT_EXPIRES_ACCESS
   ? parseInt(process.env.JWT_EXPIRES_ACCESS)
   : 60 * 15; // 15 minutes
-export const maxAgeRefresh = process.env.JWT_EXPIRES_REFRESH
+export const maxAgeRefreshInSec = process.env.JWT_EXPIRES_REFRESH
   ? parseInt(process.env.JWT_EXPIRES_REFRESH)
   : 60 * 60 * 24 * 7; // 7 days
 
 export const generateAccessToken = (
   payload: object,
-  expiresIn: number = maxAgeAccess,
+  expiresIn: number = maxAgeAccessInSec,
 ): string => {
   if (!JWT_SECRET) {
     throw new Error("JWT_SECRET is not defined in environment variables");
