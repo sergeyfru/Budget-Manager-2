@@ -11,7 +11,6 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  console.log(config.baseURL);
   const token =
     useAuthStore.getState().access_token ||
     localStorage.getItem("access_token");

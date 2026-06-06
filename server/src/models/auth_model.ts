@@ -6,7 +6,6 @@ import {
   generateAccessToken,
   generateRefreshToken,
   hashedRefreshToken,
-  maxAgeAccess,
   maxAgeRefresh,
 } from "../utils/token";
 import { sendPasswordResetEmail, sendVerificationEmail } from "../utils/emailSender";
@@ -19,9 +18,9 @@ import {
   RefreshTokenDB,
   ReqRegister,
   UserView,
+  userDBSchema,
 } from "@shared/core";
 import { validateDB } from "../utils/validation";
-import { errorMonitor } from "node:events";
 
 export const login = async (
   email: string,
@@ -96,7 +95,7 @@ export const register = async (newUser: ReqRegister): Promise<UserView> => {
       throw new ApiError(409, "Duplicate value");
     }
 
-    const [user] = await trx("users")
+    const [dbResponse] = await trx("users")
       .insert(userInfo)
       .returning([
         "user_id",
@@ -110,7 +109,10 @@ export const register = async (newUser: ReqRegister): Promise<UserView> => {
         "created_at",
         "updated_at",
       ]);
+      const user = validateDB(userDBSchema,dbResponse)
     console.log("User created:", user);
+    
+    await trx("users_settings").insert({user_id:user.user_id})
 
     const salt = await bcrypt.genSalt(10);
     const password_hash = await bcrypt.hash(password, salt);

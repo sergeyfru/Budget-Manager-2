@@ -26,12 +26,11 @@ export const CurrencySelector = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const select = (code: string) => {
+  const select = async (code: string) => {
     const c = currencies.find(x => x.currency_code === code);
-    if (c) setSelectedCurrency(c);
+    if (c) await setSelectedCurrency(c);
     setOpen(false);
     setQuery('');
-    toast.success(`Currency set to ${c?.currency_name}`);
   };
 
   return (
