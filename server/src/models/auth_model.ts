@@ -178,6 +178,10 @@ export const register = async (newUser: ReqRegister): Promise<UserView> => {
   }
 };
 
+export const getMe = async (user_id: number) => {
+  return db({ u: "users" }).where({ "u.user_id": user_id }).first();
+};
+
 export const change_password = async (
   user_id: number,
   old_password: string,

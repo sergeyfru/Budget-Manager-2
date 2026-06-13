@@ -63,7 +63,6 @@ export const currencyForUpdateSchema = z.object({
   currency_time_last_update_unix: z.number(),
   currency_time_next_update_unix: z.number(),
 });
-
 export type CurrencyForUpdate = z.infer<typeof currencyForUpdateSchema>;
 
 export const currenciesArrDBSchema = z.array(currencyDBSchema);
@@ -71,6 +70,8 @@ export type CurrenciesArrDB = z.infer<typeof currenciesArrDBSchema>;
 
 // RESPONSE
 
-export const resCurrenciesArrSchema = createApiResponseSchema(currenciesArrDBSchema);
+export const resCurrencySchema = createApiResponseSchema(currencyDBSchema);
+export type ResCurrency = z.infer<typeof resCurrencySchema>;
 
+export const resCurrenciesArrSchema = createApiResponseSchema(currenciesArrDBSchema);
 export type ResCurrenciesArr = z.infer<typeof resCurrenciesArrSchema>;

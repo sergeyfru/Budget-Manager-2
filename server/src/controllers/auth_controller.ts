@@ -7,9 +7,19 @@ import {
   register,
   forgot_password,
   reset_password,
+  getMe,
 } from "../models/auth_model";
 import { hashedRefreshToken, maxAgeRefresh } from "../utils/token";
-import { ReqLogin, ReqRegister, ResLogin, ResRefresh, ResSimple } from "@shared/core";
+import {
+  ReqLogin,
+  ReqRegister,
+  ResLogin,
+  ResRefresh,
+  ResSimple,
+  ResUser,
+  userViewSchema,
+} from "@shared/core";
+import { validateDB } from "../utils/validation";
 // const UAParser = require("ua-parser-js");
 
 export const _login = async (req: Request, res: Response<ResLogin>) => {
@@ -64,6 +74,26 @@ export const _register = async (req: Request, res: Response<ResSimple>) => {
     await register(data);
     res.status(201).json({ status: "success", message: "User registered successfully" });
   } catch (error: any) {
+    res.status(error.status || 500).json({
+      status: "error",
+      message: error.message || "An unexpected error occurred during registration",
+    });
+  }
+};
+
+export const _getMe = async (req: Request, res: Response<ResUser>) => {
+  try {
+    const user_id = req.user.user_id;
+    const dbResponse = await getMe(user_id);
+
+    const user = validateDB(userViewSchema, dbResponse);
+    res.status(200).json({
+      status: "success",
+      message: "User fetched successfully",
+      data: user,
+    });
+  } catch (error: any) {
+    console.log("Error in get user:", error);
     res.status(error.status || 500).json({
       status: "error",
       message: error.message || "An unexpected error occurred during registration",

@@ -41,8 +41,8 @@ export const CurrencySelector = () => {
       >
         <span className="flex items-center gap-2.5">
           {/* <span className="text-base">{defaultCurrency.flag}</span> */}
-          <span className="font-medium text-foreground">{defaultCurrency.currency_code}</span>
-          <span className="text-muted-foreground">— {defaultCurrency.currency_name}</span>
+          <span className="font-medium text-foreground">{defaultCurrency?.currency_code}</span>
+          <span className="text-muted-foreground">— {defaultCurrency?.currency_name}</span>
         </span>
         <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
       </button>

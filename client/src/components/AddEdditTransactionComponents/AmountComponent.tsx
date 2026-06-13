@@ -29,8 +29,6 @@ export const AmountComponent = ({
   const enteredAmount = watch("transaction_amount");
 
   const calculatingAmountInBaseCurrency = useMemo(() => {
-    // console.log("render in memo");
-
     const amount = Number(enteredAmount || 0);
 
     const rateExchangeCurrency = currencies.find((currency) => currency.currency_id === selectedCurrency);

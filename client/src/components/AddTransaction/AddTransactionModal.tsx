@@ -34,8 +34,13 @@ const AddTransactionModal = ({ dataForUpdate }: AddTransactionModalProps) => {
   const { addTransaction, updateTransaction } = useTransactionStore();
   const { paymentMethodsStatus, paymentMethods } = usePaymentMethodsStore();
   const { categories, categoriesStatus } = useCategoriesStore();
-  const { defaultCurrency } = useSettingsStore();
+  const { defaultCurrency, getBaseCurrency } = useSettingsStore();
   const { resetTransactionModalStore } = useModalsStore();
+  
+  if (!defaultCurrency) {
+    getBaseCurrency();
+    return;
+  }
 
   useEffect(() => {
     if (dataForUpdate) {
@@ -64,7 +69,6 @@ const AddTransactionModal = ({ dataForUpdate }: AddTransactionModalProps) => {
       base_currency_id: defaultCurrency.currency_id,
     },
   });
-
 
   const onFormSubmit = async (data: ReqCreateTransaction) => {
     try {

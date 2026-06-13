@@ -23,7 +23,8 @@ export const Layout = () => {
   const { categories, getUserCategories } = useCategoriesStore();
   const { paymentMethods, getUserPaymentMethods } = usePaymentMethodsStore();
   const { currencies, getCurrencies } = useCurrenciesStore();
-  const { defaultCurrency, updateDefaultCurrency } = useSettingsStore();
+  const { defaultCurrency, getBaseCurrency, updateDefaultCurrency } = useSettingsStore();
+  const { user, getMe } = useAuthStore();
 
   useEffect(() => {
     if (!isAutorized) {
@@ -35,14 +36,22 @@ export const Layout = () => {
     if (transactionTypes.length === 0) {
       getTransactionTypes();
     }
+    if (!user || Object.keys(user).length === 0) {
+      getMe();
+    }
     if (paymentMethods.length === 0) {
       getUserPaymentMethods();
     }
     if (currencies.length === 0 || currencies[0].currency_time_next_update_unix < Math.floor(Date.now() / 1000)) {
       getCurrencies();
-      const defaultCurrencyId = defaultCurrency.currency_id;
-      const updatedDefCur = currencies.filter((c) => c.currency_id === defaultCurrencyId);
-      updateDefaultCurrency(updatedDefCur[0]);
+      if (defaultCurrency) {
+        const defaultCurrencyId = defaultCurrency.currency_id;
+        const updatedDefCur = currencies.filter((c) => c.currency_id === defaultCurrencyId);
+        updateDefaultCurrency(updatedDefCur[0]);
+      }
+    }
+    if (!defaultCurrency || Object.keys(defaultCurrency).length === 0) {
+      getBaseCurrency();
     }
     if (categories.length === 0) {
       getUserCategories();

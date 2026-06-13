@@ -10,14 +10,14 @@ interface RecentTransactionsMobileItemProps {
   showDate?: boolean;
 }
 
-export function RecentTransactionsMobileItem({ transaction, showDate = false }: RecentTransactionsMobileItemProps) {
+export const RecentTransactionsMobileItem = ({ transaction, showDate = false }: RecentTransactionsMobileItemProps) => {
   const { deleteTransaction } = useTransactionStore();
   const { setEditingTransaction, setAddEditTransactionModalOpen } = useModalsStore();
   const category = transaction.user_category; // Assuming category is a property of TransactionDetailed
   const { defaultCurrency } = useSettingsStore();
 
   const symbol = transaction.currency.currency_symbol || "";
-  const currSymbol = defaultCurrency.currency_symbol || "";
+  const currSymbol = defaultCurrency?.currency_symbol || "";
 
   const handleEdit = (transaction: TransactionDetailed) => {
     const {
@@ -106,4 +106,4 @@ export function RecentTransactionsMobileItem({ transaction, showDate = false }: 
       </div>
     </div>
   );
-}
+};

@@ -4,6 +4,7 @@ import {
   _change_password,
   _verify_phone_number, _refresh,
   _reset_password, _forgot_password,
+  _getMe,
 } from "../controllers/auth_controller";
 
 import { authMiddleware, validate } from "../middlewares/middleware";
@@ -17,6 +18,7 @@ const router = exporess.Router();
 
 router.post("/login", validate(reqLoginSchema), _login);
 router.post("/register", validate(reqRegisterSchema), _register); 
+router.get("/me",authMiddleware(), _getMe)
 router.post("/logout", _logout);
 router.patch("/change-password", authMiddleware(), validate(reqChangePasswordSchema), _change_password);
 

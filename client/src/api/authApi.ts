@@ -1,6 +1,14 @@
-
 import axios from "axios";
-import type { ReqChangePassword, ReqLogin, ReqRegister, ReqResetPassword, ResLogin, ResRefresh, ResSimple } from "@shared/core";
+import type {
+  ReqChangePassword,
+  ReqLogin,
+  ReqRegister,
+  ReqResetPassword,
+  ResLogin,
+  ResRefresh,
+  ResSimple,
+  ResUser,
+} from "@shared/core";
 import { api } from "./axios";
 
 export const apiAuth = axios.create({
@@ -8,26 +16,24 @@ export const apiAuth = axios.create({
   withCredentials: true,
 });
 
-
 export const authApi = {
-  login: (data: ReqLogin):Promise<ResLogin> =>
-    apiAuth.post("/auth/login", data).then((res) => res.data),
+  login: (data: ReqLogin): Promise<ResLogin> => apiAuth.post("/auth/login", data).then((res) => res.data),
 
-  register: (data: ReqRegister): Promise<ResSimple> =>
-    apiAuth.post("/auth/register", data).then((res) => res.data),
+  register: (data: ReqRegister): Promise<ResSimple> => apiAuth.post("/auth/register", data).then((res) => res.data),
 
-  refresh:(refresh_token: string):Promise<ResRefresh>=>
-    apiAuth.post("/auth/refresh",null,{headers:{"x-refresh-token": refresh_token}}).then((res) => res.data),
-  
+  getMe: (): Promise<ResUser> => apiAuth.get("/auth/me").then((res) => res.data),
+
+  refresh: (refresh_token: string): Promise<ResRefresh> =>
+    apiAuth.post("/auth/refresh", null, { headers: { "x-refresh-token": refresh_token } }).then((res) => res.data),
+
   forgotPassword: (email: string): Promise<ResSimple> =>
     apiAuth.post("/auth/forgot-password", { email }).then((res) => res.data),
 
-  changePassword: (data: ReqChangePassword ): Promise<ResSimple> =>
+  changePassword: (data: ReqChangePassword): Promise<ResSimple> =>
     api.patch("/auth/change-password", data).then((res) => res.data),
 
   resetPassword: (data: ReqResetPassword, token: string): Promise<ResSimple> =>
     apiAuth.post(`/auth/reset-password?token=${token}`, data).then((res) => res.data),
 
   logout: (): Promise<ResSimple> => api.post("/auth/logout").then((res) => res.data),
-
-}; 
+};

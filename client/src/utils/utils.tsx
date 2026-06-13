@@ -18,16 +18,10 @@ export const withSuspense = (component: React.ReactNode) => (
   </Suspense>
 );
 
-export const clearStores = async () => {
-  const settingStore = useSettingsStore();
-  const currenciesStore = useCurrenciesStore();
-  const categoriesStore = useCategoriesStore();
-  const paymentMethodsStore = usePaymentMethodsStore();
-  const transactionsStore = useTransactionStore();
-
-  transactionsStore.clear();
-  settingStore.clear();
-  paymentMethodsStore.clear();
-  currenciesStore.clear();
-  categoriesStore.clear();
+export const clearStores = () => {
+  useTransactionStore.getState().clear();
+  useSettingsStore.getState().clear();
+  usePaymentMethodsStore.getState().clear();
+  useCurrenciesStore.getState().clear();
+  useCategoriesStore.getState().clear();
 };
