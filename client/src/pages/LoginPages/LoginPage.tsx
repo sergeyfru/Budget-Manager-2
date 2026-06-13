@@ -54,7 +54,7 @@ const LoginPage = () => {
 
       if (data?.errors) {
         data.errors.forEach((e: any) => {
-          console.log(e.field, { message: e.message });
+          console.error(e.field, { message: e.message });
 
           setError(e.field, { message: `${e.message}` });
         });

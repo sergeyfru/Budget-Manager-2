@@ -24,7 +24,6 @@ export const RecentTransactionsCard = ({ transactions, symbol }: RecentTransacti
     .slice(0, howManyToShow);
 
   const toggleShowMore = () => {
-    console.log("Show more clicked, now showing", howManyToShow + 5, "transactions");
     setHowManyToShow(howManyToShow + 5);
   };
 

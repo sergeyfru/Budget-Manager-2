@@ -85,7 +85,7 @@ const AddTransactionModal = ({ dataForUpdate }: AddTransactionModalProps) => {
       const data = (err as AxiosError)?.response?.data || err;
       if (data?.errors) {
         data.errors.forEach((e: any) => {
-          console.log(e.field, { message: e.message });
+          console.error(e.field, { message: e.message });
           setError(e.field, { message: `${e.message}` });
         });
         return;

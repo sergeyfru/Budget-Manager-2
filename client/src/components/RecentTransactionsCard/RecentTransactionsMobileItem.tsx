@@ -44,9 +44,6 @@ export const RecentTransactionsMobileItem = ({ transaction, showDate = false }: 
       created_at,
     } as TransactionDB;
 
-    console.log(transactionForEdit);
-    console.log(new Date(transactionForEdit.date_of_transaction));
-
     setEditingTransaction(transactionForEdit);
     setAddEditTransactionModalOpen(true);
   };

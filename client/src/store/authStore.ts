@@ -36,7 +36,7 @@ export const useAuthStore = create<AuthState>()(
       authError: null,
 
       setToken: (token: string) => {
-        console.log("Setting token: ", token);
+        // console.log("Setting token: ", token);
         localStorage.setItem("access_token", token);
         set({ access_token: token });
       },

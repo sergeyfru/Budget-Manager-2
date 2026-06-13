@@ -33,8 +33,6 @@ const RegistrationPage = () => {
   const confirm_password = watch("confirm_password");
 
   const onSubmit = async (data: any) => {
-    console.log("Submitting registration form with data:", data);
-
     try {
       await authStore.register(data);
       toast.success("Account created successfully!");
@@ -43,7 +41,7 @@ const RegistrationPage = () => {
       const data = (err as AxiosError)?.response?.data || err;
       if (data?.errors) {
         data.errors.forEach((e: any) => {
-          console.log(e.field, { message: e.message });
+          console.error(e.field, { message: e.message });
 
           setError(e.field, { message: `${e.message}` });
         });

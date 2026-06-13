@@ -79,11 +79,9 @@ export const useTransactionStore = create<TransactionState>()(
       },
 
       getTransactions: async () => {
-        console.log("In getTransaction");
         set({ transactionsStatus: "loading", transactionsError: null });
         try {
           const response = await transactionsApi.getTransactions();
-          console.log("Response from API:", response);
 
           if (response.status === "error") {
             set(() => ({
