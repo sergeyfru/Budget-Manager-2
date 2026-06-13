@@ -5,19 +5,19 @@ import { useTransactionStore } from "../../store/transactionsStore";
 import { useModalsStore } from "../../store/modalsStore";
 import { Plus } from "lucide-react";
 
-interface RecentTransactionsTableCardProps {
+interface RecentTransactionsTableProps {
   transactions: TransactionsDetailedArr;
   symbol: string | null;
   showMore: boolean;
   toggleShowMore: () => void;
 }
 
-export const RecentTransactionsTableCard = ({
+export const RecentTransactionsTable = ({
   transactions,
   symbol,
   showMore,
   toggleShowMore,
-}: RecentTransactionsTableCardProps) => {
+}: RecentTransactionsTableProps) => {
   const { setEditingTransaction, setAddEditTransactionModalOpen } = useModalsStore();
 
   const transactionStore = useTransactionStore();
@@ -25,36 +25,51 @@ export const RecentTransactionsTableCard = ({
     transactionStore.deleteTransaction(transaction_id);
   };
 
-  const handleEdit = (transaction:TransactionDetailed)=>{
-      const { transaction_id,
-      // user_id,
-      transaction_type,
-      user_payment_method,
-      user_category,
-      transaction_amount,
-      currency,
+  const handleEdit = (transaction: TransactionDetailed) => {
+    const {
+      transaction_id,
       date_of_transaction,
       transaction_note,
-      created_at,
-      } = transaction; 
-      
-      const transactionForEdit = {
-        transaction_id,
-        // user_id,
-        transaction_amount,
-        date_of_transaction,
-        transaction_note,
-        transaction_type_id: transaction_type.id,
-        user_category_id:user_category.id,
-        user_payment_method_id: user_payment_method.id,
-        currency_id: currency.currency_id,
-        created_at,
-      } as TransactionDB
 
-      setEditingTransaction(transactionForEdit);
-      setAddEditTransactionModalOpen(true);
-      
-    }
+      fx_rate_to_base,
+
+      base_currency_id,
+      actual_base_amount,
+
+      transaction_type_id,
+      user_category_id,
+      user_payment_method_id,
+
+      transaction_amount,
+      transaction_currency_id,
+
+      created_at,
+    } = transaction;
+
+    const transactionForEdit = {
+      transaction_id,
+
+      date_of_transaction,
+      transaction_note,
+
+      fx_rate_to_base,
+
+      base_currency_id,
+      actual_base_amount,
+
+      transaction_type_id,
+      user_category_id,
+      user_payment_method_id,
+
+      transaction_amount,
+      transaction_currency_id,
+
+      created_at,
+    } as TransactionDB;
+
+    setEditingTransaction(transactionForEdit);
+    setAddEditTransactionModalOpen(true);
+  };
   return (
     <table className="w-full">
       <thead>
@@ -65,7 +80,6 @@ export const RecentTransactionsTableCard = ({
           <th className="py-3 px-4 text-sm font-medium text-muted-foreground text-center">Payment</th>
           <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground text-center">Amount</th>
           <th className="py-3 px-4 text-sm font-medium text-muted-foreground text-center">Action</th>
-          {/* <th className="w-12">Actions</th> */}
         </tr>
       </thead>
       <tbody>
@@ -93,7 +107,9 @@ export const RecentTransactionsTableCard = ({
                 </td>
                 <td className="py-4 px-4">
                   <div className="flex items-center justify-center gap-2">
-                    <span className="text-muted-foreground">{transaction.transaction_note || "No description"}</span>
+                    <span className={transaction.transaction_note ? "text-foreground" : "text-muted-foreground/50"}>
+                      {transaction.transaction_note || "No description"}
+                    </span>
                   </div>
                 </td>
                 <td className="py-4 px-4">
@@ -118,31 +134,44 @@ export const RecentTransactionsTableCard = ({
                   </div>
                 </td>
                 <td className="py-4 px-4 text-right">
-                  <div className="flex items-center justify-end gap-2">
-
+                  <div className="flex flex-col items-end justify-end gap-2">
                     <span
                       className={`font-medium ${
-                        transaction.transaction_type.direction === "in"
-                          ? "text-success-foreground"
-                          : "text-foreground"
+                        transaction.transaction_type.direction === "in" ? "text-success-foreground" : "text-foreground"
                       }`}
                     >
                       {transaction.transaction_type.direction === "in" ? "+" : ""}
                       {transaction.transaction_amount}
+                      <span
+                        className={`font-medium ${
+                          transaction.transaction_type.direction === "in"
+                            ? "text-success-foreground"
+                            : "text-foreground"
+                        }`}
+                      >
+                        {transaction.currency.currency_symbol}
+                      </span>
                     </span>
-                    <span
-                      className={`font-medium ${
-                        transaction.transaction_type.direction === "in"
-                          ? "text-success-foreground"
-                          : "text-foreground"
-                      }`}
-                    >
-                      {symbol}
-                    </span>
+                    {transaction.transaction_currency_id !== transaction.base_currency_id && (
+                      <span
+                        className={`${
+                          transaction.transaction_type.direction === "in"
+                            ? "text-success-foreground/80"
+                            : "text-muted-foreground"
+                        }`}
+                      >
+                        ~ {transaction.actual_base_amount.toFixed(2)} {symbol}
+                      </span>
+                    )}
                   </div>
                 </td>
                 <td className="flex justify-center gap-0.5 opacity-40 group-hover:opacity-100 transition-opacity flex-col justify-center items-center">
-                  <EditDelete onEdit={() => {handleEdit(transaction)}} onDelete={() => onDelete(transaction.transaction_id)} />
+                  <EditDelete
+                    onEdit={() => {
+                      handleEdit(transaction);
+                    }}
+                    onDelete={() => onDelete(transaction.transaction_id)}
+                  />
                 </td>
               </tr>
             );

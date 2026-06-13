@@ -2,11 +2,11 @@ import { Globe } from "lucide-react";
 import { SectionRow } from "../SettingsComponents/SectionRow";
 import { SectionWrapper } from "../SettingsComponents/SectionWrapper";
 import { CurrencySelector } from "../CurrencySelector/CurrencySelector";
-import { BREAKPOINTS } from "../../constants/constants";
+import { breakpoints } from "../../constants/constants";
 import { useMediaQuery } from "react-responsive";
 
 export const PreferencesCard = () => {
-  const isMobile = useMediaQuery({ maxWidth: BREAKPOINTS.sm - 1 });
+  const isMobile = useMediaQuery({ maxWidth: breakpoints.sm - 1 });
 
   return (
     <SectionWrapper title="Preferences">

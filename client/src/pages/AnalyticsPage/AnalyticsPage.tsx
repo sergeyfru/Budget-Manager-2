@@ -2,11 +2,9 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Greeting } from "../../components/Greeting/Greeting";
 
 export const AnalyticsPage = () => {
- const isFeatureEnabled = import.meta.env.VITE_ENABLE_ANALYTICS === "true";
+  const stillInDevelopment = import.meta.env.VITE_STILL_IN_DEVELOPMENT === "true";
 
-  const symbol = "$";
-
-  if (!isFeatureEnabled) {
+  if (stillInDevelopment) {
     return (
       <div className="min-h-screen pb-20 lg:pb-8">
         {/* Header */}
@@ -18,6 +16,8 @@ export const AnalyticsPage = () => {
       </div>
     );
   }
+
+  const symbol = "$";
 
   return (
     <div className="min-h-screen pb-20 lg:pb-8">

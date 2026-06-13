@@ -2,7 +2,7 @@ import { Knex } from "knex";
 
 export const getTransactionsQuery = (trx: Knex): Knex.QueryBuilder => {
   return trx({ tr: "transactions" })
-    .innerJoin({ c: "currencies" }, "tr.currency_id", "c.currency_id")
+    .innerJoin({ c: "currencies" }, "tr.transaction_currency_id", "c.currency_id")
     .innerJoin(
       { tt: "transaction_types" },
       "tr.transaction_type_id",
@@ -22,7 +22,15 @@ export const getTransactionsQuery = (trx: Knex): Knex.QueryBuilder => {
       "tr.transaction_id",
       "tr.transaction_amount",
       "tr.date_of_transaction",
+      "tr.fx_rate_to_base",
+      "tr.actual_base_amount",
+      "tr.base_currency_id",
+      "tr.transaction_currency_id",
+      "tr.transaction_type_id",
+      "tr.user_category_id",
+      "tr.user_payment_method_id",
       "tr.transaction_note",
+      "tr.updated_at_unix",
       "tr.created_at",
       trx.raw(`
         json_build_object(
@@ -39,7 +47,6 @@ export const getTransactionsQuery = (trx: Knex): Knex.QueryBuilder => {
           'created_at', c.created_at
         ) as currency
       `),
-
       trx.raw(`
       json_build_object(
         'id', tt.transaction_type_id,
@@ -49,7 +56,6 @@ export const getTransactionsQuery = (trx: Knex): Knex.QueryBuilder => {
         'color', tt.transaction_type_color
       ) as transaction_type
     `),
-
       trx.raw(`
       json_build_object(
         'id', uc.user_category_id,
@@ -59,7 +65,6 @@ export const getTransactionsQuery = (trx: Knex): Knex.QueryBuilder => {
         'color', uc.user_category_color
       ) as user_category
     `),
-
       trx.raw(`
       json_build_object(
         'id', upm.user_payment_method_id,

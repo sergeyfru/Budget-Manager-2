@@ -1,8 +1,7 @@
 import { db } from "../config/db";
 import { ApiError } from "../errors/ApiErrors";
 import { dbErrorHandler } from "../errors/db_errors";
-import { generateAccessToken, generateRefreshToken, hashedRefreshToken } from "../utils/token";
-import bcrypt from "bcryptjs";
+import { generateRefreshToken, hashedRefreshToken, maxAgeAccess } from "../utils/token";
 import { sendVerificationEmail } from "../utils/emailSender";
 import { validateDB } from "../utils/validation";
 import { userDBSchema } from "@shared/core";
@@ -60,7 +59,7 @@ export const resend_verification_email = async (email: string) => {
       await trx("email_verification_tokens").insert({
         user_id: user.user_id,
         token_hash,
-        expires_at: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes from now
+        expires_at: new Date(Date.now() + maxAgeAccess), // 15 minutes from now
         used: false,
         created_at: new Date(Date.now()),
       });
@@ -91,7 +90,6 @@ export const resend_verification_email = async (email: string) => {
 };
 
 export const check_email_verification = async (email: string) => {
-
   try {
     const responseFromDB = await db("users").where({ email }).first();
 

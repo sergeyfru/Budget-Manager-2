@@ -7,8 +7,9 @@ import { toast } from "sonner";
 type SettingsState = {
   addTransactionModalOpen: boolean;
   setAddTransactionModalOpen: (addTransactionModalOpen: boolean) => void;
-  defaultCurrency: CurrencyDB | null;
+  defaultCurrency: CurrencyDB;
   setSelectedCurrency: (currency: CurrencyDB) => void;
+  updateDefaultCurrency: (currency: CurrencyDB) => void;
   theme: Theme;
   setTheme: (theme: Theme) => void;
   clear: () => void;
@@ -48,11 +49,22 @@ export const useSettingsStore = create<SettingsState>()(
         try {
           const response = await userSettingsApi.changeBaseCurrency(currency.currency_id);
 
-          response.status === "success" ? toast.success(`Currency set to ${currency?.currency_name}`) : toast.error(response.message);
+          response.status === "success"
+            ? toast.success(`Currency set to ${currency?.currency_name}`)
+            : toast.error(response.message);
           set({ defaultCurrency: currency });
         } catch (error) {
           console.error(error);
-          toast.error("Failed to update base currency types");
+          toast.error("Failed to update base currency type");
+        }
+      },
+
+      updateDefaultCurrency: async (currency: CurrencyDB) => {
+        try {
+          set({ defaultCurrency: currency });
+        } catch (error) {
+          console.error(error);
+          toast.error("Failed to update base currency type");
         }
       },
 

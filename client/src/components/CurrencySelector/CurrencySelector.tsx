@@ -1,36 +1,36 @@
 import { Check, ChevronDown, Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
 import { useCurrenciesStore } from "../../store/currenciesStore";
 import { useSettingsStore } from "../../store/settingsStore";
 
-
 export const CurrencySelector = () => {
-  const { currencies } = useCurrenciesStore()
-  const {defaultCurrency,setSelectedCurrency} = useSettingsStore()
+  const { currencies } = useCurrenciesStore();
+  const { defaultCurrency, setSelectedCurrency } = useSettingsStore();
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const ref = useRef<HTMLDivElement>(null);
 
-  const current = currencies.find(c => c.currency_code === defaultCurrency?.currency_code);
-  const filtered = currencies.filter(c =>
-    c.currency_name.toLowerCase().includes(query.toLowerCase()) ||
-    c.currency_code.toLowerCase().includes(query.toLowerCase())
+  // const current = currencies.find(c => c.currency_code === defaultCurrency?.currency_code);
+
+  const filtered = currencies.filter(
+    (c) =>
+      c.currency_name.toLowerCase().includes(query.toLowerCase()) ||
+      c.currency_code.toLowerCase().includes(query.toLowerCase()),
   );
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const select = async (code: string) => {
-    const c = currencies.find(x => x.currency_code === code);
+    const c = currencies.find((x) => x.currency_code === code);
     if (c) await setSelectedCurrency(c);
     setOpen(false);
-    setQuery('');
+    setQuery("");
   };
 
   return (
@@ -40,15 +40,15 @@ export const CurrencySelector = () => {
         className="w-full flex items-center justify-between p-4 bg-background border border-border rounded-xl hover:border-primary/50 transition-colors text-sm"
       >
         <span className="flex items-center gap-2.5">
-          {/* <span className="text-base">{current?.flag}</span> */}
-          <span className="font-medium text-foreground">{current?.currency_code}</span>
-          <span className="text-muted-foreground">— {current?.currency_name}</span>
+          {/* <span className="text-base">{defaultCurrency.flag}</span> */}
+          <span className="font-medium text-foreground">{defaultCurrency.currency_code}</span>
+          <span className="text-muted-foreground">— {defaultCurrency.currency_name}</span>
         </span>
-        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
 
       {open && (
-        <div className="absolute top-full left-0 right-0 mt-1.5 bg-card border border-border rounded-xl shadow-xl z-20 overflow-hidden">
+        <div className="absolute bottom-full left-0 right-0 mt-1.5 bg-card border border-border rounded-xl shadow-xl z-20 overflow-hidden">
           <div className="p-2 border-b border-border">
             <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-lg">
               <Search className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
@@ -68,7 +68,7 @@ export const CurrencySelector = () => {
                 key={c.currency_code}
                 onClick={() => select(c.currency_code)}
                 className={`w-full flex items-center justify-between px-4 py-2.5 hover:bg-muted transition-colors text-sm ${
-                  defaultCurrency?.currency_code === c.currency_code ? 'text-primary' : 'text-foreground'
+                  defaultCurrency?.currency_code === c.currency_code ? "text-primary" : "text-foreground"
                 }`}
               >
                 <span className="flex items-center gap-2.5">
@@ -79,12 +79,10 @@ export const CurrencySelector = () => {
                 {defaultCurrency?.currency_code === c.currency_code && <Check className="w-3.5 h-3.5 text-primary" />}
               </button>
             ))}
-            {filtered.length === 0 && (
-              <p className="text-center text-sm text-muted-foreground py-4">No results</p>
-            )}
+            {filtered.length === 0 && <p className="text-center text-sm text-muted-foreground py-4">No results</p>}
           </div>
         </div>
       )}
     </div>
   );
-}
+};

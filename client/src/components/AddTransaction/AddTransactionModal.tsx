@@ -1,48 +1,47 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createTransactionFormSchema, type ReqCreateTransaction, type TransactionDB } from "@shared/core";
-import { Controller, useForm } from "react-hook-form";
+import {
+  createTransactionFormSchema,
+  type ReqCreateTransaction,
+  type TransactionDB,
+  type UserCategoryDB,
+  type UserPaymentMethodDB,
+} from "@shared/core";
+import { useForm } from "react-hook-form";
 import { useTransactionStore } from "../../store/transactionsStore";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect } from "react";
 import { usePaymentMethodsStore } from "../../store/paymentMethodsStore";
 import { useSettingsStore } from "../../store/settingsStore";
-import { useCurrenciesStore } from "../../store/currenciesStore";
 import { useCategoriesStore } from "../../store/categoriesStore";
 import { useModalsStore } from "../../store/modalsStore";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
 import { ModalFormContainer } from "../ModalComponents/ModalContainer";
+import { TypeComponent } from "../AddEdditTransactionComponents/TypeComponent";
+import { AmountComponent } from "../AddEdditTransactionComponents/AmountComponent";
+import { SelectComponent } from "../AddEdditTransactionComponents/SelectComponent";
+import { DateComponent } from "../AddEdditTransactionComponents/DateComponent";
+import { NotesComponent } from "../AddEdditTransactionComponents/NotesComponent";
+import { AdvancedSettingsComponent } from "../AddEdditTransactionComponents/AdvancedSettingsComponent.tsx";
 
 interface AddTransactionModalProps {
   dataForUpdate: TransactionDB | null;
 }
 
 const AddTransactionModal = ({ dataForUpdate }: AddTransactionModalProps) => {
-  const { transactionTypes, transactionTypesStatus, getTransactionTypes, addTransaction, updateTransaction } =
-    useTransactionStore();
+  const isEditing = !!dataForUpdate;
+  console.log("RENDERING");
+
+  const { addTransaction, updateTransaction } = useTransactionStore();
+  const { paymentMethodsStatus, paymentMethods } = usePaymentMethodsStore();
   const { categories, categoriesStatus } = useCategoriesStore();
-  const { paymentMethodsStatus, paymentMethods, getUserPaymentMethods } = usePaymentMethodsStore();
-  const { currencies, currenciesStatus, getCurrencies } = useCurrenciesStore();
   const { defaultCurrency } = useSettingsStore();
   const { resetTransactionModalStore } = useModalsStore();
-  const { getUserCategories } = useCategoriesStore();
 
   useEffect(() => {
-    if (transactionTypes.length === 0) {
-      getTransactionTypes();
-    }
-    if (paymentMethods.length === 0) {
-      getUserPaymentMethods();
-    }
-    if (currencies.length === 0) {
-      getCurrencies();
-    }
-    if (categories.length === 0) {
-      getUserCategories();
-    }
     if (dataForUpdate) {
       reset({
         ...dataForUpdate,
-        date_of_transaction: new Date(dataForUpdate.date_of_transaction).toISOString().split("T")[0],
+        date_of_transaction: dataForUpdate.date_of_transaction,
       });
     }
   }, []);
@@ -55,38 +54,18 @@ const AddTransactionModal = ({ dataForUpdate }: AddTransactionModalProps) => {
     control,
     setError,
     formState: { errors, isSubmitting },
+    setValue,
   } = useForm({
     resolver: zodResolver(createTransactionFormSchema),
     defaultValues: {
-      currency_id: defaultCurrency?.currency_id || 3,
+      transaction_currency_id: defaultCurrency.currency_id,
       date_of_transaction: new Date().toISOString().split("T")[0],
+      fx_rate_to_base: 1,
+      base_currency_id: defaultCurrency.currency_id,
     },
   });
 
-  const selectedCurrency = watch("currency_id");
-  const enteredAmount = watch("transaction_amount");
-  const [fullSelectedCurrency, setFullSelectedCurrency] = useState(defaultCurrency);
 
-  const calculatingAmountInBaseCurrency = useMemo(() => {
-    const amount = Number(enteredAmount || 0);
-
-    const rateExchange = currencies.find((currency) => currency.currency_id === selectedCurrency);
-    if (!rateExchange || !defaultCurrency)
-      return {
-        baseAmount: 0,
-        rate: 0,
-      };
-    setFullSelectedCurrency(rateExchange);
-
-    const rate = Number(defaultCurrency.currency_exchange_rate_usd) / Number(rateExchange.currency_exchange_rate_usd);
-
-    const baseAmount = amount * rate;
-    console.log(rate, typeof rate);
-    console.log(baseAmount, typeof baseAmount);
-    return { baseAmount, rate };
-  }, [selectedCurrency, enteredAmount]);
-
-  const isEditing = !!dataForUpdate;
   const onFormSubmit = async (data: ReqCreateTransaction) => {
     try {
       if (isEditing && dataForUpdate) {
@@ -126,243 +105,44 @@ const AddTransactionModal = ({ dataForUpdate }: AddTransactionModalProps) => {
       closeModal={closeModal}
       disabled={isSubmitting}
       onSubmit={handleSubmit(onFormSubmit)}
-      fullScrin
+      fullScreen
     >
-      <div className="space-y-2">
-        <Controller
-          name="transaction_type_id"
-          control={control}
-          rules={{ required: "Transaction type is required" }}
-          render={({ field }) => (
-            <div className="flex gap-2">
-              {transactionTypesStatus === "loading" ? (
-                <p>Loading transaction types...</p>
-              ) : transactionTypesStatus === "error" ? (
-                <p className="text-sm text-destructive-foreground">Failed to load transaction types</p>
-              ) : (
-                transactionTypes.slice(0, 2).map((type) => {
-                  const isActive = field.value === type.transaction_type_id;
+      <TypeComponent control={control} errors={errors} />
 
-                  return (
-                    <button
-                      key={type.transaction_type_id}
-                      type="button"
-                      onClick={() => field.onChange(type.transaction_type_id)}
-                      className={`flex-1 py-3 rounded-xl font-medium shadow-md transition-all
-                ${
-                  isActive && type.transaction_type_direction === "out"
-                    ? "bg-destructive/40 text-destructive-foreground border-destructive"
-                    : isActive && type.transaction_type_direction === "in"
-                      ? "bg-success/60 text-success-foreground border-success"
-                      : "bg-accent text-accent-foreground border-border hover:bg-secondary"
-                }`}
-                    >
-                      {type.transaction_type_name}
-                    </button>
-                  );
-                })
-              )}
-            </div>
-          )}
-        />
-        {errors.transaction_type_id && (
-          <p className="text-sm text-destructive-foreground flex items-center gap-1.5">
-            {/* <span className="inline-block w-1 h-1 rounded-full bg-destructive" /> */}
-            {errors.transaction_type_id.message}
-          </p>
-        )}
-      </div>
+      <AmountComponent
+        watch={watch}
+        errors={errors}
+        register={register}
+        defaultCurrency={defaultCurrency}
+        setValue={setValue}
+        dataForUpdate={dataForUpdate}
+      />
 
-      <div className="space-y-2">
-        <label className="text-sm font-medium">
-          Amount *
-          <div
-            className={`flex items-center justify-between gap-1 w-full h-16 p-2 font-semibold border rounded-xl 
-                  ${
-                    errors.transaction_amount
-                      ? "border-destructive focus:border-destructive"
-                      : // : "border-transparent focus:border-primary focus:bg-card"
-                        "focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  }
-                  `}
-          >
-            {/* Icon */}
-            <div className="w-10 text-lg flex justify-center text-muted-foreground">
-              {currenciesStatus === "error" ? null : (
-                <span>{currencies.find((c) => c.currency_id === selectedCurrency)?.currency_symbol || ""}</span>
-              )}
-            </div>
+      <SelectComponent<UserCategoryDB>
+        title="Category *"
+        error={errors.user_category_id}
+        selectorStatus={categoriesStatus}
+        labelKey="user_category_name"
+        valueKey="user_category_id"
+        selectOptions={categories}
+        registration={register("user_category_id", { valueAsNumber: true })}
+      />
 
-            {/* Input */}
-            <input
-              {...register("transaction_amount", { valueAsNumber: true })}
-              type="number"
-              min="0"
-              placeholder="0.00"
-              className={`w-full text-3xl h-16 pl-3 font-semibold`}
-            />
+      <SelectComponent<UserPaymentMethodDB>
+        title="Payment Method *"
+        error={errors.user_payment_method_id}
+        selectorStatus={paymentMethodsStatus}
+        labelKey="user_payment_method_name"
+        valueKey="user_payment_method_id"
+        selectOptions={paymentMethods}
+        registration={register("user_payment_method_id", { valueAsNumber: true })}
+      />
 
-            {/* Currency */}
-            <select
-              {...register("currency_id", { valueAsNumber: true })}
-              className={`
-                  
-                  h-10 px-2 pr-8 rounded-md bg-accent
-                  text-foreground border border-border text-sm
-                  focus:outline-none focus:ring-2 focus:ring-ring/50
-                `}
-            >
-              {currenciesStatus === "loading" ? (
-                <option>Loading...</option>
-              ) : currenciesStatus === "error" ? (
-                <option>Error loading currencies</option>
-              ) : (
-                currencies.map((currency) => {
-                  return (
-                    <option key={currency.currency_id} value={currency.currency_id}>
-                      {currency.currency_code}
-                    </option>
-                  );
-                })
-              )}
-            </select>
-          </div>
-        </label>
-        {/* <div className="flex justify-between"> */}
-        {errors.transaction_amount && (
-          <p className="text-sm text-destructive-foreground flex items-center gap-1.5 ">
-            {/* <span className="inline-block w-1 h-1 rounded-full bg-destructive" /> */}
-            {errors.transaction_amount.message}
-          </p>
-        )}
-        {selectedCurrency !== defaultCurrency?.currency_id && (
-          <p className="m-2  text-sm text-muted-foreground">
-            ≈ {calculatingAmountInBaseCurrency.baseAmount.toFixed(2)}{" "}
-            {defaultCurrency?.currency_symbol || defaultCurrency?.currency_code} {""}
-            <span className="text-xs opacity-70">
-              ( 1 {fullSelectedCurrency?.currency_symbol || fullSelectedCurrency?.currency_code} ={" "}
-              {calculatingAmountInBaseCurrency.rate.toFixed(3)}{" "}
-              {defaultCurrency?.currency_symbol || defaultCurrency?.currency_code})
-            </span>
-          </p>
-        )}
-        {/* </div> */}
-      </div>
+      <DateComponent errors={errors} register={register} />
 
-      {/* Category */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">
-          Category *
-          <select
-            {...register("user_category_id", { valueAsNumber: true })}
-            defaultValue=""
-            className={`w-full h-12 px-3 border rounded-xl
-                ${
-                  errors.user_category_id
-                    ? "border-destructive focus:border-destructive"
-                    : // : "border-transparent focus:border-primary focus:bg-card"
-                      "focus:outline-none focus:ring-2 focus:ring-blue-500"
-                }
-                  `}
-          >
-            <option value={""} disabled>
-              Select Category
-            </option>
-            {categoriesStatus === "loading" ? (
-              <option disabled>Loading categories..</option>
-            ) : categoriesStatus === "error" ? (
-              <option disabled>Failed to load categories</option>
-            ) : (
-              categories.map((category) => (
-                <option key={category.user_category_id} value={category.user_category_id}>
-                  {category.user_category_name}
-                </option>
-              ))
-            )}
-          </select>
-          {errors.user_category_id ? (
-            <p className="text-sm text-destructive-foreground">{errors.user_category_id.message}</p>
-          ) : null}
-        </label>
-      </div>
-      {/* </div> */}
+      <NotesComponent errors={errors} register={register} />
 
-      {/* Payment Method */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">
-          Payment Method
-          <select
-            {...register("user_payment_method_id", { valueAsNumber: true })}
-            defaultValue=""
-            className={`w-full h-12 px-3 border rounded-xl 
-                          ${
-                            errors.user_payment_method_id
-                              ? "border-destructive focus:border-destructive"
-                              : // : "border-transparent focus:border-primary focus:bg-card"
-                                " focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          }
-                        `}
-          >
-            <option value="" disabled>
-              Select Payment Method
-            </option>
-            {paymentMethodsStatus === "loading" ? (
-              <option>Loading payment methods...</option>
-            ) : paymentMethodsStatus === "error" ? (
-              <option>Failed to load payment methods</option>
-            ) : (
-              paymentMethods.map((method) => (
-                <option key={method.user_payment_method_id} value={method.user_payment_method_id}>
-                  {method.user_payment_method_name}
-                </option>
-              ))
-            )}
-          </select>
-          {errors.user_payment_method_id ? (
-            <p className="text-sm text-destructive-foreground">{errors.user_payment_method_id.message}</p>
-          ) : null}
-        </label>
-      </div>
-
-      {/* Date */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">
-          Date
-          <input
-            type="date"
-            {...register("date_of_transaction", { valueAsDate: true })}
-            className={`w-full h-12 px-3 border rounded-xl 
-                          ${
-                            errors.date_of_transaction
-                              ? "border-destructive focus:border-destructive"
-                              : // : "border-transparent focus:border-primary focus:bg-card"
-                                "focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          }
-                        `}
-          />
-          {errors.date_of_transaction && (
-            <p className="text-sm text-destructive-foreground">{errors.date_of_transaction.message}</p>
-          )}
-        </label>
-      </div>
-
-      {/* Notes */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">
-          Notes (optional)
-          <textarea
-            {...register("transaction_note")}
-            className="w-full h-20 px-3 py-2 border rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Add any additional notes..."
-          />
-          {errors.transaction_note && (
-            <p className="text-sm text-destructive-foreground flex items-center gap-1.5">
-              {/* <span className="inline-block w-1 h-1 rounded-full bg-destructive" /> */}
-              {errors.transaction_note.message}
-            </p>
-          )}
-        </label>
-      </div>
+      <AdvancedSettingsComponent />
     </ModalFormContainer>
   );
 };

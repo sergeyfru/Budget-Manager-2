@@ -56,11 +56,16 @@ export const transactionDBSchema = z.object({
   user_category_id: z.number(),
 
   transaction_amount: z.coerce.number("Amount is required").min(0.01, "Amount must be greater than 0"),
-  currency_id: z.number(),
+  // currency_id: z.number(),
+  transaction_currency_id: z.number(),
+  fx_rate_to_base: z.number(),
+  actual_base_amount: z.number(),
+  base_currency_id: z.number(),
 
-  date_of_transaction: z.coerce.date(),
+  // date_of_transaction: z.coerce.date(),
+  date_of_transaction: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   transaction_note: z.string().nullable(),
-
+  update_at_unix: z.number().int().nonnegative(),
   created_at: z.coerce.date(),
 });
 
@@ -75,8 +80,19 @@ export type TransactionDB = z.infer<typeof transactionDBSchema>;
 export const transactionDetailedSchema = z.object({
   transaction_id: z.number(),
   transaction_amount: z.coerce.number("Amount is required").min(0.01, "Amount must be greater than 0"),
-  date_of_transaction: z.coerce.date(),
+
+  fx_rate_to_base: z.coerce.number(),
+  actual_base_amount: z.coerce.number(),
+  base_currency_id: z.number(),
+  transaction_currency_id: z.number(),
+  transaction_type_id: z.number(),
+  user_category_id: z.number(),
+  user_payment_method_id: z.number(),
+  updated_at_unix: z.number().int().nonnegative(),
   transaction_note: z.string().nullable(),
+
+  // date_of_transaction: z.coerce.date(),
+  date_of_transaction: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 
   currency: currencyDBSchema,
   transaction_type: transactionTypeSchema,
@@ -104,18 +120,14 @@ export const createTransactionFormSchema = z.object({
   user_payment_method_id: z.number("Payment method is required"),
   user_category_id: z.number("Category is required"),
   transaction_amount: z.number("Amount is required").min(0.01, "Amount must be greater than 0"),
-  currency_id: z.number().min(1, "Currency is required"),
-  date_of_transaction: z.coerce.date(),
-  transaction_note: z.string().nullable(),
-});
+  // currency_id: z.number(),
 
-export const createTransactionFormSchema2 = z.object({
-  transaction_type_id: z.coerce.number("Transaction type is required").min(1, "Transaction type is required"),
-  user_payment_method_id: z.coerce.number("Payment method is required"),
-  user_category_id: z.coerce.number("Category is required"),
-  transaction_amount: z.coerce.number("Amount is required").min(0.01, "Amount must be greater than 0"),
-  currency_id: z.coerce.number().min(1, "Currency is required"),
-  date_of_transaction: z.coerce.date(),
+  transaction_currency_id: z.number().min(1, "Currency is required"),
+  fx_rate_to_base: z.number(),
+  actual_base_amount: z.number(),
+  base_currency_id: z.number(),
+  date_of_transaction: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  // date_of_transaction: z.coerce.date(),
   transaction_note: z.string().nullable(),
 });
 

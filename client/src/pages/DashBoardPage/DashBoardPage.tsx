@@ -21,9 +21,9 @@ const DashBoardPage = () => {
 
   const totalBalance = transactionStore.transactions.reduce((acc, transaction) => {
     if (transaction.transaction_type.direction === "in") {
-      return acc + transaction.transaction_amount;
+      return acc + transaction.actual_base_amount;
     } else if (transaction.transaction_type.direction === "out") {
-      return acc - transaction.transaction_amount;
+      return acc - transaction.actual_base_amount;
     } else {
       return acc;
     }
@@ -41,7 +41,7 @@ const DashBoardPage = () => {
       );
     });
   const monthlyExpenses = monthlyExpenseTransactions.reduce(
-    (acc, transaction) => acc + transaction.transaction_amount,
+    (acc, transaction) => acc + transaction.actual_base_amount,
     0,
   );
 
@@ -55,7 +55,7 @@ const DashBoardPage = () => {
         transactionDate.getFullYear() === currentDate.getFullYear()
       );
     });
-  const monthlyIncome = monthlyIncomeTransactions.reduce((acc, transaction) => acc + transaction.transaction_amount, 0);
+  const monthlyIncome = monthlyIncomeTransactions.reduce((acc, transaction) => acc + transaction.actual_base_amount, 0);
 
   const spendingsGrupedByCategory = monthlyExpenseTransactions.reduce(
     (acc, t) => {
@@ -70,11 +70,11 @@ const DashBoardPage = () => {
   );
   const spendingsSumByCategory = Object.entries(spendingsGrupedByCategory)
     .map(([category, transactions]) => {
-      const totalAmount = transactions.reduce((sum, t) => sum + t.transaction_amount, 0);
+      const totalAmount = transactions.reduce((sum, t) => sum + t.actual_base_amount, 0);
       return {
         category,
         user_category_color: transactions[0].user_category.color,
-        currency: transactions[0].currency.currency_symbol,
+        currency: symbol,
         totalAmount,
       };
     })

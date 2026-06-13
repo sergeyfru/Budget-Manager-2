@@ -6,6 +6,7 @@ import {
   generateAccessToken,
   generateRefreshToken,
   hashedRefreshToken,
+  maxAgeAccess,
   maxAgeRefresh,
 } from "../utils/token";
 import { sendPasswordResetEmail, sendVerificationEmail } from "../utils/emailSender";
@@ -109,10 +110,9 @@ export const register = async (newUser: ReqRegister): Promise<UserView> => {
         "created_at",
         "updated_at",
       ]);
-      const user = validateDB(userDBSchema,dbResponse)
+    const user = validateDB(userDBSchema, dbResponse);
     console.log("User created:", user);
-    
-    await trx("users_settings").insert({user_id:user.user_id})
+    await trx("users_settings").insert({ user_id: user.user_id });
 
     const salt = await bcrypt.genSalt(10);
     const password_hash = await bcrypt.hash(password, salt);
@@ -153,11 +153,12 @@ export const register = async (newUser: ReqRegister): Promise<UserView> => {
 
     const email_verification_token = generateRefreshToken();
     const token_hash = hashedRefreshToken(email_verification_token);
+    const expires_at = new Date(Date.now() + maxAgeAccess * 1000);
 
     await trx("email_verification_tokens").insert({
       user_id: user.user_id,
       token_hash,
-      expires_at: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes from now
+      expires_at,
     });
     console.log("Email verification token created for user:", user.user_id);
 
@@ -238,11 +239,13 @@ export const refresh = async (hashed_refresh_token: string): Promise<RefreshToke
 
     const newRefreshToken = generateRefreshToken();
     const hashedNewRefreshToken = hashedRefreshToken(newRefreshToken);
+    const expires_at = new Date(Date.now() + maxAgeRefresh * 1000);
+
     await trx("refresh_tokens").insert({
       hashed_refresh_token: hashedNewRefreshToken,
       user_id: dbResponse.user_id,
-      expires_at: new Date(Date.now() + 15 * 60 * 1000),
-      session_id: null,
+      expires_at,
+      session_id: dbResponse.session_id,
     });
     await trx("refresh_tokens").where({ token_id: dbResponse.token_id }).delete();
     console.log("New refresh token generated and old one deleted for user_id:", dbResponse.user_id);

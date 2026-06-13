@@ -99,7 +99,7 @@ export const colorOptions = [
   "#6366f1",
 ];
 
-export const BREAKPOINTS = {
+export const breakpoints = {
   sm: 640,
   md: 768,
   lg: 1024,

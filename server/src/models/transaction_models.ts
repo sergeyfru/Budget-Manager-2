@@ -59,19 +59,24 @@ export const addTransaction = async (
   transactionData: ReqCreateTransaction,
 ): Promise<TransactionDetailed> => {
   console.log("In models, adding transaction for user_id:", user_id);
+  const now = Math.floor(Date.now() / 1000);
+
   const trx = await db.transaction();
   try {
     const [newTransaction] = await trx("transactions")
-      .insert({  // insert transactionData as an object with the correct keys
-        user_id,
-        transaction_type_id: transactionData.transaction_type_id,
-        user_payment_method_id: transactionData.user_payment_method_id,
-        user_category_id: transactionData.user_category_id,
-        transaction_amount: transactionData.transaction_amount,
-        currency_id: transactionData.currency_id,
-        date_of_transaction: transactionData.date_of_transaction,
-        transaction_note: transactionData.transaction_note,
-      })
+      .insert(
+        { ...transactionData, user_id, updated_at_unix: now },
+        //   {  // insert transactionData as an object with the correct keys
+        //   user_id,
+        //   transaction_type_id: transactionData.transaction_type_id,
+        //   user_payment_method_id: transactionData.user_payment_method_id,
+        //   user_category_id: transactionData.user_category_id,
+        //   transaction_amount: transactionData.transaction_amount,
+        //   currency_id: transactionData.currency_id,
+        //   date_of_transaction: transactionData.date_of_transaction,
+        //   transaction_note: transactionData.transaction_note,
+        // }
+      )
       .returning(["transaction_id", "user_id"]);
 
     console.log("New transaction inserted with ID:", newTransaction.transaction_id);
@@ -97,20 +102,22 @@ export const updateTransaction = async (
   transaction_id: number,
   updatedTransactionData: ReqUpdateTransaction,
 ): Promise<TransactionDetailed> => {
-  console.log("In models, updating transaction for user_id:", user_id);
+  // console.log("In models, updating transaction for user_id:", user_id);
 
   const trx = await db.transaction();
   try {
-
-    const fieldsToUpdate = Object.fromEntries(Object.entries(updatedTransactionData).filter(([_, v]) => v !== undefined));
+    const fieldsToUpdate = Object.fromEntries(
+      Object.entries(updatedTransactionData).filter(([_, v]) => v !== undefined),
+    );
 
     if (Object.keys(fieldsToUpdate).length === 0) {
       throw new ApiError(400, "No fields to update");
     }
+    const now = Math.floor(Date.now() / 1000);
 
     await trx({ tr: "transactions" })
       .where({ "tr.user_id": user_id, "tr.transaction_id": transaction_id })
-      .update(fieldsToUpdate);
+      .update({ ...fieldsToUpdate, updated_at_unix: now });
 
     const responseFromDB = await getTransactionsQuery(trx).where("tr.transaction_id", transaction_id).first();
 

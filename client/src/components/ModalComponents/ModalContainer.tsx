@@ -9,7 +9,7 @@ interface ModalFormContainerProps {
   disabled: boolean;
   onSubmit?: React.FormEventHandler<HTMLFormElement>;
   buttonTitle?: string;
-  fullScrin?: boolean;
+  fullScreen?: boolean;
 }
 
 export const ModalFormContainer = ({
@@ -19,16 +19,16 @@ export const ModalFormContainer = ({
   disabled,
   onSubmit,
   buttonTitle,
-  fullScrin,
+  fullScreen,
 }: ModalFormContainerProps) => {
   return (
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center bg-foreground/50 backdrop-blur-sm p-3 sm:p-4 
-    ${!fullScrin && "pb-20 sm:pb-18 md:pb-20 lg:pb-4"}
+    ${!fullScreen && "pb-20 sm:pb-18 md:pb-20 lg:pb-4"}
     `}
     >
       <div
-        className={`w-full max-w-md ${fullScrin ? "max-h-[90vh]" : "max-h-[85vh]"} md:max-h-[90vh] overflow-y-auto rounded-2xl bg-card shadow-lg`}
+        className={`w-full max-w-md ${fullScreen ? "max-h-[90vh]" : "max-h-[85vh]"} md:max-h-[90vh] overflow-y-auto rounded-2xl bg-card shadow-lg`}
       >
         <ModalTitle title={title} closeModal={closeModal} />
         {onSubmit && (
